@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..r import Component
+    from .core import Component
 
 class VirtualDom:
     def __init__(self, app: Component):

@@ -1,4 +1,4 @@
-from .r import VComponent, VElement, VNode, VString
+from .core import VElement, VNode, VString
 from .scope import ElementId
 
 class Modification:
@@ -15,6 +15,18 @@ class ReplaceNode(Modification):
         super().__init__(id)
         self.node = node
 
+RemoveNode = Modification
+
+class CreateElement(Modification):
+    def __init__(self, node: VElement):
+        super().__init__(node.id)
+        self.node = node
+
+class CreateString(Modification):
+    def __init__(self, node: VString):
+        super().__init__(node.id)
+        self.node = node
+
 class Diff:
     def __init__(self, initial: VNode):
         self.current = initial
@@ -29,9 +41,19 @@ class Diff:
             case VElement() as before, VElement() as after:
                 self.diff_element_nodes(mutations, before, after)
 
-            case VString() | VComponent() | VElement() as before, VString() | VComponent() | VElement() as after:
+            case VElement() | VString() as before, None:
+                mutations.append(RemoveNode(before.id))
+
+            case None, VElement() as after:
+                mutations.append(CreateElement(after))
+
+            case None, VString() as after:
+                mutations.append(CreateString(after))
+
+            case VString() | VElement() as before, VString() | VElement() as after:
                 mutations.append(ReplaceNode(before.id, after))
 
+        self.current = next
         return mutations
 
     def diff_string_nodes(self, mutations: list[Modification], before: VString, after: VString):
@@ -48,5 +70,3 @@ class Diff:
         if before.tag != after.tag:
             mutations.append(ReplaceNode(before.id, after))
             return
-
-        

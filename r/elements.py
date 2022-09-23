@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TypedDict, Callable, TYPE_CHECKING
+from typing import Any, TypedDict, Callable, TYPE_CHECKING
 from typing_extensions import Self, Unpack
 
 from r.scope import ElementId
 
 if TYPE_CHECKING:
-    from .r import Node
+    from .core import Node
 
 __all__ = (
     "Element",
@@ -24,9 +24,11 @@ class ElementArgs(TypedDict, total=False):
 class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
         self.children: tuple[Node] = tuple()
-        self.handlers = {}
+        self.handlers: dict[str, Any] = {}
 
-        for name, value in attributes.items():
+        self.id: ElementId | None = None
+
+        for name, value in list(attributes.items()):
             if name.startswith("on"):
                 self.handlers[name] = value
                 del attributes[name]

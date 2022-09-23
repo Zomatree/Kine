@@ -1,14 +1,20 @@
 from typing import ParamSpec
 
-from r.scope import Scopes
-from ..r import Component, Node
+
+from .. import Scopes, Component, transform_node, set_ids
 
 P = ParamSpec("P")
 
 async def start(app: Component[P], *args: P.args, **kwargs: P.kwargs):
     scopes = Scopes()
 
-    cx = scopes.new_scope(None)
+    scope_id = scopes.new_scope(None)
+    cx = scopes.get_scope(scope_id)
+
     inital_tree = app(cx, *args, **kwargs)
 
-    diff = Diff(inital_tree)
+    set_ids(scopes, inital_tree)
+    vnode = transform_node(scopes, inital_tree)
+
+    print(vnode)
+    breakpoint()

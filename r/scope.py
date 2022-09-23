@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Coroutine, NewType, Optional, TypeVar, cast
+from typing import Any, Callable, Coroutine, Generic, NewType, Optional, TypeVar, cast
 import asyncio
 
 T = TypeVar("T")
@@ -10,6 +10,21 @@ V = TypeVar("V")
 ScopeId = NewType("ScopeId", int)
 TaskId = NewType("TaskId", tuple[int, ScopeId])
 ElementId = NewType("ElementId", int)
+
+class UseState(Generic[T]):
+    def __init__(self, scope: Scope, idx: int):
+        self.scope = scope
+        self.idx = idx
+
+    def get(self) -> T:
+        return self.scope.hooks[self.idx]
+
+    def set(self, value: T):
+        self.scope.hooks[self.idx] = value
+        self.scope.schedule_update()
+
+    def modify(self, func: Callable[[T], T]):
+        self.set(func(self.get()))
 
 class Scope:
     def __init__(self, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, scopes: Scopes):
@@ -27,7 +42,6 @@ class Scope:
         hook_len = len(self.hooks)
 
         if self.hook_idx >= hook_len:
-            print("Calling hook")
             self.hooks.append(f())
 
         value = self.hooks[self.hook_idx]
@@ -35,24 +49,17 @@ class Scope:
 
         return value
 
-    def use_state(self, value: T) -> tuple[Callable[[T], None], T]:
-        value = self.use_hook(lambda: value)
-        idx = self.hook_idx - 1
-
-        def update(value: T):
-            self.hooks[idx] = value
-            self.schedule_update()
-
-        return (update, value)
+    def use_state(self, value: T) -> UseState[T]:
+        return self.use_hook(lambda: UseState(self, self.hook_idx))
 
     def use_future(self, coro: Coroutine[Any, Any, T]) -> T | None:
         def hook():
             task = asyncio.create_task(coro)
             self.tasks.spawn(self.scope_id, task)
 
-            (set_result, _) = self.use_state(cast(None | T, None))
+            result = self.use_state(cast(None | T, None))
 
-            task.add_done_callback(lambda t: set_result(t.result()))
+            task.add_done_callback(lambda t: result.set(t.result()))
             return self.hook_idx - 1
 
         idx = self.use_hook(hook)
@@ -76,15 +83,13 @@ class Scope:
     def _reset(self):
         self.hook_idx = 0
 
-    def next_scope(self) -> Scope:
-        return self.scopes.new_scope(self.scope_id)
-
 class Scopes:
     def __init__(self):
         self.scopes: dict[ScopeId, Scope] = {}
         self.scope_id = ScopeId(0)
+        self.element_id = ElementId(0)
 
-    def new_scope(self, parent: Optional[ScopeId]) -> Scope:
+    def new_scope(self, parent: Optional[ScopeId]) -> ScopeId:
         scope_id = self.scope_id
         self.scope_id += 1
 
@@ -95,11 +100,19 @@ class Scopes:
 
         self.scopes[scope_id] = scope
 
-        return scope
+        return scope_id
 
     def remove_scope(self, id: int):
         ...
 
+    def get_scope(self, scope_id: ScopeId) -> Scope:
+        return self.scopes[scope_id]
+
+    def next_element_id(self) -> ElementId:
+        id = self.element_id
+        self.element_id = ElementId(self.element_id + 1)
+
+        return id
 
 class TaskQueue:
     def __init__(self):
