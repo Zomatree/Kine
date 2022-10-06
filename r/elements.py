@@ -23,7 +23,7 @@ class ElementArgs(TypedDict, total=False):
 
 class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
-        self.children: tuple[Node] = tuple()
+        self.children: tuple[Node[Any]] = tuple()
         self.listeners: dict[str, Callable[[Any], None]] = {}
 
         self.parent_id: ElementId | None = None
@@ -36,7 +36,7 @@ class Element:
 
         self.attributes = {k: str(v) for k, v in attributes.items()}
 
-    def __getitem__(self, children: Node | tuple[Node, ...]) -> Self:
+    def __getitem__(self, children: Node[...] | tuple[Node[...], ...]) -> Self:
         self.children = children if isinstance(children, tuple) else (children,)
         return self
 

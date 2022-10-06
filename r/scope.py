@@ -6,7 +6,7 @@ import asyncio
 from r.core import VElement
 
 if TYPE_CHECKING:
-    from .dom import EventMessage
+    from .dom import EventMessage, VirtualDom
     from .core import VNode
 
 T = TypeVar("T")
@@ -82,12 +82,14 @@ class Scope:
         return self.contexts[value_t]
 
     def schedule_update(self):
-        ...
+        self.scopes.dom.messages.put_nowait()
 
     def _reset(self):
         self.hook_idx = 0
 
 class Scopes:
+    dom: VirtualDom
+
     def __init__(self):
         self.scopes: dict[ScopeId, Scope] = {}
         self.scope_id = ScopeId(0)
@@ -108,8 +110,8 @@ class Scopes:
 
         return scope_id
 
-    def remove_scope(self, id: int):
-        ...
+    def remove_scope(self, id: ScopeId) -> Scope:
+        return self.scopes.pop(id)
 
     def get_scope(self, scope_id: ScopeId) -> Scope:
         return self.scopes[scope_id]
@@ -140,11 +142,9 @@ class Scopes:
             if isinstance(element, VElement):
                 for listener in element.listeners:
                     if listener.name == event.name:
-                        if cancelled:
-                            return
-
                         listener.func(event.data)
                         element_id = element.parent_id
+
 class TaskQueue:
     def __init__(self):
         self.tasks: dict[TaskId, asyncio.Task[Any]] = {}

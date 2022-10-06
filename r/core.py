@@ -7,7 +7,6 @@ from .elements import Element
 from .scope import ElementId, Scope, ScopeId, Scopes
 
 P = ParamSpec("P")
-C_P = ParamSpec("C_P")
 T = TypeVar("T")
 
 Component = Callable[Concatenate[Scope, P], "Node[P]"]
@@ -49,8 +48,8 @@ class VElement:
 VNode = Union[VString, VElement, None]
 
 class ComponentFunction(Generic[P]):
-    def __init__(self, func: Callable[Concatenate[Scope, P], Node[Any]]):
-        self.func = cast(Callable[[Scope], Node[Any]], func)
+    def __init__(self, func: Callable[Concatenate[Scope, P], Node[...]]):
+        self.func = cast(Callable[[Scope], Node[...]], func)
         self.id: ElementId | None = None
         self.scope_id: ScopeId | None = None
         self.parent_id: ElementId | None = None
@@ -66,13 +65,13 @@ class ComponentFunction(Generic[P]):
 
         return self
 
-    def _call(self, cx: Scope) -> Node[P]:
+    def _call(self, cx: Scope) -> Node[...]:
         if not self.invoked:
             raise Exception
 
         return self.func(cx, *self.args, **self.kwargs)
 
-def component(func: Callable[Concatenate[Scope, P], Node[C_P]]) -> ComponentFunction[P]:
+def component(func: Callable[Concatenate[Scope, P], Node[...]]) -> ComponentFunction[P]:
     return ComponentFunction(func)
 
 def set_ids(scopes: Scopes, node: Node[P], parent_id: ElementId | None = None):
@@ -90,7 +89,7 @@ def set_ids(scopes: Scopes, node: Node[P], parent_id: ElementId | None = None):
 
 # converts a Node into a VNode, presumes ids have already been set onto the nodes
 
-def transform_node(scopes: Scopes, node: Node) -> VNode:
+def transform_node(scopes: Scopes, node: Node[...]) -> VNode:
     if isinstance(node, String):
         assert node.id is not None
 
@@ -100,7 +99,7 @@ def transform_node(scopes: Scopes, node: Node) -> VNode:
     elif isinstance(node, Element):
         assert node.id is not None
 
-        nodes = []
+        nodes: list[VNode] = []
 
         for child in node.children:
             nodes.append(transform_node(scopes, child))

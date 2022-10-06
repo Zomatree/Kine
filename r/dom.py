@@ -3,12 +3,9 @@ from collections import deque
 from dataclasses import dataclass
 import asyncio
 
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar, cast
+from typing import Any, TypeAlias, TypeVar, cast
 
 from r.scope import ElementId, ScopeId, Scopes
-
-if TYPE_CHECKING:
-    from .core import Component
 
 T = TypeVar("T")
 
@@ -38,6 +35,8 @@ ScheduleMessage: TypeAlias = EventMessage | Immediate | DirtyAll | NewTask
 class VirtualDom:
     def __init__(self, scopes: Scopes):
         self.scopes = scopes
+        self.scopes.dom = self
+
         self.dirty_scopes = {ScopeId(0)}
         self.messages: asyncio.Queue[ScheduleMessage] = asyncio.Queue()
         self.pending_messages = deque[ScheduleMessage]()

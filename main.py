@@ -7,7 +7,7 @@ def text(cx: Scope, text: str) -> Element:
         String(text)
     ]
 
-def app(cx: Scope) -> Node[()]:
+def app(cx: Scope) -> Node[...]:
     foo = cx.use_state(1)
 
     return div(id="foo")[
