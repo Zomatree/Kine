@@ -1,3 +1,4 @@
+from typing_extensions import reveal_type
 from .core import VElement, VNode, VString
 from .scope import ElementId
 
@@ -33,6 +34,7 @@ class Diff:
 
     def diff(self, next: VNode) -> list[Modification]:
         mutations: list[Modification] = []
+        reveal_type((self.current, next))
 
         match self.current, next:
             case VString() as before, VString() as after:
@@ -50,8 +52,11 @@ class Diff:
             case None, VString() as after:
                 mutations.append(CreateString(after))
 
-            case VString() | VElement() as before, VString() | VElement() as after:
+            case (VString() | VElement()) as before, (VString() | VElement()) as after:
                 mutations.append(ReplaceNode(before.id, after))
+
+            case None, None:
+                pass
 
         self.current = next
         return mutations
@@ -70,3 +75,4 @@ class Diff:
         if before.tag != after.tag:
             mutations.append(ReplaceNode(before.id, after))
             return
+

@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Coroutine, Generic, NewType, Optional, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, NewType, Optional, TypeVar, cast
 import asyncio
 
+from r.core import VElement
+
+if TYPE_CHECKING:
+    from .dom import EventMessage
+    from .core import VNode
+
 T = TypeVar("T")
-U = TypeVar("U")
-V = TypeVar("V")
 
 ScopeId = NewType("ScopeId", int)
 TaskId = NewType("TaskId", tuple[int, ScopeId])
@@ -32,11 +36,10 @@ class Scope:
         self.parent_scope = parent_scope
         self.height = height
         self.scopes = scopes
-        self.contexts = {}
+        self.contexts: dict[Any, Any] = {}
 
         self.hooks: list[Any] = []
         self.hook_idx = 0
-        self.tasks = TaskQueue()
 
     def use_hook(self, f: Callable[[], T]) -> T:
         hook_len = len(self.hooks)
@@ -50,12 +53,13 @@ class Scope:
         return value
 
     def use_state(self, value: T) -> UseState[T]:
-        return self.use_hook(lambda: UseState(self, self.hook_idx))
+        self.hooks[self.hook_idx] = value
+        return self.use_hook(lambda: UseState[T](self, self.hook_idx))
 
     def use_future(self, coro: Coroutine[Any, Any, T]) -> T | None:
         def hook():
             task = asyncio.create_task(coro)
-            self.tasks.spawn(self.scope_id, task)
+            self.scopes.tasks.spawn(self.scope_id, task)
 
             result = self.use_state(cast(None | T, None))
 
@@ -88,6 +92,8 @@ class Scopes:
         self.scopes: dict[ScopeId, Scope] = {}
         self.scope_id = ScopeId(0)
         self.element_id = ElementId(0)
+        self.tasks = TaskQueue()
+        self.nodes: list[VNode] = []
 
     def new_scope(self, parent: Optional[ScopeId]) -> ScopeId:
         scope_id = self.scope_id
@@ -114,13 +120,38 @@ class Scopes:
 
         return id
 
+    def reverse_node(self, node: VNode) -> ElementId:
+        next_id = ElementId(len(self.nodes))
+        self.nodes.append(node)
+        return next_id
+
+    def update_node(self, node: VNode, id: ElementId):
+        self.nodes[id] = node
+
+    def remove_node(self, id: ElementId):
+        del self.nodes[id]
+
+    def call_listener_with_bubbling(self, event: EventMessage):
+        element_id = event.element_id
+
+        while element_id := element_id:
+            element = self.nodes[element_id]
+
+            if isinstance(element, VElement):
+                for listener in element.listeners:
+                    if listener.name == event.name:
+                        if cancelled:
+                            return
+
+                        listener.func(event.data)
+                        element_id = element.parent_id
 class TaskQueue:
     def __init__(self):
-        self.tasks: dict[TaskId, asyncio.Task] = {}
+        self.tasks: dict[TaskId, asyncio.Task[Any]] = {}
         self.task_map: dict[ScopeId, set[TaskId]] = {}
         self.current_task_id = 0
 
-    def spawn(self, scope_id: ScopeId, task: asyncio.Task) -> TaskId:
+    def spawn(self, scope_id: ScopeId, task: asyncio.Task[Any]) -> TaskId:
         task_id = TaskId((self.current_task_id, scope_id))
         self.current_task_id += 1
 

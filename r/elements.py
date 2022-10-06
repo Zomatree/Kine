@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, TypedDict, Callable, TYPE_CHECKING
+from typing import Any, TypedDict, Callable, TYPE_CHECKING, cast
 from typing_extensions import Self, Unpack
 
 from r.scope import ElementId
@@ -19,18 +19,19 @@ class ElementArgs(TypedDict, total=False):
     id: str
     cls: str
 
-    onclick: Callable[[dict], None]
+    onclick: Callable[[Any], None]
 
 class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
         self.children: tuple[Node] = tuple()
-        self.handlers: dict[str, Any] = {}
+        self.listeners: dict[str, Callable[[Any], None]] = {}
 
+        self.parent_id: ElementId | None = None
         self.id: ElementId | None = None
 
         for name, value in list(attributes.items()):
             if name.startswith("on"):
-                self.handlers[name] = value
+                self.listeners[name] = cast(Callable[[Any], None], value)
                 del attributes[name]
 
         self.attributes = {k: str(v) for k, v in attributes.items()}
