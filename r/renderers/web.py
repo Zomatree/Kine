@@ -51,7 +51,7 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
   <body>
     <div id="main"></div>
     <script>
-      var WS_ADDR = "ws://{addr}/app";
+      var WS_ADDR = "wss://{addr}/app";
       {interpreter}
       main();
     </script>

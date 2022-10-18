@@ -36,7 +36,12 @@ class VElement:
         self.attributes = attributes
         self.listeners = listeners
 
-VNode = Union[VString, VElement, None]
+class VPlaceholder:
+    def __init__(self, id: ElementId, parent_id: ElementId | None):
+        self.id = id
+        self.parent_id = parent_id
+
+VNode = Union[VString, VElement, VPlaceholder]
 
 class ComponentFunction(Generic[P]):
     def __init__(self, func: Callable[Concatenate[Scope, P], VNode]):

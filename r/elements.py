@@ -15,6 +15,7 @@ __all__ = (
     "div",
     "p",
     "button",
+    "marquee",
     "String"
 )
 
@@ -56,6 +57,9 @@ class p(Element):
     pass
 
 class button(Element):
+    pass
+
+class marquee(Element):
     pass
 
 class String(UserString):

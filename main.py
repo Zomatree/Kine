@@ -26,7 +26,10 @@ def app(cx: Scope):
             )[
                 String(cx, "Minus")
             ],
+            marquee(cx)[
+                String(cx, "I have large cock")
+            ]
         ]
     )
 
-asyncio.run(web.start(app))
+asyncio.run(web.start(app, addr="zomatree-r-q955j7vq49gf49qr-8080.githubpreview.dev"))

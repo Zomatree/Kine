@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, cast
 
 from .core import (ComponentFunction, Element, Listener, VElement, VNode,
                    VString)
@@ -69,15 +69,15 @@ class Scope:
 
     def wip_frame(self) -> VNode:
         if self.generation & 1 == 0:
-            return self.frames[0]
+            return cast(VNode, self.frames[0])
         else:
-            return self.frames[1]
+            return cast(VNode, self.frames[1])
 
     def fin_frame(self) -> VNode:
         if self.generation & 1 == 1:
-            return self.frames[0]
+            return cast(VNode, self.frames[0])
         else:
-            return self.frames[1]
+            return cast(VNode, self.frames[1])
 
     def set_wip_frame(self, node: VNode):
         if self.generation & 1 == 0:
@@ -120,7 +120,7 @@ class Scope:
 
         elif isinstance(node, ComponentFunction):
             return node.call()
-
+        elif node is 
     def _reset(self):
         self.hook_idx = 0
         self.parent_scope = None

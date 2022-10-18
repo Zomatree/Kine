@@ -153,16 +153,16 @@ class Diff:
         self.scopes.update_node(new, old.id)
 
     def replace_node(self, old: VNode, new: VNode):
-        created = self.create_node(new)
+        created = self.create_node(new, old.id)
         self.replace_inner(old, created)
 
-    def create_node(self, node: VNode) -> int:
-        match node:
-            case VString() as node:
-                return self.create_string_node(node)
-            case VElement() as node:
-                return self.create_element_node(node)
-            case _:
+    def create_node(self, node: VNode, id: ElementId | None) -> int:
+        match node, id:
+            case VString() as node, int() as id:
+                return self.create_string_node(node, id)
+            case VElement() as node, int() as id:
+                return self.create_element_node(node, id)
+            case _, _:
                 return 0
 
     def replace_inner(self, node: VNode, created: int):
@@ -197,25 +197,25 @@ class Diff:
                 case _:
                     pass
 
-    def create_string_node(self, node: VString) -> int:
-        self.scopes.update_node(node, node.id)
+    def create_string_node(self, node: VString, id: ElementId) -> int:
+        self.scopes.update_node(node, id)
 
-        self.mutations.append(CreateTextNode(node.id, node.data))
+        self.mutations.append(CreateTextNode(id, node.data))
         return 1
 
-    def create_element_node(self, node: VElement) -> int:
-        self.scopes.update_node(node, node.id)
+    def create_element_node(self, node: VElement, id: ElementId) -> int:
+        self.scopes.update_node(node, id)
         node.parent_id = self.element_stack[-1]
-        self.element_stack.append(node.id)
-        self.mutations.append(CreateElement(node.id, node.tag))
+        self.element_stack.append(id)
+        self.mutations.append(CreateElement(id, node.tag))
 
         scope_id = self.current_scope()
 
         for listener in node.listeners:
-            self.mutations.append(NewEventListener(listener.name, scope_id, node.id))
+            self.mutations.append(NewEventListener(listener.name, scope_id, id))
 
         for key, value in node.attributes.values():
-            self.mutations.append(SetAttribute(node.id, key, value))
+            self.mutations.append(SetAttribute(id, key, value))
 
         if children := node.children:
             self.create_and_append_children(children)
@@ -230,7 +230,7 @@ class Diff:
 
     def create_children(self, nodes: list[VNode]) -> int:
         for node in nodes:
-            self.create_node(node)
+            self.create_node(node, node.id)
 
         return len(nodes)
 
