@@ -1,34 +1,25 @@
 from __future__ import annotations
+
 from collections import UserString
+from typing import (TYPE_CHECKING, Any, Callable, Concatenate, Generic,
+                    ParamSpec, TypeVar, Union, cast)
 
-from typing import Any, Callable, Concatenate, Generic, ParamSpec, TypeVar, Union, cast
+from .elements import Element, String
 
-from .elements import Element
-from .scope import ElementId, Scope, ScopeId, Scopes
+if TYPE_CHECKING:
+    from .scope import Scope
+    from .utils import ElementId, ScopeId
 
 P = ParamSpec("P")
 T = TypeVar("T")
 
-Component = Callable[Concatenate[Scope, P], "Node[P]"]
-Node = Union["String", Element, "ComponentFunction[P]", None]
-Nodes = list[Node[P]]
+__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes")
 
 class Listener:
     def __init__(self, name: str, func: Callable[[Any], None], element_id: ElementId):
         self.name = name
         self.func = func
         self.element_id = element_id
-
-class String(str):
-    id: ElementId | None
-    parent_id: ElementId | None
-
-    def __new__(cls, v: Any):
-        self = super().__new__(cls, v)
-        self.id = None
-        self.parent_id = None
-
-        return self
 
 class VString(UserString):
     def __init__(self, id: ElementId, parent_id: ElementId | None, value: str):
@@ -48,8 +39,9 @@ class VElement:
 VNode = Union[VString, VElement, None]
 
 class ComponentFunction(Generic[P]):
-    def __init__(self, func: Callable[Concatenate[Scope, P], Node[...]]):
-        self.func = cast(Callable[[Scope], Node[...]], func)
+    def __init__(self, func: Callable[Concatenate[Scope, P], VNode]):
+        self.func = cast("Callable[[Scope], VNode]", func)
+        self.scope: Scope | None = None
         self.id: ElementId | None = None
         self.scope_id: ScopeId | None = None
         self.parent_id: ElementId | None = None
@@ -58,70 +50,27 @@ class ComponentFunction(Generic[P]):
         self.args: tuple[Any, ...] = ()
         self.kwargs: dict[Any, Any] = {}
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs):
+    def __call__(self, scope: Scope, *args: P.args, **kwargs: P.kwargs):
         self.invoked = True
+
+        self.scope = scope
+        self.scope.component = self
+
         self.args = args
         self.kwargs = kwargs
 
         return self
 
-    def _call(self, cx: Scope) -> Node[...]:
+    def call(self) -> VNode:
         if not self.invoked:
             raise Exception
 
-        return self.func(cx, *self.args, **self.kwargs)
+        return self.func(cast("Scope", self.scope), *self.args, **self.kwargs)
 
-def component(func: Callable[Concatenate[Scope, P], Node[...]]) -> ComponentFunction[P]:
+def component(func: Callable[Concatenate[Scope, P], VNode]) -> ComponentFunction[P]:
     return ComponentFunction(func)
 
-def set_ids(scopes: Scopes, node: Node[P], parent_id: ElementId | None = None):
-    if node and not node.id:
-        node.id = scopes.next_element_id()
 
-    if isinstance(node, String):
-        node.parent_id = parent_id
-
-    if isinstance(node, Element):
-        node.parent_id = parent_id
-
-        for child in node.children:
-            set_ids(scopes, child, node.id)
-
-# converts a Node into a VNode, presumes ids have already been set onto the nodes
-
-def transform_node(scopes: Scopes, node: Node[...]) -> VNode:
-    if isinstance(node, String):
-        assert node.id is not None
-
-        vnode = VString(node.id, None, str(node))
-        return vnode
-
-    elif isinstance(node, Element):
-        assert node.id is not None
-
-        nodes: list[VNode] = []
-
-        for child in node.children:
-            nodes.append(transform_node(scopes, child))
-
-        vnode = VElement(
-            node.id,
-            node.parent_id,
-            node.__class__.__name__,
-            nodes,
-            node.attributes,
-            [Listener(name, func, node.id) for name, func in node.listeners.items()]
-        )
-
-        return vnode
-
-    elif isinstance(node, ComponentFunction):
-        if not node.scope_id:
-            node.scope_id = scopes.new_scope(None)  # todo: parent scope
-
-        cx = scopes.get_scope(node.scope_id)
-
-        child = node._call(cx)
-        set_ids(scopes, child)
-
-        return transform_node(scopes, child)
+Component = Callable[Concatenate["Scope", P], "VNode"]
+Node = Union[String, Element, ComponentFunction[P], None]
+Nodes = list[Node[P]]

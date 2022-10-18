@@ -1,47 +1,38 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, NewType, Optional, TypeVar, cast
 import asyncio
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar
 
-from r.core import VElement
+from .core import (ComponentFunction, Element, Listener, VElement, VNode,
+                   VString)
+from .dom import EventMessage, Immediate
+from .elements import Element, String
+from .utils import ElementId, ScopeId, TaskId
 
 if TYPE_CHECKING:
-    from .dom import EventMessage, VirtualDom
-    from .core import VNode
+    from .core import Node, P, VNode
+    from .dom import VirtualDom
+
+__all__ = ("Scope", "Scopes", "TaskQueue")
 
 T = TypeVar("T")
 
-ScopeId = NewType("ScopeId", int)
-TaskId = NewType("TaskId", tuple[int, ScopeId])
-ElementId = NewType("ElementId", int)
-
-class UseState(Generic[T]):
-    def __init__(self, scope: Scope, idx: int):
-        self.scope = scope
-        self.idx = idx
-
-    def get(self) -> T:
-        return self.scope.hooks[self.idx]
-
-    def set(self, value: T):
-        self.scope.hooks[self.idx] = value
-        self.scope.schedule_update()
-
-    def modify(self, func: Callable[[T], T]):
-        self.set(func(self.get()))
 
 class Scope:
-    def __init__(self, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, scopes: Scopes):
+    def __init__(self, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, container: ElementId, scopes: Scopes):
         self.scope_id = scope_id
         self.parent_scope = parent_scope
+        self.component: ComponentFunction[...] | None = None
         self.height = height
+        self.container = container
         self.scopes = scopes
         self.contexts: dict[Any, Any] = {}
-
+        self.generation = 0
+        self.frames: tuple[Optional[VNode], Optional[VNode]] = (None, None)
         self.hooks: list[Any] = []
         self.hook_idx = 0
 
-    def use_hook(self, f: Callable[[], T]) -> T:
+    def use_hook(self: Scope, f: Callable[[], T]) -> T:
         hook_len = len(self.hooks)
 
         if self.hook_idx >= hook_len:
@@ -52,59 +43,113 @@ class Scope:
 
         return value
 
-    def use_state(self, value: T) -> UseState[T]:
-        self.hooks[self.hook_idx] = value
-        return self.use_hook(lambda: UseState[T](self, self.hook_idx))
+    def provide_context(self, value: T) -> T:
+        # lets just hope users dont use specialforms
 
-    def use_future(self, coro: Coroutine[Any, Any, T]) -> T | None:
-        def hook():
-            task = asyncio.create_task(coro)
-            self.scopes.tasks.spawn(self.scope_id, task)
-
-            result = self.use_state(cast(None | T, None))
-
-            task.add_done_callback(lambda t: result.set(t.result()))
-            return self.hook_idx - 1
-
-        idx = self.use_hook(hook)
-
-        return self.hooks[idx]
-
-    def provide_context(self, value: T, ty: type[T] | None = None):
-        if not ty:
-            ty = type(value)
-
-        self.contexts[ty] = value
+        self.contexts[type(value)] = value
 
         return value
 
     def consume_context(self, value_t: type[T]) -> T:
-        return self.contexts[value_t]
+        try:
+            return self.contexts[value_t]
+        except IndexError:
+            parent_scope = self.parent_scope
+
+            while parent_scope:
+                try:
+                    return parent_scope.contexts[value_t]
+                except IndexError:
+                    parent_scope = parent_scope.parent_scope
+
+            raise IndexError from None
 
     def schedule_update(self):
-        self.scopes.dom.messages.put_nowait()
+        self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
+
+    def wip_frame(self) -> VNode:
+        if self.generation & 1 == 0:
+            return self.frames[0]
+        else:
+            return self.frames[1]
+
+    def fin_frame(self) -> VNode:
+        if self.generation & 1 == 1:
+            return self.frames[0]
+        else:
+            return self.frames[1]
+
+    def set_wip_frame(self, node: VNode):
+        if self.generation & 1 == 0:
+            self.frames = (node, self.frames[0])
+        else:
+            self.frames = (self.frames[1], node)
+
+    def set_fin_frame(self, node: VNode):
+        if self.generation & 1 == 1:
+            self.frames = (node, self.frames[0])
+        else:
+            self.frames = (self.frames[1], node)
+
+    def next_frame(self):
+        self.generation += 1
+
+    def render(self, node: Node[P]) -> VNode:
+        if isinstance(node, String):
+            vnode = VString(node.id, node.parent_id, str(node))
+            return vnode
+
+        elif isinstance(node, Element):
+            assert node.id is not None
+
+            nodes: list[VNode] = []
+
+            vnode = VElement(
+                node.id,
+                node.parent_id,
+                node.__class__.__name__,
+                nodes,
+                node.attributes,
+                [Listener(name, func, node.id) for name, func in node.listeners.items()]
+            )
+
+            for child in node.children:
+                nodes.append(self.render(child))
+
+            return vnode
+
+        elif isinstance(node, ComponentFunction):
+            return node.call()
 
     def _reset(self):
         self.hook_idx = 0
+        self.parent_scope = None
+        self.generation = 0
+        self.contexts.clear()
 
 class Scopes:
     dom: VirtualDom
 
-    def __init__(self):
+    def __init__(self, app: ComponentFunction[...]):
         self.scopes: dict[ScopeId, Scope] = {}
         self.scope_id = ScopeId(0)
         self.element_id = ElementId(0)
         self.tasks = TaskQueue()
-        self.nodes: list[VNode] = []
+        self.root = VElement(self.next_element_id(), None, "div", [], {}, [])
+        self.nodes: dict[ElementId, VNode] = {self.root.id: self.root}
 
-    def new_scope(self, parent: Optional[ScopeId]) -> ScopeId:
+        scope_id = self.new_scope(None, ElementId(0))
+        scope = self.get_scope(scope_id)
+        scope.component = app(scope)
+
+    def new_scope(self, parent: Optional[ScopeId], container: ElementId) -> ScopeId:
         scope_id = self.scope_id
         self.scope_id += 1
 
         height = parent + 1 if parent else 0
         parent_scope = self.scopes[parent] if parent else None
 
-        scope = Scope(scope_id, parent_scope, height, self)
+        scope = Scope(scope_id, parent_scope, height, container, self)
 
         self.scopes[scope_id] = scope
 
@@ -122,11 +167,6 @@ class Scopes:
 
         return id
 
-    def reverse_node(self, node: VNode) -> ElementId:
-        next_id = ElementId(len(self.nodes))
-        self.nodes.append(node)
-        return next_id
-
     def update_node(self, node: VNode, id: ElementId):
         self.nodes[id] = node
 
@@ -134,16 +174,35 @@ class Scopes:
         del self.nodes[id]
 
     def call_listener_with_bubbling(self, event: EventMessage):
+        print(event)
         element_id = event.element_id
 
         while element_id := element_id:
             element = self.nodes[element_id]
 
+            if not element:
+                break
+
             if isinstance(element, VElement):
                 for listener in element.listeners:
                     if listener.name == event.name:
                         listener.func(event.data)
-                        element_id = element.parent_id
+
+            element_id = element.parent_id
+
+    def run_scope(self, scope_id: ScopeId):
+        scope = self.get_scope(scope_id)
+        scope.hook_idx = 0
+
+        if not scope.component:
+            raise
+
+        if node := scope.component.call():
+            scope.set_wip_frame(node)
+        else:
+            scope.set_wip_frame(None)
+
+        scope.next_frame()
 
 class TaskQueue:
     def __init__(self):

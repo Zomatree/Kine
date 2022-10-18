@@ -1,27 +1,32 @@
-from r import *
 import asyncio
+import logging
+from typing import TypeVar
+
+from r import *
+
+logging.basicConfig(level=logging.INFO)
+
+T = TypeVar("T")
 
 @component
-def text(cx: Scope, text: str) -> Element:
-    return p()[
-        String(text)
-    ]
+def app(cx: Scope):
+    foo = use_state(cx, 1)
+    print(foo, foo.get())
 
-def app(cx: Scope) -> Node[...]:
-    foo = cx.use_state(1)
-
-    return div(id="foo")[
-        text(str(foo)),
-        button(
-            onclick=lambda _: foo.modify(lambda v: v + 1)
-        )[
-            String("Add")
-        ],
-        button(
-            onclick=lambda _: foo.modify(lambda v: v - 1)
-        )[
-            String("Minus")
+    return cx.render(
+        div(cx)[
+            String(cx, f"Current value: {foo.get()}"),
+            button(cx,
+                onclick=lambda _: foo.modify(lambda v: v + 1)
+            )[
+                String(cx, "Add")
+            ],
+            button(cx,
+                onclick=lambda _: foo.modify(lambda v: v - 1)
+            )[
+                String(cx, "Minus")
+            ],
         ]
-    ]
+    )
 
 asyncio.run(web.start(app))

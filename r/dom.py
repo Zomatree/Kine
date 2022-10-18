@@ -1,40 +1,23 @@
 from __future__ import annotations
-from collections import deque
-from dataclasses import dataclass
+
 import asyncio
+from collections import deque
+from typing import Callable, TypeVar, cast
 
-from typing import Any, TypeAlias, TypeVar, cast
+from r.core import ComponentFunction
 
-from r.scope import ElementId, ScopeId, Scopes
+from .diff import AppendChildren, Diff, Mutations
+from .messages import (DirtyAll, EventMessage, Immediate, NewTask,
+                       ScheduleMessage)
+from .scope import Scopes
+from .utils import ElementId, ScopeId
 
 T = TypeVar("T")
 
-@dataclass
-class EventMessage:
-    scope_id: ScopeId | None
-    priority: int
-    element_id: ElementId | None
-    name: str
-    bubbles: bool
-    data: Any
-
-@dataclass
-class Immediate:
-    scope_id: ScopeId
-
-@dataclass
-class DirtyAll:
-    pass
-
-@dataclass
-class NewTask:
-    scope_id: ScopeId
-
-ScheduleMessage: TypeAlias = EventMessage | Immediate | DirtyAll | NewTask
 
 class VirtualDom:
-    def __init__(self, scopes: Scopes):
-        self.scopes = scopes
+    def __init__(self, app: ComponentFunction[...]):
+        self.scopes = Scopes(app)
         self.scopes.dom = self
 
         self.dirty_scopes = {ScopeId(0)}
@@ -100,3 +83,56 @@ class VirtualDom:
             case DirtyAll():
                 for id in self.scopes.scopes:
                     self.dirty_scopes.add(id)
+
+    def handle_message(self, message: ScheduleMessage):
+        self.messages.put_nowait(message)
+        self.process_all_messages()
+
+    def rebuild(self):
+        scope_id = ScopeId(0)
+
+        diff_state = Diff(self.scopes)
+        self.scopes.run_scope(scope_id)
+
+        diff_state.element_stack.append(ElementId(0))
+        diff_state.scope_stack.append(scope_id)
+
+        node = self.scopes.get_scope(scope_id).fin_frame()
+        created = diff_state.create_node(node)
+
+        diff_state.mutations.append(AppendChildren(created))
+
+        return diff_state.mutations
+
+    def work_with_deadline(self, deadline: Callable[[], bool]) -> list[Mutations]:
+        mutations: list[Mutations] = []
+
+        while self.dirty_scopes:
+            diff = Diff(self.scopes)
+            ran_scopes: set[ScopeId] = set()
+
+            self.dirty_scopes = {scope_id for scope_id in self.dirty_scopes if scope_id in self.scopes.scopes}
+
+            self.dirty_scopes = set(sorted(self.dirty_scopes, reverse=True))
+
+            if self.dirty_scopes:
+                scope_id = self.dirty_scopes.pop()
+
+                if scope_id not in ran_scopes:
+                    ran_scopes.add(scope_id)
+
+                    self.scopes.run_scope(scope_id)
+                    diff.diff_scope(scope_id)
+
+                    for dirty_scope_id in diff.mutations.dirty_scopes:
+                        try:
+                            self.dirty_scopes.remove(dirty_scope_id)
+                        except KeyError:
+                            pass
+
+                    if diff.mutations.modifications:
+                        mutations.append(diff.mutations)
+
+                    # todo: more stuff
+
+        return mutations

@@ -1,25 +1,17 @@
 from typing import ParamSpec
 
-from r.core import VNode
-
-
-from .. import Scopes, Component, transform_node, set_ids
+from r.core import ComponentFunction, VNode
+from r.dom import VirtualDom
+from r.utils import ScopeId
 
 P = ParamSpec("P")
 
 def transform_vnode(node: VNode) -> str:
     ...
 
-async def start(app: Component[P], *args: P.args, **kwargs: P.kwargs):
-    scopes = Scopes()
+async def start(app: ComponentFunction[P], *args: P.args, **kwargs: P.kwargs):
 
-    scope_id = scopes.new_scope(None)
-    cx = scopes.get_scope(scope_id)
+    dom = VirtualDom(app)
+    mutations = dom.rebuild()
 
-    inital_tree = app(cx, *args, **kwargs)
-
-    set_ids(scopes, inital_tree)
-
-    vnode = transform_node(scopes, inital_tree)
-
-    while True:
+    dom.scopes.run_scope(ScopeId(0))
