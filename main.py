@@ -1,35 +1,29 @@
 import asyncio
 import logging
-from typing import TypeVar
 
 from r import *
 
 logging.basicConfig(level=logging.INFO)
 
-T = TypeVar("T")
 
 @component
 def app(cx: Scope):
-    foo = use_state(cx, 1)
-    print(foo, foo.get())
+    name = use_state(cx, lambda: "")
+    clicked = use_state(cx, lambda: False)
 
     return cx.render(
-        div(cx)[
-            String(cx, f"Current value: {foo.get()}"),
-            button(cx,
-                onclick=lambda _: foo.modify(lambda v: v + 1)
+        div()[
+            input(
+                type="text",
+                oninput=lambda evt: name.set(evt["value"])
+            ),
+            button(
+                onclick=lambda _: clicked.modify(lambda v: not v)
             )[
-                String(cx, "Add")
+                "Enter"
             ],
-            button(cx,
-                onclick=lambda _: foo.modify(lambda v: v - 1)
-            )[
-                String(cx, "Minus")
-            ],
-            marquee(cx)[
-                String(cx, "I have large cock")
-            ]
+            p()[f"hello {name.get()}"] if clicked.get() else None
         ]
     )
 
-asyncio.run(web.start(app, addr="zomatree-r-q955j7vq49gf49qr-8080.githubpreview.dev"))
+asyncio.run(web.start(app))

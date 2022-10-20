@@ -4,7 +4,7 @@ from typing import Any, Awaitable, ParamSpec, cast
 
 from aiohttp import web
 
-from .. import ComponentFunction, messages, utils
+from .. import ComponentFunction, messages
 from ..dom import VirtualDom
 
 P = ParamSpec("P")
@@ -45,17 +45,17 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
         return web.Response(body=f"""
 <!DOCTYPE html>
 <html>
-  <head>
-    {headers}
-  </head>
-  <body>
-    <div id="main"></div>
-    <script>
-      var WS_ADDR = "wss://{addr}/app";
-      {interpreter}
-      main();
-    </script>
-  </body>
+    <head>
+        {headers}
+    </head>
+    <body>
+        <div id="main"></div>
+        <script>
+        var WS_ADDR = "ws://{addr}/app";
+        {interpreter}
+        main();
+        </script>
+    </body>
 </html>""", content_type="text/html")
 
     web_app.add_routes([web.get("/app", ws_handle), web.get("/", index)])

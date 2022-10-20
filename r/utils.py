@@ -17,7 +17,6 @@ async def select(*futures: Future[T]) -> tuple[int, T]:
 
         new_futures.append(asyncio.ensure_future(wrapper()))
 
-    print(new_futures)
     (task,), _ = await asyncio.wait(new_futures, return_when=asyncio.FIRST_COMPLETED)
 
     return task.result()

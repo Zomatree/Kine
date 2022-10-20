@@ -12,15 +12,15 @@ __all__ = ("use_state", "use_future", "UseState")
 
 T = TypeVar("T")
 
-def use_state(cx: Scope, value: T) -> UseState[T]:
-    return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, value))
+def use_state(cx: Scope, value: Callable[[], T]) -> UseState[T]:
+    return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, value()))
 
 def use_future(cx: Scope, coro: Coroutine[Any, Any, T]) -> T | None:
     def hook():
         task = asyncio.create_task(coro)
         cx.scopes.tasks.spawn(cx.scope_id, task)
 
-        result = use_state(cx, cast(None | T, None))
+        result = use_state(cx, lambda: cast(None | T, None))
 
         task.add_done_callback(lambda t: result.set(t.result()))
         return cx.hook_idx - 1

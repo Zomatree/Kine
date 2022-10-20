@@ -94,13 +94,17 @@ class VirtualDom:
         diff_state = Diff(self.scopes)
         self.scopes.run_scope(scope_id)
 
-        diff_state.element_stack.append(ElementId(0))
         diff_state.scope_stack.append(scope_id)
 
         node = self.scopes.get_scope(scope_id).fin_frame()
-        created = diff_state.create_node(node)
+        created: list[ElementId] = []
+        root_id = cast(ElementId, self.scopes.root.id)
 
-        diff_state.mutations.append(AppendChildren(created))
+        diff_state.create_node(root_id, node, created)
+
+        diff_state.mutations.append(AppendChildren(root_id, created))
+
+        self.dirty_scopes.clear()
 
         return diff_state.mutations
 
@@ -122,7 +126,7 @@ class VirtualDom:
                     ran_scopes.add(scope_id)
 
                     self.scopes.run_scope(scope_id)
-                    diff.diff_scope(scope_id)
+                    diff.diff_scope(ElementId(0), scope_id)
 
                     for dirty_scope_id in diff.mutations.dirty_scopes:
                         try:

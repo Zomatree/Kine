@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar
 
-from .core import (ComponentFunction, Element, Listener, VElement, VNode,
-                   VString)
+from .core import (ComponentFunction, Element, Listener, VComponent, VElement,
+                   VNode, VPlaceholder, VString)
 from .dom import EventMessage, Immediate
-from .elements import Element, String
+from .elements import Element
 from .utils import ElementId, ScopeId, TaskId
 
 if TYPE_CHECKING:
@@ -28,7 +28,8 @@ class Scope:
         self.scopes = scopes
         self.contexts: dict[Any, Any] = {}
         self.generation = 0
-        self.frames: tuple[Optional[VNode], Optional[VNode]] = (None, None)
+        self.frame_0 = VString("placeholder")
+        self.frame_1 = VString("placeholder")
         self.hooks: list[Any] = []
         self.hook_idx = 0
 
@@ -69,48 +70,45 @@ class Scope:
 
     def wip_frame(self) -> VNode:
         if self.generation & 1 == 0:
-            return cast(VNode, self.frames[0])
+            return self.frame_0
         else:
-            return cast(VNode, self.frames[1])
+            return self.frame_1
 
     def fin_frame(self) -> VNode:
         if self.generation & 1 == 1:
-            return cast(VNode, self.frames[0])
+            return self.frame_0
         else:
-            return cast(VNode, self.frames[1])
+            return self.frame_1
 
     def set_wip_frame(self, node: VNode):
         if self.generation & 1 == 0:
-            self.frames = (node, self.frames[0])
+            self.frame_0 = node
         else:
-            self.frames = (self.frames[1], node)
+            self.frame_1 = node
 
     def set_fin_frame(self, node: VNode):
         if self.generation & 1 == 1:
-            self.frames = (node, self.frames[0])
+            self.frame_0 = node
         else:
-            self.frames = (self.frames[1], node)
+            self.frame_1 = node
 
     def next_frame(self):
         self.generation += 1
 
     def render(self, node: Node[P]) -> VNode:
-        if isinstance(node, String):
-            vnode = VString(node.id, node.parent_id, str(node))
+        if isinstance(node, str):
+            vnode = VString(str(node))
             return vnode
 
         elif isinstance(node, Element):
-            assert node.id is not None
 
             nodes: list[VNode] = []
 
             vnode = VElement(
-                node.id,
-                node.parent_id,
                 node.__class__.__name__,
                 nodes,
                 node.attributes,
-                [Listener(name, func, node.id) for name, func in node.listeners.items()]
+                [Listener(name, func) for name, func in node.listeners.items()]
             )
 
             for child in node.children:
@@ -119,8 +117,10 @@ class Scope:
             return vnode
 
         elif isinstance(node, ComponentFunction):
-            return node.call()
-        elif node is 
+            return VComponent(node)
+        elif node is None:
+            return VPlaceholder()
+
     def _reset(self):
         self.hook_idx = 0
         self.parent_scope = None
@@ -135,8 +135,9 @@ class Scopes:
         self.scope_id = ScopeId(0)
         self.element_id = ElementId(0)
         self.tasks = TaskQueue()
-        self.root = VElement(self.next_element_id(), None, "div", [], {}, [])
-        self.nodes: dict[ElementId, VNode] = {self.root.id: self.root}
+        self.root = VElement("div", [], {}, [])
+        self.root.id = ElementId(0)
+        self.nodes: list[VNode] = [self.root]
 
         scope_id = self.new_scope(None, ElementId(0))
         scope = self.get_scope(scope_id)
@@ -173,22 +174,23 @@ class Scopes:
     def remove_node(self, id: ElementId):
         del self.nodes[id]
 
+    def reserve_node(self, node: VNode) -> ElementId:
+        id = ElementId(len(self.nodes))
+        self.nodes.append(node)
+        return id
+
     def call_listener_with_bubbling(self, event: EventMessage):
-        print(event)
         element_id = event.element_id
 
-        while element_id := element_id:
-            element = self.nodes[element_id]
+        while element_id:
+            node = self.nodes[element_id]
 
-            if not element:
-                break
-
-            if isinstance(element, VElement):
-                for listener in element.listeners:
+            if isinstance(node, VElement):
+                for listener in node.listeners:
                     if listener.name == event.name:
                         listener.func(event.data)
 
-            element_id = element.parent_id
+                element_id = node.parent_id
 
     def run_scope(self, scope_id: ScopeId):
         scope = self.get_scope(scope_id)
@@ -200,7 +202,7 @@ class Scopes:
         if node := scope.component.call():
             scope.set_wip_frame(node)
         else:
-            scope.set_wip_frame(None)
+            scope.set_wip_frame(VPlaceholder())
 
         scope.next_frame()
 
