@@ -30,16 +30,18 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
                 asyncio.ensure_future(dom.wait_for_work()),
                 asyncio.ensure_future(cast(Awaitable[dict[str, Any]], ws.receive_json())),
             ], return_when=asyncio.FIRST_COMPLETED)
-
-            if msg := done.result():
+            result = done.result()
+            print(result)
+            if msg := result:
                 if msg["method"] == "user_event":
                     payload = msg["params"]
                     dom.handle_message(messages.EventMessage(scope_id=None, priority=0, element_id=payload["mounted_dom_id"], name=payload["event"], bubbles=False, data=payload["contents"]))
 
-            mutations = dom.work_with_deadline(lambda: False)
+            else:
+                mutations = dom.work_with_deadline(lambda: False)
 
-            for mutation in mutations:
-                await ws.send_json(mutation.serialize())
+                for mutation in mutations:
+                    await ws.send_json(mutation.serialize())
 
     async def index(request: web.Request) -> web.Response:
         return web.Response(body=f"""

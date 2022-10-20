@@ -42,11 +42,12 @@ class VPlaceholder:
         self.parent_id: ElementId | None = None
 
 class VComponent:
-    def __init__(self, func: ComponentFunction[...]):
+    def __init__(self, func: ComponentFunction[...], parent_scope: ScopeId):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
         self.scope_id: ScopeId | None = None
         self.func = func
+        self.parent_scope = parent_scope
 
 VNode = Union[VString, VElement, VPlaceholder, VComponent]
 
@@ -62,22 +63,19 @@ class ComponentFunction(Generic[P]):
         self.args: tuple[Any, ...] = ()
         self.kwargs: dict[Any, Any] = {}
 
-    def __call__(self, scope: Scope, *args: P.args, **kwargs: P.kwargs):
+    def __call__(self, *args: P.args, **kwargs: P.kwargs):
         self.invoked = True
-
-        self.scope = scope
-        self.scope.component = self
 
         self.args = args
         self.kwargs = kwargs
 
         return self
 
-    def call(self) -> VNode:
+    def call(self, scope: Scope) -> VNode:
         if not self.invoked:
             raise Exception
 
-        return self.func(cast("Scope", self.scope), *self.args, **self.kwargs)
+        return self.func(scope, *self.args, **self.kwargs)
 
 def component(func: Callable[Concatenate[Scope, P], VNode]) -> ComponentFunction[P]:
     return ComponentFunction(func)

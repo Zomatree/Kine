@@ -54,16 +54,16 @@ class Scope:
     def consume_context(self, value_t: type[T]) -> T:
         try:
             return self.contexts[value_t]
-        except IndexError:
+        except KeyError:
             parent_scope = self.parent_scope
 
             while parent_scope:
                 try:
                     return parent_scope.contexts[value_t]
-                except IndexError:
+                except KeyError:
                     parent_scope = parent_scope.parent_scope
 
-            raise IndexError from None
+            raise KeyError from None
 
     def schedule_update(self):
         self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
@@ -117,7 +117,8 @@ class Scope:
             return vnode
 
         elif isinstance(node, ComponentFunction):
-            return VComponent(node)
+            return VComponent(node, self.scope_id)
+
         elif node is None:
             return VPlaceholder()
 
@@ -141,14 +142,14 @@ class Scopes:
 
         scope_id = self.new_scope(None, ElementId(0))
         scope = self.get_scope(scope_id)
-        scope.component = app(scope)
+        scope.component = app()
 
     def new_scope(self, parent: Optional[ScopeId], container: ElementId) -> ScopeId:
         scope_id = self.scope_id
         self.scope_id += 1
 
         height = parent + 1 if parent else 0
-        parent_scope = self.scopes[parent] if parent else None
+        parent_scope = self.scopes[parent] if parent is not None else None
 
         scope = Scope(scope_id, parent_scope, height, container, self)
 
@@ -199,7 +200,7 @@ class Scopes:
         if not scope.component:
             raise
 
-        if node := scope.component.call():
+        if node := scope.component.call(scope):
             scope.set_wip_frame(node)
         else:
             scope.set_wip_frame(VPlaceholder())

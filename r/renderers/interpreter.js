@@ -4,8 +4,6 @@ function main() {
   if (root != null) {
     // create a new ipc
     window.ipc = new IPC(root);
-
-    window.ipc.send(serializeIpcMessage("initialize"));
   }
 }
 
@@ -18,6 +16,7 @@ class IPC {
 
     this.ws.onopen = () => {
       console.log("Connected to the websocket");
+      window.ipc.send(serializeIpcMessage("initialize"));
     };
 
     this.ws.onerror = (err) => {
@@ -197,7 +196,7 @@ class Interpreter {
     } else {
       node = this.nodes[root];
     }
-    node.setAttribute("data-dioxus-id", `${root}`);
+    node.setAttribute("data-r-id", `${root}`);
     this.listeners.create(event_name, node, handler, bubbles);
   }
   RemoveEventListener(root, event_name, bubbles) {
@@ -207,7 +206,7 @@ class Interpreter {
     } else {
       node = this.nodes[root];
     }
-    node.removeAttribute(`data-dioxus-id`);
+    node.removeAttribute(`data-r-id`);
     this.listeners.remove(node, event_name, bubbles);
   }
   SetText(root, text) {

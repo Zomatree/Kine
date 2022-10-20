@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar,
-                    cast)
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar
 
 if TYPE_CHECKING:
     from .scope import Scope
@@ -12,22 +11,25 @@ __all__ = ("use_state", "use_future", "UseState")
 
 T = TypeVar("T")
 
-def use_state(cx: Scope, value: Callable[[], T]) -> UseState[T]:
-    return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, value()))
+def use_state(cx: Scope, func: Callable[[], T]) -> UseState[T]:
+    return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, func()))
 
-def use_future(cx: Scope, coro: Coroutine[Any, Any, T]) -> T | None:
+def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> T | None:
     def hook():
-        task = asyncio.create_task(coro)
+        state = UseFuture[T](cx, cx.hook_idx)
+        task = asyncio.create_task(func())
+
+        def cb(task: asyncio.Task[T]):
+            state.value = task.result()
+            cx.schedule_update()
+
+        task.add_done_callback(cb)
+
         cx.scopes.tasks.spawn(cx.scope_id, task)
 
-        result = use_state(cx, lambda: cast(None | T, None))
+        return state
 
-        task.add_done_callback(lambda t: result.set(t.result()))
-        return cx.hook_idx - 1
-
-    idx = cx.use_hook(hook)
-
-    return cx.hooks[idx]
+    return cx.use_hook(hook).value
 
 class UseState(Generic[T]):
     def __init__(self, scope: Scope, idx: int, value: T):
@@ -44,3 +46,9 @@ class UseState(Generic[T]):
 
     def modify(self, func: Callable[[T], T]):
         self.set(func(self.get()))
+
+class UseFuture(Generic[T]):
+    def __init__(self, scope: Scope, idx: int):
+        self.scope = scope
+        self.idx = idx
+        self.value: T | None = None

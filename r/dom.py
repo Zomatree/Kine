@@ -27,32 +27,37 @@ class VirtualDom:
     async def _task(self):
         while True:
             for task_id, task in list(self.scopes.tasks.tasks.items()):
-                if not task.done():
+                if task.done():
                     del self.scopes.tasks.tasks[task_id]
 
-            if self.scopes.tasks.tasks:
+            if not self.scopes.tasks.tasks:
                 return
             else:
                 await asyncio.sleep(0)
 
     async def wait_for_work(self):
         while True:
-            if self.dirty_scopes and not self.messages:
+            print(1)
+            if self.dirty_scopes and self.messages.empty():
                 break
-
+            print(2)
             if self.messages.empty():
+                print(3)
                 if self.scopes.tasks.tasks:
+                    print(4)
                     loop_task = asyncio.create_task(self._task())
                     message_task = asyncio.create_task(self.messages.get())
-
+                    print(5)
                     done, _ = await asyncio.wait((loop_task, message_task), return_when=asyncio.FIRST_COMPLETED)
-
+                    print(6)
                     if message_task in done:
+                        print(7)
                         msg, = cast(set[asyncio.Task[EventMessage]], done)
                         self.pending_messages.appendleft(msg.result())
                 else:
+                    print(8)
                     self.pending_messages.appendleft(await self.messages.get())
-
+            print(9)
             self.process_all_messages()
 
     def process_all_messages(self):
@@ -70,6 +75,7 @@ class VirtualDom:
             pass
 
     def process_message(self, message: ScheduleMessage):
+        print(message)
         match message:
             case NewTask():
                 pass  # dont need to do anything
