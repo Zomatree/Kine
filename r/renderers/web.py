@@ -37,11 +37,10 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
                     payload = msg["params"]
                     dom.handle_message(messages.EventMessage(scope_id=None, priority=0, element_id=payload["mounted_dom_id"], name=payload["event"], bubbles=False, data=payload["contents"]))
 
-            else:
-                mutations = dom.work_with_deadline(lambda: False)
+            mutations = dom.work_with_deadline(lambda: False)
 
-                for mutation in mutations:
-                    await ws.send_json(mutation.serialize())
+            for mutation in mutations:
+                await ws.send_json(mutation.serialize())
 
     async def index(request: web.Request) -> web.Response:
         return web.Response(body=f"""
@@ -53,7 +52,7 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
     <body>
         <div id="main"></div>
         <script>
-        var WS_ADDR = "ws://{addr}/app";
+        var WS_ADDR = "wss://{addr}/app";
         {interpreter}
         main();
         </script>

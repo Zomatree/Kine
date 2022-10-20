@@ -1,35 +1,34 @@
 import asyncio
 import logging
 
-import aiohttp
-
 from r import *
 
 logging.basicConfig(level=logging.INFO)
 
 @component
-def http(cx: Scope):
-    session = cx.consume_context(aiohttp.ClientSession)
+def my_component(cx: Scope):
+    name = use_state(cx, lambda: "")
 
-    async def get():
-        request = await session.get("https://httpbin.org/get")
-        return await request.json()
-
-    req = use_future(cx, get)
-    print(req)
     return cx.render(
-        str(req) if req is not None else None
+        div()[
+            input(
+                type="text",
+                oninput=lambda evt: name.set(evt["value"])
+            ),
+            p()[
+                f"Hello {name.get()}"
+            ]
+        ]
     )
 
 @component
 def app(cx: Scope):
-    cx.use_hook(lambda: cx.provide_context(aiohttp.ClientSession()))
 
     return cx.render(
         div()[
-            http(),
+            my_component(),
             "asdas"
         ]
     )
 
-asyncio.run(web.start(app))
+asyncio.run(web.start(app, addr="zomatree-r-q955j7vq49gf49qr-8080.githubpreview.dev"))

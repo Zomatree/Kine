@@ -54,7 +54,7 @@ class ListenerMap {
         this.global[event_name].active++;
       }
     } else {
-      const id = element.getAttribute("data-dioxus-id");
+      const id = element.getAttribute("data-r-id");
       if (!this.local[id]) {
         this.local[id] = {};
       }
@@ -74,7 +74,7 @@ class ListenerMap {
         delete this.global[event_name];
       }
     } else {
-      const id = element.getAttribute("data-dioxus-id");
+      const id = element.getAttribute("data-r-id");
       delete this.local[id][event_name];
       if (this.local[id].length === 0) {
         delete this.local[id];
@@ -355,9 +355,9 @@ class Interpreter {
         let handler = (event) => {
           let target = event.target;
           if (target != null) {
-            let realId = target.getAttribute(`data-dioxus-id`);
+            let realId = target.getAttribute(`data-r-id`);
             let shouldPreventDefault = target.getAttribute(
-              `dioxus-prevent-default`
+              `r-prevent-default`
             );
 
             if (event.type === "click") {
@@ -387,11 +387,11 @@ class Interpreter {
               }
 
               target = target.parentElement;
-              realId = target.getAttribute(`data-dioxus-id`);
+              realId = target.getAttribute(`data-r-id`);
             }
 
             shouldPreventDefault = target.getAttribute(
-              `dioxus-prevent-default`
+              `r-prevent-default`
             );
 
             let contents = serialize_event(event);
