@@ -37,16 +37,19 @@ class VirtualDom:
 
     async def wait_for_work(self):
         while True:
-            if self.dirty_scopes and self.messages.empty():
-                break
+            if self.dirty_scopes and not self.pending_messages:
+                return
 
-            if self.messages.empty():
+            if not self.pending_messages:
                 if self.scopes.tasks.tasks:
 
                     loop_task = asyncio.create_task(self._task())
                     message_task = asyncio.create_task(self.messages.get())
 
-                    done, _ = await asyncio.wait((loop_task, message_task), return_when=asyncio.FIRST_COMPLETED)
+                    done, pending = await asyncio.wait((loop_task, message_task), return_when=asyncio.FIRST_COMPLETED)
+
+                    for task in pending:
+                        task.cancel()
 
                     if message_task in done:
                         msg, = cast(set[asyncio.Task[EventMessage]], done)

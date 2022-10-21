@@ -21,7 +21,7 @@ def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> T | Non
 
         def cb(task: asyncio.Task[T]):
             state.value = task.result()
-            cx.schedule_update()
+            cx.scopes.dom.dirty_scopes.add(cx.scope_id)
 
         task.add_done_callback(cb)
 
