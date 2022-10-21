@@ -1,3 +1,5 @@
+// original code is from https://github.com/DioxusLabs/dioxus/blob/master/packages/liveview/src/interpreter.js and is licensed under the MIT license
+
 function main() {
   let root = window.document.getElementById("main");
 
