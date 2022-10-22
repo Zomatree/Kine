@@ -191,7 +191,7 @@ class Diff:
 
     def replace_node(self, parent_id: ElementId, old: VNode, new: VNode):
         nodes: list[ElementId] = []
-        self.create_node(parent_id, old, nodes)
+        self.create_node(parent_id, new, nodes)
         self.replace_inner(old, nodes)
 
     def create_node(self, parent_id: ElementId, node: VNode, nodes: list[ElementId]):
