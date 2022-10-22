@@ -44,26 +44,42 @@ class Scope:
 
         return value
 
-    def provide_context(self, value: T) -> T:
+    def provide_context(self, context: T) -> T:
         # lets just hope users dont use specialforms
 
-        self.contexts[type(value)] = value
+        self.contexts[type(context)] = context
 
-        return value
+        return context
 
-    def consume_context(self, value_t: type[T]) -> T:
+    def consume_context(self, context_t: type[T]) -> T:
         try:
-            return self.contexts[value_t]
+            return self.contexts[context_t]
         except KeyError:
             parent_scope = self.parent_scope
 
             while parent_scope:
                 try:
-                    return parent_scope.contexts[value_t]
+                    return parent_scope.contexts[context_t]
                 except KeyError:
                     parent_scope = parent_scope.parent_scope
 
             raise KeyError from None
+
+    def provide_root_context(self, context: T) -> T:
+        return self.root_scope().provide_context(context)
+
+    def root_scope(self) -> Scope:
+        scope = self
+
+        while scope:
+            parent = scope.parent_scope
+
+            if parent:
+                scope = parent
+            else:
+                return scope
+
+        raise  # will never run
 
     def schedule_update(self):
         self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
@@ -148,8 +164,8 @@ class Scopes:
         scope_id = self.scope_id
         self.scope_id += 1
 
-        height = parent + 1 if parent else 0
         parent_scope = self.scopes[parent] if parent is not None else None
+        height = parent_scope.height + 1 if parent_scope else 0
 
         scope = Scope(scope_id, parent_scope, height, container, self)
 
