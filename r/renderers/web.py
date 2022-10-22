@@ -30,7 +30,11 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
                 asyncio.ensure_future(dom.wait_for_work()),
                 asyncio.ensure_future(cast(Awaitable[dict[str, Any]], ws.receive_json())),
             ], return_when=asyncio.FIRST_COMPLETED)
-            result = done.result()
+
+            try:
+                result = done.result()
+            except TypeError:
+                return  # closed ws
 
             for task in pending:
                 task.cancel()
