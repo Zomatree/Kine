@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, TypedDict, cast
 
 from typing_extensions import Self, Unpack
 
@@ -23,6 +23,7 @@ __all__ = (
 class ElementArgs(TypedDict, total=False):
     id: str
     cls: str
+    key: str
     type: str
     style: str
 
@@ -41,9 +42,15 @@ class Element:
 
         self.attributes = {k: str(v) for k, v in attributes.items()}
 
-    def __getitem__(self, children: Node[...] | tuple[Node[...], ...]) -> Self:
-        self.children = children if isinstance(children, tuple) else (children,)
+    def __getitem__(self, children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> Self:
+        if isinstance(children, Generator):
+            children = tuple(children)
+        elif isinstance(children, tuple):
+            pass
+        else:
+            children = (children,)
 
+        self.children = children
         return self
 
 div = type("div", (Element,), {})

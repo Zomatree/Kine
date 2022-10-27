@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
+from contextlib import contextmanager
 
 from .core import VComponent, VElement, VNode, VPlaceholder, VString
-from .utils import ElementId, ScopeId
+from .utils import ElementId, ScopeId, find_lis
 
 if TYPE_CHECKING:
     from .scope import Scopes
@@ -93,6 +94,7 @@ class PopRoot:
 
 Modification = PushRoot | AppendChildren | ReplaceWith | InsertAfter | InsertBefore | Remove | CreateTextNode | CreateElement | CreatePlaceholder | NewEventListener | SetText | SetAttribute | RemoveAttribute | PopRoot
 
+MAX_N = (1 << 32) - 1  # 32 bit int max size
 
 class Mutations:
     def __init__(self):
@@ -135,6 +137,10 @@ class Diff:
                 self.diff_string_nodes(old, new)
             case VElement() as old, VElement() as new:
                 self.diff_element_nodes(old, new)
+            case VComponent() as old, VComponent() as new:
+                self.diff_component_nodes(parent_id, old, new)
+            case VPlaceholder() as old, VPlaceholder() as new:
+                self.diff_placeholder_nodes(old, new)
             case _:
                 self.replace_node(parent_id, old, new)
 
@@ -177,7 +183,224 @@ class Diff:
             case old_children, new_children:
                 self.diff_children(element_id, old_children, new_children)
 
+    def diff_component_nodes(self, parent_id: ElementId, old: VComponent, new: VComponent):
+        scope_id = old.scope_id
+        if scope_id is None:
+            raise Exception
+
+        if old is new:
+            return
+
+        if old.func == new.func:
+            with self.scope(scope_id):
+                new.scope_id = scope_id
+
+                self.scopes.run_scope(scope_id)
+                self.mutations.mark_dirty(scope_id)
+
+                scope = self.scopes.get_scope(scope_id)
+
+                self.diff_node(parent_id, scope.wip_frame(), scope.fin_frame())
+
+        else:
+            self.replace_node(parent_id, old, new)
+
+    def diff_placeholder_nodes(self, old: VPlaceholder, new: VPlaceholder):
+        if old is new:
+            return
+
+        element_id = old.id or self.scopes.reserve_node(new)
+
+        self.scopes.update_node(new, element_id)
+        new.id = element_id
+
     def diff_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
+        old_is_keyed = bool(old[0].key)
+        new_is_keyed = bool(old[0].key)
+
+        if old_is_keyed and new_is_keyed:
+            self.diff_keyed_children(parent_id, old, new)
+        else:
+            self.diff_unkeyed_children(parent_id, old, new)
+
+    def diff_keyed_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
+        if (offsets := self.diff_keyed_ends(parent_id, old, new)):
+            left_offset, right_offset = offsets
+        else:
+            return
+
+        old_middle = old[left_offset:len(old) - right_offset]
+        new_middle = old[left_offset:len(new) - right_offset]
+
+        if not new_middle:
+            self.remove_nodes(old_middle, True)
+
+        elif not old_middle:
+            if left_offset == 0:
+                foothold = old[-right_offset]
+                self.create_and_insert_before(parent_id, new_middle, foothold)
+
+            elif right_offset == 0:
+                foothold = old[-1]
+                self.create_and_insert_after(parent_id, new_middle, foothold)
+
+            else:
+                foothold = old[left_offset - 1]
+                self.create_and_insert_after(parent_id, new_middle, foothold)
+        else:
+            self.diff_keyed_middle(parent_id, old_middle, new_middle)
+
+    def diff_keyed_middle(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
+        old_key_to_old_index = {cast(str, old.key): i for i, old in enumerate(old)}
+
+        shared_keys: set[str] = set()
+
+        new_index_to_old_index: list[int] = []
+
+        for new_node in new:
+            assert new_node.key
+
+            if (index := old_key_to_old_index.get(new_node.key)) is not None:
+                shared_keys.add(new_node.key)
+                value = index
+            else:
+                value = MAX_N
+
+            new_index_to_old_index.append(value)
+
+        if not shared_keys:
+            if old:
+                first_old = old[0]
+
+                self.remove_nodes(old[1:], True)
+
+                created: list[ElementId] = []
+                self.create_children(parent_id, new, created)
+                self.replace_inner(first_old, created)
+            else:
+                self.create_and_append_children(parent_id, new)
+
+            return
+
+
+        for old_node in old:
+            assert old_node.key
+
+            if old_node.key not in shared_keys:
+                self.remove_nodes([old_node], True)
+
+        lis = find_lis(new_index_to_old_index)
+        lis_seq = lis.output
+        lis_seq.sort()
+
+        if lis_seq and new_index_to_old_index[lis_seq[-1]] == MAX_N:
+            lis_seq.pop()
+
+        for idx in lis_seq:
+            self.diff_node(parent_id, old[new_index_to_old_index[idx]], new[idx])
+
+        created: list[ElementId] = []
+
+        last = lis_seq[-1]
+
+        if last < (len(new) - 1):
+            for idx, new_node in enumerate(new[last + 1:]):
+                new_idx = idx + last + 1
+                old_index = new_index_to_old_index[new_idx]
+
+                if old_index == MAX_N:
+                    self.create_node(parent_id, new_node, created)
+                else:
+                    self.diff_node(parent_id, old[old_index], new_node)
+                    self.get_all_real_nodes(new_node, created)
+
+            last = self.find_last_element(new[last])
+            assert last is not None
+            self.mutations.append(InsertAfter(last, created))
+            created = []
+
+        lis_iter = reversed(lis.output)
+
+        last = next(lis_iter)
+
+        for next_idx in lis_iter:
+            if last - next_idx > 1:
+                for idx, new_node in enumerate(new[next_idx + 1:last]):
+                    new_idx = idx + next_idx + 1
+                    old_index = new_index_to_old_index[new_idx]
+
+                    if old_index == MAX_N:
+                        self.create_node(parent_id, new_node, created)
+                    else:
+                        self.diff_node(parent_id, old[old_index], new_node)
+                        self.get_all_real_nodes(new_node, created)
+
+                last = self.find_last_element(new[last])
+                assert last is not None
+                self.mutations.append(InsertBefore(last, created))
+
+                created = []
+
+            last = next_idx
+
+        first = lis.output[0]
+
+        if first > 0:
+            for idx, new_node in enumerate(new[:first]):
+                old_index = new_index_to_old_index[idx]
+
+                if old_index == MAX_N:
+                    self.create_node(parent_id, new_node, created)
+                else:
+                    self.diff_node(parent_id, old[old_index], new_node)
+                    self.get_all_real_nodes(new_node, created)
+
+            first = self.find_last_element(new[first])
+            assert first
+            self.mutations.append(InsertBefore(first, created))
+
+    def get_all_real_nodes(self, node: VNode, nodes: list[ElementId]):
+        match node:
+            case VString() | VPlaceholder() | VElement():
+                assert node.id is not None
+
+                nodes.append(node.id)
+            case VComponent() as node:
+                assert node.scope_id is not None
+
+                scope_id = node.scope_id
+                root = self.scopes.get_scope(scope_id).fin_frame()
+                self.get_all_real_nodes(root, nodes)
+
+    def diff_keyed_ends(self, parent_id: ElementId, old: list[VNode], new: list[VNode]) -> tuple[int, int] | None:
+        left_offset = 0
+
+        for old_node, new_node in zip(old, new):
+            if old_node.key != new_node.key:
+                break
+
+            self.diff_node(parent_id, old_node, new_node)
+            left_offset += 1
+
+        if left_offset == len(old):
+            self.create_and_insert_after(parent_id, new[left_offset:], old[-1])
+            return
+
+        elif left_offset == len(new):
+            self.remove_nodes(old[left_offset:], True)
+
+        right_offset = 0
+
+        for old_node, new_node in zip(old[::-1], new[::-1]):
+            if old_node.key != new_node.key:
+                break
+
+            self.diff_node(parent_id, old_node, new_node)
+            right_offset += 1
+
+        return (left_offset, right_offset)
+
+    def diff_unkeyed_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
         old_len = len(old)
         new_len = len(new)
 
@@ -226,14 +449,12 @@ class Diff:
                 scope = self.scopes.get_scope(scope_id)
                 inner_node = scope.fin_frame()
 
-                self.enter_scope(scope_id)
+                with self.scope(scope_id):
+                    self.replace_inner(inner_node, nodes)
 
-                self.replace_inner(inner_node, nodes)
+                    node.scope_id = None
+                    self.scopes.remove_scope(scope_id)
 
-                node.scope_id = None
-                self.scopes.remove_scope(scope_id)
-
-                self.leave_scope()
 
     def remove_nodes(self, nodes: list[VNode], gen_muts: bool):
         for node in nodes:
@@ -270,15 +491,13 @@ class Diff:
                     assert scope_id is not None
 
                     scope = self.scopes.get_scope(scope_id)
-                    self.enter_scope(scope_id)
 
-                    root = scope.fin_frame()
-                    self.remove_nodes([root], gen_muts)
-                    node.scope_id = None
+                    with self.scope(scope_id):
+                        root = scope.fin_frame()
+                        self.remove_nodes([root], gen_muts)
+                        node.scope_id = None
 
-                    self.scopes.remove_scope(scope_id)
-
-                    self.leave_scope()
+                        self.scopes.remove_scope(scope_id)
 
     def create_string_node(self, node: VString, nodes: list[ElementId]):
         element_id = self.scopes.reserve_node(node)
@@ -314,20 +533,17 @@ class Diff:
     def create_componet_node(self, parent_id: ElementId, node: VComponent, nodes: list[ElementId]):
         parent_scope = self.current_scope()
 
-        if not (scope_id := node.scope_id):
+        if (scope_id := node.scope_id) is None:
             scope_id = self.scopes.new_scope(parent_scope, parent_id)
             scope = self.scopes.get_scope(scope_id)
             scope.component = node.func
             node.scope_id = scope_id
 
-        self.enter_scope(scope_id)
-
-        self.scopes.run_scope(scope_id)
-        self.mutations.mark_dirty(scope_id)
-        next_node = self.scopes.get_scope(scope_id).fin_frame()
-        self.create_node(parent_id, next_node, nodes)
-
-        self.leave_scope()
+        with self.scope(scope_id):
+            self.scopes.run_scope(scope_id)
+            self.mutations.mark_dirty(scope_id)
+            next_node = self.scopes.get_scope(scope_id).fin_frame()
+            self.create_node(parent_id, next_node, nodes)
 
     def create_and_append_children(self, parent_id: ElementId, nodes: list[VNode]):
         children_nodes: list[ElementId] = []
@@ -339,17 +555,45 @@ class Diff:
             self.create_node(parent_id, node, children_nodes)
 
     def create_and_insert_after(self, parent_id: ElementId, nodes: list[VNode], after: VNode):
-        assert after.id
+        element_id = self.find_last_element(after)
+        assert element_id is not None
 
         created: list[ElementId] = []
         self.create_children(parent_id, nodes, created)
-        self.mutations.append(InsertAfter(after.id, created))
+        self.mutations.append(InsertAfter(element_id, created))
+
+    def create_and_insert_before(self, parent_id: ElementId, nodes: list[VNode], before: VNode):
+        element_id = self.find_last_element(before)
+        assert element_id is not None
+
+        children_nodes: list[ElementId] = []
+        self.create_children(parent_id, nodes, children_nodes)
+
+        self.mutations.append(InsertBefore(element_id, children_nodes))
+
+    def find_last_element(self, node: VNode) -> ElementId | None:
+        search_node = node
+
+        while True:
+            match search_node:
+                case VString() | VElement() | VPlaceholder() as node:
+                    return node.id
+                case VComponent() as node:
+                    assert node.scope_id is not None
+                    search_node = self.scopes.get_scope(node.scope_id).fin_frame()
 
     def current_scope(self) -> ScopeId:
         return self.scope_stack[-1]
 
-    def enter_scope(self, scope_id: ScopeId):
+    def _enter_scope(self, scope_id: ScopeId):
         self.scope_stack.append(scope_id)
 
-    def leave_scope(self):
+    def _leave_scope(self):
         del self.scope_stack[-1]
+
+    @contextmanager
+    def scope(self, scope_id: ScopeId):
+        try:
+            yield self._enter_scope(scope_id)
+        finally:
+            self._leave_scope()

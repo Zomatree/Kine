@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections import UserString
+import functools
 from typing import (TYPE_CHECKING, Any, Callable, Concatenate, Generic,
-                    ParamSpec, TypeVar, Union, cast)
+                    ParamSpec, TypeVar, Union)
 
 from .elements import Element
 
@@ -25,6 +26,7 @@ class VString(UserString):
     def __init__(self, value: str):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
+        self.key = None
         super().__init__(value)
 
 class VElement:
@@ -35,51 +37,47 @@ class VElement:
         self.children = children
         self.attributes = attributes
         self.listeners = listeners
+        self.key = attributes.get("key")
 
 class VPlaceholder:
     def __init__(self):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
+        self.key = None
 
 class VComponent:
-    def __init__(self, func: ComponentFunction[...], parent_scope: ScopeId):
-        self.id: ElementId | None = None
+    def __init__(self, func: ComponentFunction[...], parent_scope: ScopeId, key: str | None):
         self.parent_id: ElementId | None = None
         self.scope_id: ScopeId | None = None
         self.func = func
         self.parent_scope = parent_scope
+        self.key = key
 
 VNode = Union[VString, VElement, VPlaceholder, VComponent]
 
 class ComponentFunction(Generic[P]):
-    def __init__(self, func: Callable[Concatenate[Scope, P], VNode]):
-        self.func = cast("Callable[[Scope], VNode]", func)
-        self.scope: Scope | None = None
+    def __init__(self, func: Callable[Concatenate[Scope, P], VNode], *args: P.args, **kwargs: P.kwargs):
+        self.func = func
         self.id: ElementId | None = None
         self.scope_id: ScopeId | None = None
         self.parent_id: ElementId | None = None
-
-        self.invoked = False
-        self.args: tuple[Any, ...] = ()
-        self.kwargs: dict[Any, Any] = {}
-
-    def __call__(self, *args: P.args, **kwargs: P.kwargs):
-        self.invoked = True
-
+        self._key: str | None = None
         self.args = args
         self.kwargs = kwargs
 
+    def key(self, key: str):
+        self._key = key
         return self
 
     def call(self, scope: Scope) -> VNode:
-        if not self.invoked:
-            raise Exception
-
         return self.func(scope, *self.args, **self.kwargs)
 
-def component(func: Callable[Concatenate[Scope, P], VNode]) -> ComponentFunction[P]:
-    return ComponentFunction(func)
+def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[Concatenate[P], ComponentFunction[P]]:
+    @functools.wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs):
+        return ComponentFunction(func, *args, **kwargs)
 
+    return wrapper
 
 Component = Callable[Concatenate["Scope", P], "VNode"]
 Node = Union[str, Element, ComponentFunction[P], None]

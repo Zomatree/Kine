@@ -71,15 +71,10 @@ class Scope:
     def root_scope(self) -> Scope:
         scope = self
 
-        while scope:
-            parent = scope.parent_scope
+        while parent := scope.parent_scope:
+            scope = parent
 
-            if parent:
-                scope = parent
-            else:
-                return scope
-
-        raise  # will never run
+        return scope
 
     def schedule_update(self):
         self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
@@ -133,7 +128,7 @@ class Scope:
             return vnode
 
         elif isinstance(node, ComponentFunction):
-            return VComponent(node, self.scope_id)
+            return VComponent(node, self.scope_id, node._key)
 
         elif node is None:
             return VPlaceholder()
@@ -154,11 +149,11 @@ class Scopes:
         self.tasks = TaskQueue()
         self.root = VElement("div", [], {}, [])
         self.root.id = ElementId(0)
-        self.nodes: list[VNode] = [self.root]
+        self.nodes: dict[ElementId, VNode] = {self.root.id: self.root}
 
         scope_id = self.new_scope(None, ElementId(0))
         scope = self.get_scope(scope_id)
-        scope.component = app()
+        scope.component = app
 
     def new_scope(self, parent: Optional[ScopeId], container: ElementId) -> ScopeId:
         scope_id = self.scope_id
@@ -193,7 +188,7 @@ class Scopes:
 
     def reserve_node(self, node: VNode) -> ElementId:
         id = ElementId(len(self.nodes))
-        self.nodes.append(node)
+        self.nodes[id] = node
         return id
 
     def call_listener_with_bubbling(self, event: EventMessage):

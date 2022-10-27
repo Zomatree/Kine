@@ -26,28 +26,30 @@ async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127
         await ws.send_json(edits.serialize())
 
         while True:
-            (done,), pending = await asyncio.wait([
+            futs = await asyncio.wait([
                 asyncio.ensure_future(dom.wait_for_work()),
                 asyncio.ensure_future(cast(Awaitable[dict[str, Any]], ws.receive_json())),
             ], return_when=asyncio.FIRST_COMPLETED)
-
-            try:
-                result = done.result()
-            except TypeError:
-                return  # closed ws
+            dones, pending = futs
 
             for task in pending:
                 task.cancel()
 
-            if msg := result:
-                if msg["method"] == "user_event":
-                    payload = msg["params"]
-                    dom.handle_message(messages.EventMessage(scope_id=None, priority=0, element_id=payload["mounted_dom_id"], name=payload["event"], bubbles=False, data=payload["contents"]))
+            for done in dones:
+                try:
+                    result = done.result()
+                except TypeError:
+                    return ws # closed ws
 
-            mutations = dom.work_with_deadline(lambda: False)
+                if msg := result:
+                    if msg["method"] == "user_event":
+                        payload = msg["params"]
+                        dom.handle_message(messages.EventMessage(scope_id=None, priority=0, element_id=payload["mounted_dom_id"], name=payload["event"], bubbles=False, data=payload["contents"]))
 
-            for mutation in mutations:
-                await ws.send_json(mutation.serialize())
+                mutations = dom.work_with_deadline(lambda: False)
+
+                for mutation in mutations:
+                    await ws.send_json(mutation.serialize())
 
     async def index(request: web.Request) -> web.Response:
         return web.Response(body=f"""
