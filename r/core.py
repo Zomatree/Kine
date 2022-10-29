@@ -49,7 +49,7 @@ class VComponent:
     def __init__(self, func: ComponentFunction[...], parent_scope: ScopeId, key: str | None):
         self.parent_id: ElementId | None = None
         self.scope_id: ScopeId | None = None
-        self.func = func
+        self.comp_func = func
         self.parent_scope = parent_scope
         self.key = key
 

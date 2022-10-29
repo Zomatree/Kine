@@ -191,7 +191,7 @@ class Diff:
         if old is new:
             return
 
-        if old.func == new.func:
+        if old.comp_func.func == new.comp_func.func:
             with self.scope(scope_id):
                 new.scope_id = scope_id
 
@@ -536,7 +536,7 @@ class Diff:
         if (scope_id := node.scope_id) is None:
             scope_id = self.scopes.new_scope(parent_scope, parent_id)
             scope = self.scopes.get_scope(scope_id)
-            scope.component = node.func
+            scope.component = node.comp_func
             node.scope_id = scope_id
 
         with self.scope(scope_id):
