@@ -147,9 +147,10 @@ class Scopes:
         self.scope_id = ScopeId(0)
         self.element_id = ElementId(0)
         self.tasks = TaskQueue()
+        self.element_idx = 0
         self.root = VElement("div", [], {}, [])
-        self.root.id = ElementId(0)
-        self.nodes: dict[ElementId, VNode] = {self.root.id: self.root}
+        self.nodes: dict[ElementId, VNode] = {}
+        self.root.id = self.reserve_node(self.root)
 
         scope_id = self.new_scope(None, ElementId(0))
         scope = self.get_scope(scope_id)
@@ -187,8 +188,9 @@ class Scopes:
         del self.nodes[id]
 
     def reserve_node(self, node: VNode) -> ElementId:
-        id = ElementId(len(self.nodes))
+        id = ElementId(self.element_idx)
         self.nodes[id] = node
+        self.element_idx += 1
         return id
 
     def call_listener_with_bubbling(self, event: EventMessage):
@@ -202,7 +204,7 @@ class Scopes:
                     if listener.name == event.name:
                         listener.func(event.data)
 
-                element_id = node.parent_id
+            element_id = node.parent_id
 
     def run_scope(self, scope_id: ScopeId):
         scope = self.get_scope(scope_id)
