@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
-from contextlib import contextmanager
 
 from .core import VComponent, VElement, VNode, VPlaceholder, VString
 from .utils import ElementId, ScopeId, find_lis

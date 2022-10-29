@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections import UserString
 import functools
+from collections import UserString
 from typing import (TYPE_CHECKING, Any, Callable, Concatenate, Generic,
                     ParamSpec, TypeVar, Union)
 

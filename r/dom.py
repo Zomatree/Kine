@@ -7,8 +7,8 @@ from typing import Callable, TypeVar, cast
 from r.core import ComponentFunction
 
 from .diff import AppendChildren, Diff, Mutations
-from .messages import (DirtyAll, EventMessage, Immediate, NewTask, ScheduleMessage)
-
+from .messages import (DirtyAll, EventMessage, Immediate, NewTask,
+                       ScheduleMessage)
 from .scope import Scopes
 from .utils import ElementId, ScopeId
 

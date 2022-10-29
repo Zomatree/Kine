@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar
+
 from .utils import ScopeId
 
 if TYPE_CHECKING:

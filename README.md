@@ -31,6 +31,5 @@ def app(cx: Scope):
         ],
     ])
 
-asyncio.run(web.start(app))
-
+asyncio.run(web.start(app()))
 ```

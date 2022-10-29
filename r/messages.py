@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, get_args, Union
+from typing import (TYPE_CHECKING, Any, Generic, Literal, TypeVar, Union,
+                    get_args)
 
 if TYPE_CHECKING:
     from .utils import ElementId, ScopeId
