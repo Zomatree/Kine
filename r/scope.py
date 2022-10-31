@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar
 
 from .core import (ComponentFunction, Element, Listener, VComponent, VElement,
                    VNode, VPlaceholder, VString)
-from .dom import EventMessage, Immediate
+from .messages import EventMessage, Immediate
 from .elements import Element
 from .utils import ElementId, ScopeId, TaskId
 

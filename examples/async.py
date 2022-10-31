@@ -1,4 +1,6 @@
 from r import *
+from r.renderers.web import *
+
 import aiohttp
 import asyncio
 
@@ -21,4 +23,4 @@ def app(cx: Scope):
         ]
     ])
 
-asyncio.run(web.start(app()))
+asyncio.run(start_web(app()))

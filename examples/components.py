@@ -1,9 +1,9 @@
+from r import *
+from r.renderers.web import *
+
 import asyncio
 from dataclasses import dataclass
 from typing import Any, Callable
-
-from r import *
-
 
 @dataclass
 class Item:
@@ -65,7 +65,6 @@ def add_item(cx: Scope):
 @component
 def app(cx: Scope):
     item_state =  use_read(cx, ItemState)
-    print("app ", item_state)
 
     return cx.render(div()[
         add_item(),
@@ -74,4 +73,4 @@ def app(cx: Scope):
         ]
     ])
 
-asyncio.run(web.start(app()))
+asyncio.run(start_web(app()))

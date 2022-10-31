@@ -4,8 +4,9 @@ from typing import Any, Awaitable, ParamSpec, cast
 
 from aiohttp import web
 
-from .. import ComponentFunction, messages
-from ..dom import VirtualDom
+from ... import ComponentFunction, messages
+from ...dom import VirtualDom
+from .elements import *
 
 P = ParamSpec("P")
 
@@ -14,7 +15,7 @@ file = pathlib.Path(__file__)
 with open(file.parent / "interpreter.js") as f:
     interpreter = f.read()
 
-async def start(app: ComponentFunction[...], headers: str = "", addr: str = "127.0.0.1:8080"):
+async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "127.0.0.1:8080"):
     web_app = web.Application()
 
     async def ws_handle(request: web.Request):

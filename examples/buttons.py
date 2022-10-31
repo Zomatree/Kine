@@ -1,5 +1,7 @@
-import asyncio
 from r import *
+from r.renderers.web import *
+
+import asyncio
 
 @component
 def app(cx: Scope):
@@ -19,4 +21,4 @@ def app(cx: Scope):
         ],
     ])
 
-asyncio.run(web.start(app()))
+asyncio.run(start_web(app()))

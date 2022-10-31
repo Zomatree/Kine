@@ -1,4 +1,6 @@
 from r import *
+from r.renderers.web import *
+
 import asyncio
 from functools import partial
 from typing import Any
@@ -15,8 +17,7 @@ def calc_button(cx: Scope, equation: UseState[str], char: str):
         onclick=lambda _: equation.modify(lambda eq: eq + char),
     )[
         char
-    ]
-    )
+    ])
 
 @component
 def enter_button(cx: Scope, output: UseState[str]):
@@ -54,4 +55,4 @@ def app(cx: Scope):
         ]
     ])
 
-asyncio.run(web.start(app()))
+asyncio.run(start_web(app()))
