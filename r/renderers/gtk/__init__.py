@@ -1,5 +1,6 @@
 import asyncio
 from typing import ParamSpec
+import threading
 
 from ... import ComponentFunction, diff, messages
 from ...dom import VirtualDom
@@ -34,9 +35,19 @@ class App(Adw.Application):
         mods = self.dom.rebuild()
         self.calculate_diffs(mods)
 
+        self.bg_thread = threading.Thread(target=lambda: asyncio.run(self.bg_loop()))
+        self.bg_thread.start()
+
+    async def bg_loop(self):
+        while True:
+            await self.dom.wait_for_work()
+            mutations = self.dom.work_with_deadline(lambda: False)
+
+            for mutation in mutations:
+                self.calculate_diffs(mutation)
+
     def calculate_diffs(self, mutations: Mutations):
         for mod in mutations.modifications:
-            print(mod)
             match mod:
                 case diff.CreateElement():
                     widget = self.create_widget(mod.tag)
@@ -48,10 +59,8 @@ class App(Adw.Application):
                 case diff.AppendChildren():
                     parent = self.nodes[mod.root]
                     assert not isinstance(parent, str)
-                    print(parent)
                     for child_id in mod.children:
                         child = self.nodes[child_id]
-                        print(child)
 
                         if isinstance(child, str):
                             if isinstance(parent, Gtk.Label):
@@ -70,7 +79,7 @@ class App(Adw.Application):
 
     def call_event(self, element_id: ElementId, name: str):
         def inner(widget: Gtk.Widget):
-            self.dom.pending_messages.appendleft(messages.EventMessage(None, 0, element_id, name, True, widget))
+            self.dom.messages.put_nowait(messages.EventMessage(None, 0, element_id, name, True, widget))
 
         return inner
 

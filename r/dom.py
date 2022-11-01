@@ -43,8 +43,8 @@ class VirtualDom:
             if not self.pending_messages:
                 if self.scopes.tasks.tasks:
 
-                    loop_task = asyncio.create_task(self._task())
-                    message_task = asyncio.create_task(self.messages.get())
+                    loop_task = asyncio.ensure_future(self._task())
+                    message_task = asyncio.ensure_future(self.messages.get())
 
                     done, pending = await asyncio.wait((loop_task, message_task), return_when=asyncio.FIRST_COMPLETED)
 
@@ -55,23 +55,19 @@ class VirtualDom:
                         msg, = cast(set[asyncio.Task[EventMessage]], done)
                         self.pending_messages.appendleft(msg.result())
                 else:
-                    self.pending_messages.appendleft(await self.messages.get())
+                    msg = await self.messages.get()
+                    self.pending_messages.appendleft(msg)
 
             self.process_all_messages()
 
     def process_all_messages(self):
-        try:
-            while True:
-                self.pending_messages.appendleft(self.messages.get_nowait())
-        except asyncio.QueueEmpty:
-            pass
+        while not self.messages.empty():
+            self.pending_messages.appendleft(self.messages.get_nowait())
 
-        try:
-            while True:
-                message = self.pending_messages.pop()
-                self.process_message(message)
-        except IndexError:
-            pass
+        for message in self.pending_messages:
+            self.process_message(message)
+
+        self.pending_messages.clear()
 
     def process_message(self, message: ScheduleMessage):
         match message:
