@@ -22,6 +22,7 @@ class App(Adw.Application):
 
         self.dom = dom
         self.nodes: dict[ElementId, Gtk.Widget | str] = {}
+        self.parents: dict[ElementId, Gtk.Widget] = {}
 
     def on_activate(self, app: Gtk.Application):
         self.win = Gtk.ApplicationWindow(application=app)
@@ -57,29 +58,70 @@ class App(Adw.Application):
                     self.nodes[mod.root] = mod.text
 
                 case diff.AppendChildren():
-                    parent = self.nodes[mod.root]
-                    assert not isinstance(parent, str)
                     for child_id in mod.children:
-                        child = self.nodes[child_id]
-
-                        if isinstance(child, str):
-                            if isinstance(parent, Gtk.Label):
-                                parent.set_text(child)
-                            else:
-                                parent.set_label(child)
-                        else:
-                            parent.append(child)
+                        self.add_node_child(mod.root, child_id)
 
                 case diff.NewEventListener():
                     parent = self.nodes[mod.root]
                     parent.connect(mod.event_name, self.call_event(mod.root, mod.event_name))
 
+                case diff.SetText():
+                    node = self.parents[mod.root]
+
+                    assert not isinstance(node, str)
+
+                    self.set_node_label(node, mod.text)
+
+                case diff.SetAttribute():
+                    if mod.field == "key":
+                        continue
+
+                    node = self.nodes[mod.root]
+
+                    if isinstance(node, Gtk.Widget):
+                        node.set_property(mod.field, mod.value)
+
+                case diff.InsertAfter():
+                    parent = self.parents[mod.root]
+                    before_node = self.nodes[mod.root]
+
+                    for element_id in mod.nodes:
+                        node = self.nodes[element_id]
+                        self.parents[element_id] = parent
+
+                        node.set_parent(parent)
+                        parent.insert_child_after(before_node, node)
+
+                case diff.Remove():
+                    parent = self.parents[mod.root]
+                    widget = self.nodes[mod.root]
+                    parent.remove(widget)
+
                 case _:
                     raise Exception(mod)
 
+    def add_node_child(self, parent_id: ElementId, child_id: ElementId):
+        parent = self.nodes[parent_id]
+        assert not isinstance(parent, str)
+
+        self.parents[child_id] = parent
+        child = self.nodes[child_id]
+
+        if isinstance(child, str):
+            self.set_node_label(parent, child)
+        else:
+            parent.append(child)
+            child.set_parent(parent)
+
+    def set_node_label(self, node: Gtk.Widget, text: str):
+        if isinstance(node, Gtk.Label):
+            node.set_text(text)
+        else:
+            node.set_label(text)
+
     def call_event(self, element_id: ElementId, name: str):
         def inner(widget: Gtk.Widget):
-            self.dom.messages.put_nowait(messages.EventMessage(None, 0, element_id, name, True, widget))
+            self.dom.temp.append(messages.EventMessage(None, 0, element_id, name, True, widget))
 
         return inner
 
@@ -93,6 +135,8 @@ class App(Adw.Application):
                 return Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             case "button":
                 return Gtk.Button()
+            case "entry":
+                return Gtk.Entry()
             case _:
                 raise Exception(name)
 

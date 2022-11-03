@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Generator, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, TypedDict, cast, TypeVar, Protocol
 
 from typing_extensions import Self, Unpack
 
@@ -44,3 +44,15 @@ class Element:
         self.children = children
         return self
 
+class GetAttrProto(Protocol):
+    def __getitem__(self, children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> Self:
+        ...
+
+T = TypeVar("T", bound=GetAttrProto)
+
+class CGIMeta(type):
+    def __getitem__(cls: type[T], children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> T:
+        return cls()[children]
+
+class CGI(metaclass=CGIMeta):
+    pass

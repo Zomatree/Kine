@@ -7,7 +7,7 @@ import asyncio
 def app(cx: Scope):
     value = use_state(cx, lambda: 0)
 
-    return cx.render(div()[
+    return cx.render(div[
         button(
             onclick=lambda _: value.modify(lambda v: v - 1)
         )[

@@ -18,11 +18,11 @@ def item(cx: Scope, item_id: int):
     item_state = use_read(cx, ItemState)
     item = item_state[item_id]
 
-    return cx.render(div()[
-        h3()[
+    return cx.render(div[
+        h3[
             item.title
         ],
-        p()[
+        p[
             item.description
         ]
     ])
@@ -40,15 +40,15 @@ def add_item(cx: Scope):
         item_state[id] = Item(id, title.get(), description.get())
         set_item_state(item_state)
 
-    return cx.render(div()[
-        h3()[
+    return cx.render(div[
+        h3[
             "Title"
         ],
         input(
             type="text",
             oninput=lambda evt: title.set(evt["value"])
         ),
-        h3()[
+        h3[
             "Description"
         ],
         input(
@@ -66,9 +66,9 @@ def add_item(cx: Scope):
 def app(cx: Scope):
     item_state =  use_read(cx, ItemState)
 
-    return cx.render(div()[
+    return cx.render(div[
         add_item(),
-        div()[
+        div[
             (item(item_id).key(str(item_id)) for item_id in item_state.keys())
         ]
     ])

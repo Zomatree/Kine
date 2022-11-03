@@ -23,10 +23,12 @@ class VirtualDom:
         self.dirty_scopes = {ScopeId(0)}
         self.messages: asyncio.Queue[ScheduleMessage] = asyncio.Queue()
         self.pending_messages = deque[ScheduleMessage]()
+        self.temp: list[ScheduleMessage] = []
 
     async def _task(self):
         while True:
             for task_id, task in list(self.scopes.tasks.tasks.items()):
+
                 if task.done():
                     del self.scopes.tasks.tasks[task_id]
 
@@ -55,7 +57,10 @@ class VirtualDom:
                         msg, = cast(set[asyncio.Task[EventMessage]], done)
                         self.pending_messages.appendleft(msg.result())
                 else:
-                    msg = await self.messages.get()
+                    while not self.temp:
+                        await asyncio.sleep(0)
+
+                    msg = self.temp.pop()
                     self.pending_messages.appendleft(msg)
 
             self.process_all_messages()
@@ -85,7 +90,7 @@ class VirtualDom:
                     self.dirty_scopes.add(id)
 
     def handle_message(self, message: ScheduleMessage):
-        self.messages.put_nowait(message)
+        self.temp.append(message)
         self.process_all_messages()
 
     def rebuild(self):

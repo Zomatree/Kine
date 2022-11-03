@@ -1,11 +1,11 @@
-from ...elements import Element
+from ...elements import Element, CGI
 
-div = type("div", (Element,), {})
-p = type("p", (Element,), {})
-input = type("input", (Element,), {})
-button = type("button", (Element,), {})
-h1 = type("h1", (Element,), {})
-h2 = type("h2", (Element,), {})
-h3 = type("h3", (Element,), {})
-h4 = type("h4", (Element,), {})
-h5 = type("h5", (Element,), {})
+class div(CGI, Element): pass
+class p(CGI, Element): pass
+class input(CGI, Element): pass
+class button(CGI, Element): pass
+class h1(CGI, Element): pass
+class h2(CGI, Element): pass
+class h3(CGI, Element): pass
+class h4(CGI, Element): pass
+class h5(CGI, Element): pass

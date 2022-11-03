@@ -388,6 +388,7 @@ class Diff:
 
         elif left_offset == len(new):
             self.remove_nodes(old[left_offset:], True)
+            return
 
         right_offset = 0
 

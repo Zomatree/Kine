@@ -14,11 +14,11 @@ def app(cx: Scope):
 
     future = use_future(cx, http_request)
 
-    return cx.render(div()[
-        p()[
+    return cx.render(div[
+        p[
             "Http request result:"
         ],
-        p()[
+        p[
             str(future) if future is not None else "Loading..."
         ]
     ])
