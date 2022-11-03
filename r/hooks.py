@@ -49,6 +49,11 @@ class UseState(Generic[T]):
     def modify(self, func: Callable[[T], T]):
         self.set(func(self.get()))
 
+    def mutate(self, func: Callable[[T], None]):
+        value = self.value
+        func(value)
+        self.set(value)
+
 class UseFuture(Generic[T]):
     def __init__(self, scope: Scope, idx: int):
         self.scope = scope

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar
 
 from .core import (ComponentFunction, Element, Listener, VComponent, VElement,
                    VNode, VPlaceholder, VString)
-from .dom import EventMessage, Immediate
+from .messages import EventMessage, Immediate
 from .elements import Element
 from .utils import ElementId, ScopeId, TaskId
 
@@ -77,7 +77,7 @@ class Scope:
         return scope
 
     def schedule_update(self):
-        self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
+        self.scopes.dom.temp.append(Immediate(self.scope_id))
 
     def wip_frame(self) -> VNode:
         if self.generation & 1 == 0:

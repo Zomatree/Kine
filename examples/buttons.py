@@ -1,11 +1,13 @@
-import asyncio
 from r import *
+from r.renderers.web import *
+
+import asyncio
 
 @component
 def app(cx: Scope):
     value = use_state(cx, lambda: 0)
 
-    return cx.render(div()[
+    return cx.render(div[
         button(
             onclick=lambda _: value.modify(lambda v: v - 1)
         )[
@@ -19,4 +21,4 @@ def app(cx: Scope):
         ],
     ])
 
-asyncio.run(web.start(app()))
+asyncio.run(start_web(app()))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Generator, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, TypedDict, cast, TypeVar, Protocol
 
 from typing_extensions import Self, Unpack
 
@@ -9,15 +9,6 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Element",
-    "div",
-    "p",
-    "input",
-    "button",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
 )
 
 class ElementArgs(TypedDict, total=False):
@@ -53,12 +44,15 @@ class Element:
         self.children = children
         return self
 
-div = type("div", (Element,), {})
-p = type("p", (Element,), {})
-input = type("input", (Element,), {})
-button = type("button", (Element,), {})
-h1 = type("h1", (Element,), {})
-h2 = type("h2", (Element,), {})
-h3 = type("h3", (Element,), {})
-h4 = type("h4", (Element,), {})
-h5 = type("h5", (Element,), {})
+class GetAttrProto(Protocol):
+    def __getitem__(self, children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> Self:
+        ...
+
+T = TypeVar("T", bound=GetAttrProto)
+
+class CGIMeta(type):
+    def __getitem__(cls: type[T], children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> T:
+        return cls()[children]
+
+class CGI(metaclass=CGIMeta):
+    pass
