@@ -121,7 +121,7 @@ class App(Adw.Application):
 
     def call_event(self, element_id: ElementId, name: str):
         def inner(widget: Gtk.Widget):
-            self.dom.temp.append(messages.EventMessage(None, 0, element_id, name, True, widget))
+            self.dom.messages.put_nowait(messages.EventMessage(None, 0, element_id, name, True, widget))
 
         return inner
 

@@ -12,14 +12,7 @@ __all__ = (
 )
 
 class ElementArgs(TypedDict, total=False):
-    id: str
-    cls: str
-    key: str
-    type: str
-    style: str
-
-    onclick: Callable[[Any], None]
-    oninput: Callable[[Any], None]
+    pass
 
 class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
@@ -31,7 +24,7 @@ class Element:
                 self.listeners[name[2:]] = cast(Callable[[Any], None], value)
                 del attributes[name]
 
-        self.attributes = {k: str(v) for k, v in attributes.items()}
+        self.attributes = attributes
 
     def __getitem__(self, children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> Self:
         if isinstance(children, Generator):

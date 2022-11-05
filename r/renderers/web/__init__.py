@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import pathlib
 from typing import Any, Awaitable, ParamSpec, cast
@@ -6,7 +8,8 @@ from aiohttp import web
 
 from ... import ComponentFunction, messages
 from ...dom import VirtualDom
-from .elements import *
+
+from ..web_elements import *
 
 P = ParamSpec("P")
 

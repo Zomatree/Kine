@@ -8,8 +8,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiohttp = "^3.8.3"
-
 
 [build-system]
 requires = ["poetry-core"]

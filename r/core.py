@@ -30,7 +30,7 @@ class VString(UserString):
         super().__init__(value)
 
 class VElement:
-    def __init__(self, tag: str, children: list[VNode], attributes: dict[str, str], listeners: list[Listener]):
+    def __init__(self, tag: str, children: list[VNode], attributes: dict[str, Any], listeners: list[Listener]):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
         self.tag = tag

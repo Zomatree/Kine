@@ -77,7 +77,7 @@ class Scope:
         return scope
 
     def schedule_update(self):
-        self.scopes.dom.temp.append(Immediate(self.scope_id))
+        self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
 
     def wip_frame(self) -> VNode:
         if self.generation & 1 == 0:

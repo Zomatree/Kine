@@ -1,11 +1,11 @@
-from typing import Callable, Any, TypedDict, Unpack, cast, Generic, TypeVar, Self, Generator
+from typing import Callable, Any, TypedDict, cast, Generic, TypeVar
+from typing_extensions import Unpack
 
 import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 
 from ...elements import Element as BaseElement, CGI
-from ...core import Node
 
 T = TypeVar("T")
 
@@ -18,15 +18,9 @@ class ElementArgs(TypedDict, Generic[T], total=False):
 
 class Element(BaseElement, Generic[T]):
     def __init__(self, **attributes: Unpack[ElementArgs[T]]):
-        self.children: tuple[Node[...], ...] = ()
-        self.listeners: dict[str, Callable[[T], None]] = {}
+        super().__init__(**attributes)
 
-        for name, value in list(attributes.items()):
-            if name.startswith("on"):
-                self.listeners[name[2:]] = cast(Callable[[T], None], value)
-                del attributes[name]
-
-        self.attributes = {k.replace("_", "-"): str(v) for k, v in attributes.items()}
+        self.attributes = {k.replace("_", "-"): v for k, v in self.attributes.items()}
 
 class button(CGI, Element[Gtk.Button]): pass
 class vbox(CGI, Element[Gtk.Box]): pass
