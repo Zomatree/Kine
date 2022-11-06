@@ -85,7 +85,7 @@ class SetAttribute:
 class RemoveAttribute:
     type = "RemoveAttribute"
     root: ElementId
-    name: str
+    field: str
 
 @dataclass
 class PopRoot:

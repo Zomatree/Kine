@@ -17,7 +17,12 @@ async def start_wasm(app: ComponentFunction[P]):
     edits = dom.rebuild()
 
     event_queue = asyncio.Queue[Any]()
-    nodes: dict[ElementId, js.Element] = {ElementId(0): js.document.getElementById("main")}
+    main = js.document.getElementById("main")
+
+    if not main:
+        raise Exception("No element with id of main")
+
+    nodes: dict[ElementId, js.Element | js.Text] = {ElementId(0): main}
 
     calculate_diffs(event_queue, nodes, edits)
 
@@ -47,7 +52,7 @@ async def start_wasm(app: ComponentFunction[P]):
                 for mutation in mutations:
                     calculate_diffs(event_queue, nodes, mutation)
 
-def calculate_diffs(queue: asyncio.Queue[EventData], nodes: dict[ElementId, js.Element], mutation: diff.Mutations):
+def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element | js.Text], mutation: diff.Mutations):
     for mod in mutation.modifications:
         match mod:
             case diff.AppendChildren():
@@ -58,6 +63,8 @@ def calculate_diffs(queue: asyncio.Queue[EventData], nodes: dict[ElementId, js.E
 
             case diff.ReplaceWith():
                 node = nodes[mod.root]
+                assert isinstance(node, js.Element)
+
                 elements = [nodes[id] for id in mod.nodes]
                 node.replaceWith(*elements)
 
@@ -83,32 +90,61 @@ def calculate_diffs(queue: asyncio.Queue[EventData], nodes: dict[ElementId, js.E
                 proxy_func = create_proxy(callback)
 
                 node = nodes[mod.root]
+                assert isinstance(node, js.Element)
+
                 node.setAttribute("data-r-id", str(mod.root))
                 node.addEventListener(mod.event_name, proxy_func)
 
             case diff.SetText():
                 node = nodes[mod.root]
+                assert isinstance(node, js.Text)
 
                 node.data = mod.text
 
             case diff.SetAttribute():
                 node = nodes[mod.root]
+                assert isinstance(node, js.Element)
 
-                if node == "value":
+                if mod.field == "value":
                     if mod.value != node.value:
                         node.value = mod.value
 
                 else:
-                    node.setAttribute(mod.name, mod.value)
+                    node.setAttribute(mod.field, mod.value)
 
             case diff.InsertAfter():
                 node = nodes[mod.root]
+                assert isinstance(node, js.Element)
+
                 elements = [nodes[id] for id in mod.nodes]
                 node.after(*elements)
 
             case diff.Remove():
                 node = nodes[mod.root]
+                assert isinstance(node, js.Element)
+
                 node.remove()
+
+            case diff.InsertBefore():
+                node = nodes[mod.root]
+                assert isinstance(node, js.Element)
+
+                elements = [nodes[id] for id in mod.nodes]
+                node.before(*elements)
+
+            case diff.CreatePlaceholder():
+                node = js.document.createElement("pre")
+                node.hidden = True
+                nodes[mod.root] = node
+
+            case diff.RemoveAttribute():
+                node = nodes[mod.root]
+
+                if mod.field == "value":
+                    node.value = ""
+                else:
+                    assert isinstance(node, js.Element)
+                    node.removeAttribute(mod.field)
 
             case _:
                 raise Exception(str(mod))
