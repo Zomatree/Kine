@@ -342,7 +342,37 @@ class CharacterData(Node):
 class Text(CharacterData):
     ...
 
+class Location:
+    href: str
+    protocol: str
+    host: str
+    hostname: str
+    port: str
+    pathname: str
+    search: str
+    hash: str
+    origin: str
+
+    def assign(self, url: str) -> None:
+        ...
+
+    @overload
+    def reload(self) -> None:
+        ...
+
+    @overload
+    def reload(self, forceGet: bool) -> None:
+        ...
+
+    def replace(self, url: str) -> None:
+        ...
+
+    def toString(self) -> str:
+        ...
+
 class Document:
+    location: Location
+
     def getElementById(self, id: str) -> Element | None:
         ...
 
