@@ -6,10 +6,21 @@ import tarfile
 import os.path
 import r
 import typing_extensions
-import subprocess
-import sys
 import types
 import importlib
+from http.server import HTTPServer
+from http.server import SimpleHTTPRequestHandler
+from urllib.parse import urlparse
+
+class Handler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        urlparts = urlparse(self.path)
+        request_file_path = urlparts.path.strip('/')
+
+        if not os.path.exists(request_file_path):
+            self.path = 'index.html'
+
+        return SimpleHTTPRequestHandler.do_GET(self)
 
 cwd = pathlib.Path.cwd()
 config_file = cwd / "r.toml"
@@ -132,4 +143,6 @@ if args.command == "build":
 elif args.command == "init":
     wasm_init()
 elif args.command == "serve":
-    subprocess.call([sys.executable, "-m", "http.server"], cwd="build")
+    httpd = HTTPServer(('', 8000), Handler)
+    print("Serving app on port 8000 ...")
+    httpd.serve_forever()

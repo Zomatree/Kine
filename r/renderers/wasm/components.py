@@ -9,6 +9,7 @@ class UseRouter:
     def __init__(self, cx: Scope):
         self.scope = cx
         self.current_route = js.document.location.pathname
+        self.parameters: dict[str, str] = {}
 
     def push_route(self, route: str):
         self.current_route = route
@@ -30,10 +31,10 @@ class UseRouter:
 
         return output
 
-    def matches_route(self, route: str) -> tuple[bool, list[str]]:
+    def matches_route(self, route: str) -> tuple[bool, dict[str, str]]:
         current_route = self.split_route(self.current_route)
         route_parts = self.parse_route(self.split_route(route))
-        dynamic_parts: list[str] = []
+        dynamic_parts: dict[str, str] = {}
         js.console.log(str(current_route), str(route_parts))
 
         if len(current_route) != len(route_parts):
@@ -41,7 +42,8 @@ class UseRouter:
 
         for current_part, (dynamic, match_part) in zip(current_route, route_parts):
             if dynamic:
-                dynamic_parts.append(match_part)
+                dynamic_parts[match_part] = current_part
+
             elif current_part != match_part:
                 return False, dynamic_parts
 
@@ -75,7 +77,9 @@ def router(cx: Scope, *children: Node[...]):
                 js.console.log("case 1", str(child))
                 if child.func == route.__wrapped__:  # type: ignore
                     js.console.log(str(child.args))
-                    if router.matches_route(cast(str, child.args[0])):
+                    matches, dynamic_parts = router.matches_route(cast(str, child.args[0]))
+                    if matches:
+                        router.parameters = dynamic_parts
                         filtered_children.append(child)
             case _:
                 js.console.log("case 2", str(child))
