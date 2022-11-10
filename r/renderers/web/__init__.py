@@ -73,4 +73,4 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
 </html>""", content_type="text/html")
 
     web_app.add_routes([web.get("/app", ws_handle), web.get("/", index)])
-    await web._run_app(web_app)
+    await web._run_app(web_app)  # type: ignore

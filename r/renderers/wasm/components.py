@@ -34,6 +34,10 @@ class UseRouter:
         current_route = self.split_route(self.current_route)
         route_parts = self.parse_route(self.split_route(route))
         dynamic_parts: list[str] = []
+        js.console.log(str(current_route), str(route_parts))
+
+        if len(current_route) != len(route_parts):
+            return False, dynamic_parts
 
         for current_part, (dynamic, match_part) in zip(current_route, route_parts):
             if dynamic:
@@ -68,10 +72,13 @@ def router(cx: Scope, *children: Node[...]):
     for child in children:
         match child:
             case ComponentFunction():
-                if child.func == route:
+                js.console.log("case 1", str(child))
+                if child.func == route.__wrapped__:  # type: ignore
+                    js.console.log(str(child.args))
                     if router.matches_route(cast(str, child.args[0])):
                         filtered_children.append(child)
             case _:
+                js.console.log("case 2", str(child))
                 filtered_children.append(child)
 
     return cx.render(div[tuple(filtered_children)])

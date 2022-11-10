@@ -118,7 +118,7 @@ class Scope:
             vnode = VElement(
                 node.__class__.__name__,
                 nodes,
-                node.attributes,
+                node.attributes,  # type: ignore
                 [Listener(name, func) for name, func in node.listeners.items()]
             )
 

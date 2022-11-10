@@ -387,4 +387,21 @@ class Document:
     def createTextNode(self, data: str) -> Text:
         ...
 
+class _Console:
+    def debug(self, *args: Any) -> None:
+        ...
+
+    def error(self, *args: Any) -> None:
+        ...
+
+    def info(self, *args: Any) -> None:
+        ...
+
+    def log(self, *args: Any) -> None:
+        ...
+
+    def warn(self, *args: Any) -> None:
+        ...
+
+console = _Console()
 document = Document()
