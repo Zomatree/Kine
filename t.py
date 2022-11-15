@@ -6,12 +6,7 @@ import asyncio
 @component
 def app(cx: Scope):
     return cx.render(container[
-        static["hello world"],
-        button(
-            onclick=lambda _: None
-        )[
-            
-        ]
+        button["+1"],
     ])
 
 asyncio.run(start_tui(app()))

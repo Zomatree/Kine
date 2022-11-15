@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import ParamSpec
 import js
 from pyodide.ffi import create_proxy
 import asyncio
@@ -10,8 +9,6 @@ from ... import ComponentFunction, messages, diff
 from ...dom import VirtualDom, ElementId
 
 from .components import *
-
-P = ParamSpec("P")
 
 async def start_wasm(app: ComponentFunction[P]):
     dom = VirtualDom(app)

@@ -15,3 +15,5 @@ class container(CGI, Element): pass
 class button(CGI, Element): pass
 class virtual(CGI, Element): pass
 class horizontal(CGI, Element): pass
+class header(CGI, Element): pass
+class footer(CGI, Element): pass

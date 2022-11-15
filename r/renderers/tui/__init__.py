@@ -12,7 +12,7 @@ from ...diff import Mutations
 from textual.app import App as BaseApp, ComposeResult
 from textual.containers import Container
 from textual.widget import Widget
-from textual.widgets import Static, Button
+from textual.widgets import *
 from textual import events
 
 from .elements import *
@@ -26,17 +26,13 @@ class App(BaseApp[None]):
         self.dom = dom
 
     def on_mount(self, event: events.Mount):
-        main = self.query_one("#main")
-        main._parent = self.screen
-        self.nodes[ElementId(0)] = main
+        self.nodes[ElementId(0)] = self.query_one("#main")
         mutations = self.dom.rebuild()
 
         self.handle_mutations(mutations)
 
     def handle_mutations(self, mutations: Mutations):
         for mod in mutations.modifications:
-            print(mod)
-
             match mod:
                 case diff.CreateElement():
                     widget = self.create_widget(mod.tag)
@@ -47,24 +43,30 @@ class App(BaseApp[None]):
 
                 case diff.AppendChildren():
                     parent = self.nodes[mod.root]
-                    assert isinstance(parent, Widget)
+                    assert not isinstance(parent, str)
 
                     for child_id in mod.children:
                         child = self.nodes[child_id]
-
+                        print(parent, child)
                         if isinstance(child, str):
-                            assert isinstance(parent, Static)
-                            parent.renderable = child
+                            if isinstance(parent, Button):
+                                parent.label = child
+                            elif isinstance(parent, Static):
+                                parent.renderable = child
+                                assert isinstance(parent, Static)
                         else:
-                            parent.children._append(child)
-                            child._parent = parent
+                            parent._add_child(child)
+
+                    self.refresh()
 
                 case diff.NewEventListener():
                     node = self.nodes[mod.root]
-                    def event_callback(event):
-                        print(event)
 
-                    setattr(node, f"_on_{mod.event_name}", event)
+                    async def event_callback(event, *, event_name: str = mod.event_name):
+                        node.label = "+2"
+                        getattr(type(node), f"_on_{event_name}")(node, event)
+
+                    setattr(node, f"_on_{mod.event_name}", event_callback)
                 case _:
                     raise Exception(str(mod))
 
@@ -75,12 +77,16 @@ class App(BaseApp[None]):
             case "static":
                 return Static()
             case "button":
-                return Button()
+                return Button(variant="success")
+            case "header":
+                return Header()
+            case "footer":
+                return Footer()
             case _:
                 raise Exception(str(tag))
 
     def compose(self) -> ComposeResult:
-        yield Container(id="main")
+        yield Widget(id="main")
 
 async def start_tui(app: ComponentFunction[P]):
     dom = VirtualDom(app)
