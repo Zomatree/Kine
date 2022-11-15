@@ -4,7 +4,7 @@ import asyncio
 from collections import deque
 from typing import Callable, TypeVar, cast
 
-from r.core import ComponentFunction
+from r.core import ComponentFunction, VNode
 
 from .diff import AppendChildren, Diff, Mutations
 from .messages import (DirtyAll, EventMessage, Immediate, NewTask,
@@ -23,6 +23,10 @@ class VirtualDom:
         self.dirty_scopes = {ScopeId(0)}
         self.messages: asyncio.Queue[ScheduleMessage] = asyncio.Queue()
         self.pending_messages = deque[ScheduleMessage]()
+
+    @property
+    def nodes(self) -> dict[ElementId, VNode]:
+        return self.scopes.nodes
 
     async def _task(self):
         while True:
