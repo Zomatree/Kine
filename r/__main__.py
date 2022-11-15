@@ -8,6 +8,7 @@ import r
 import typing_extensions
 import types
 import importlib
+import os
 from http.server import HTTPServer
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import urlparse
@@ -118,7 +119,7 @@ def wasm_build() -> None:
 
     script = f"""
 async function loadModule(pyodide, name) {{
-    let res = await fetch(`${{document.location.href}}${{name}}`);
+    let res = await fetch(`${{document.location.origin}}/${{name}}`);
     let buff = await res.arrayBuffer();
 
     pyodide.unpackArchive(buff, "gztar");
@@ -143,6 +144,7 @@ if args.command == "build":
 elif args.command == "init":
     wasm_init()
 elif args.command == "serve":
+    os.chdir("build")
     httpd = HTTPServer(('', 8000), Handler)
     print("Serving app on port 8000 ...")
     httpd.serve_forever()
