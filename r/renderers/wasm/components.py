@@ -81,6 +81,8 @@ def router(cx: Scope, *children: Node[...]):
                     if matches:
                         router.parameters = dynamic_parts
                         filtered_children.append(child)
+                    else:
+                        filtered_children.append(None)
             case _:
                 js.console.log("case 2", str(child))
                 filtered_children.append(child)
