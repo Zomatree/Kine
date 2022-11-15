@@ -12,7 +12,7 @@ from ...diff import Mutations
 from textual.app import App as BaseApp, ComposeResult
 from textual.containers import Container
 from textual.widget import Widget
-from textual.widgets import Static
+from textual.widgets import Static, Button
 from textual import events
 
 from .elements import *
@@ -53,10 +53,18 @@ class App(BaseApp[None]):
                         child = self.nodes[child_id]
 
                         if isinstance(child, str):
+                            assert isinstance(parent, Static)
                             parent.renderable = child
                         else:
                             parent.children._append(child)
+                            child._parent = parent
 
+                case diff.NewEventListener():
+                    node = self.nodes[mod.root]
+                    def event_callback(event):
+                        print(event)
+
+                    setattr(node, f"_on_{mod.event_name}", event)
                 case _:
                     raise Exception(str(mod))
 
@@ -66,6 +74,8 @@ class App(BaseApp[None]):
                 return Container()
             case "static":
                 return Static()
+            case "button":
+                return Button()
             case _:
                 raise Exception(str(tag))
 
@@ -77,4 +87,3 @@ async def start_tui(app: ComponentFunction[P]):
     tui_app = App(dom)
 
     await tui_app.run_async()
-    print(1)
