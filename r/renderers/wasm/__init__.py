@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ParamSpec
+from typing import TYPE_CHECKING, ParamSpec
 import js
 from pyodide.ffi import create_proxy
 import asyncio
@@ -65,7 +65,8 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
 
             case diff.ReplaceWith():
                 node = nodes[mod.root]
-                assert isinstance(node, js.Element)
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Element)
 
                 elements = [nodes[id] for id in mod.nodes]
                 node.replaceWith(*elements)
@@ -80,32 +81,37 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
 
             case diff.NewEventListener():
                 def callback(evt: Any, mod: diff.NewEventListener = mod):
+                    data = evt.to_py()
+                    js.console.log(str(data))
+
                     queue.put_nowait({
                         "method": "user_event",
                         "params": {
                             "event": mod.event_name,
                             "mounted_dom_id": mod.root,
-                            "contents": evt
+                            "contents": data
                         }
                     })
 
                 proxy_func = create_proxy(callback)
 
                 node = nodes[mod.root]
-                assert isinstance(node, js.Element)
-
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Element)
                 node.setAttribute("data-r-id", str(mod.root))
                 node.addEventListener(mod.event_name, proxy_func)
 
             case diff.SetText():
                 node = nodes[mod.root]
-                assert isinstance(node, js.Text)
-
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Text)
                 node.data = mod.text
 
             case diff.SetAttribute():
                 node = nodes[mod.root]
-                assert isinstance(node, js.Element)
+
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Element)
 
                 if mod.field == "value":
                     if mod.value != node.value:
@@ -116,21 +122,21 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
 
             case diff.InsertAfter():
                 node = nodes[mod.root]
-                assert isinstance(node, js.Element)
-
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Element)
                 elements = [nodes[id] for id in mod.nodes]
                 node.after(*elements)
 
             case diff.Remove():
                 node = nodes[mod.root]
-                assert isinstance(node, js.Element)
-
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Element)
                 node.remove()
 
             case diff.InsertBefore():
                 node = nodes[mod.root]
-                assert isinstance(node, js.Element)
-
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.Element)
                 elements = [nodes[id] for id in mod.nodes]
                 node.before(*elements)
 
@@ -145,7 +151,8 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
                 if mod.field == "value":
                     node.value = ""
                 else:
-                    assert isinstance(node, js.Element)
+                    if TYPE_CHECKING:
+                        assert isinstance(node, js.Element)
                     node.removeAttribute(mod.field)
 
             case _:

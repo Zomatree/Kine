@@ -27,7 +27,7 @@ class BaseEvent(Generic[T]):
         return cls.table[message_type](**data)
 
 @dataclass
-class EventMessage(BaseEvent[Literal["asd"]]):
+class EventMessage(BaseEvent[Literal["EventMessage"]]):
     scope_id: ScopeId | None
     priority: int
     element_id: ElementId | None

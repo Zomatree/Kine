@@ -1,5 +1,6 @@
 import argparse
 import pathlib
+import sys
 import toml
 import shutil
 import tarfile
@@ -126,7 +127,7 @@ async function loadModule(pyodide, name) {{
 }}
 
 async function main() {{
-    let pyodide = await loadPyodide();
+    let pyodide = await loadPyodide({{args:["-OO"]}});
 
     {module_imports}
 
@@ -147,4 +148,7 @@ elif args.command == "serve":
     os.chdir("build")
     httpd = HTTPServer(('', 8000), Handler)
     print("Serving app on port 8000 ...")
-    httpd.serve_forever()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        sys.exit(0)

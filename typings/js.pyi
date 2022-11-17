@@ -403,5 +403,31 @@ class _Console:
     def warn(self, *args: Any) -> None:
         ...
 
+class Storage:
+    length: int
+
+    def clear(self) -> None:
+        ...
+
+    def getItem(self, keyName: str) -> str | None:
+        ...
+
+    def key(self, index: int) -> str | None:
+        ...
+
+    def removeItem(self, keyName: str) -> None:
+        ...
+
+    def setItem(self, keyName: str, keyValue: str) -> None:
+        ...
+
+class Window:
+    closed: bool
+    console: _Console
+    document: Document
+    localStorage: Storage
+    sessionStorage: Storage
+
 console = _Console()
 document = Document()
+window = Window()

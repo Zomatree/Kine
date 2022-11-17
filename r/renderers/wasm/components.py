@@ -9,7 +9,7 @@ class UseRouter:
     def __init__(self, cx: Scope):
         self.scope = cx
         self.current_route = js.document.location.pathname
-        self.parameters: dict[str, str] = {}
+        self.route_parameters: dict[str, str] = {}
 
     def push_route(self, route: str):
         self.current_route = route
@@ -35,7 +35,6 @@ class UseRouter:
         current_route = self.split_route(self.current_route)
         route_parts = self.parse_route(self.split_route(route))
         dynamic_parts: dict[str, str] = {}
-        js.console.log(str(current_route), str(route_parts))
 
         if len(current_route) != len(route_parts):
             return False, dynamic_parts
@@ -73,18 +72,15 @@ def router(cx: Scope, *children: Node[...]):
 
     for child in children:
         match child:
-            case ComponentFunction():
-                js.console.log("case 1", str(child))
-                if child.func == route.__wrapped__:  # type: ignore
-                    js.console.log(str(child.args))
-                    matches, dynamic_parts = router.matches_route(cast(str, child.args[0]))
-                    if matches:
-                        router.parameters = dynamic_parts
-                        filtered_children.append(child)
-                    else:
-                        filtered_children.append(None)
+            case ComponentFunction() if child.func == route.__wrapped__:  # type: ignore
+                matches, dynamic_parts = router.matches_route(cast(str, child.args[0]))
+
+                if matches:
+                    router.route_parameters = dynamic_parts
+                    filtered_children.append(child)
+                else:
+                    filtered_children.append(None)
             case _:
-                js.console.log("case 2", str(child))
                 filtered_children.append(child)
 
     return cx.render(div[tuple(filtered_children)])
