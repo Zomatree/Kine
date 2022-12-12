@@ -47,14 +47,13 @@ class VirtualDom:
                     loop_task = asyncio.ensure_future(self._task())
                     message_task = asyncio.ensure_future(self.messages.get())
 
-                    done, pending = await asyncio.wait((loop_task, message_task), return_when=asyncio.FIRST_COMPLETED)
+                    def done(t: asyncio.Task[ScheduleMessage]):
+                        loop_task.cancel()
+                        self.pending_messages.appendleft(t.result())
 
-                    for task in pending:
-                        task.cancel()
+                    loop_task.add_done_callback(lambda _: message_task.cancel())
+                    message_task.add_done_callback(done)
 
-                    if message_task in done:
-                        msg, = cast(set[asyncio.Task[EventMessage]], done)
-                        self.pending_messages.appendleft(msg.result())
                 else:
                     self.pending_messages.appendleft(await self.messages.get())
 

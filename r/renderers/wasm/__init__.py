@@ -5,10 +5,10 @@ import js
 from pyodide.ffi import create_proxy
 import asyncio
 
-from ..web_elements import *
 from ... import ComponentFunction, messages, diff
 from ...dom import VirtualDom, ElementId
 
+from ..web_elements import *
 from .components import *
 
 P = ParamSpec("P")
@@ -114,6 +114,9 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
                     assert isinstance(node, js.Element)
 
                 if mod.field == "value":
+                    if TYPE_CHECKING:
+                        assert isinstance(node, js.HTMLInputElement)
+
                     if mod.value != node.value:
                         node.value = mod.value
 
@@ -142,6 +145,10 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
 
             case diff.CreatePlaceholder():
                 node = js.document.createElement("pre")
+
+                if TYPE_CHECKING:
+                    assert isinstance(node, js.HTMLElement)
+
                 node.hidden = True
                 nodes[mod.root] = node
 
@@ -149,6 +156,9 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
                 node = nodes[mod.root]
 
                 if mod.field == "value":
+                    if TYPE_CHECKING:
+                        assert isinstance(node, js.HTMLInputElement)
+
                     node.value = ""
                 else:
                     if TYPE_CHECKING:

@@ -1,4 +1,4 @@
-from typing import Callable, Any, TypedDict, cast, Generic, TypeVar
+from typing import Callable, Any, TypedDict, Generic, TypeVar
 from typing_extensions import Unpack
 
 import gi
