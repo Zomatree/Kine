@@ -1,4 +1,5 @@
-from typing import Any, Iterator, Literal, overload, TypeVar, Generic
+from typing import Any, Callable, Iterator, Literal, TypedDict, overload, TypeVar, Generic
+from typing_extensions import NotRequired, Unpack, Self
 
 T = TypeVar("T")
 
@@ -427,6 +428,101 @@ class Window:
     document: Document
     localStorage: Storage
     sessionStorage: Storage
+
+class ReadableStream:
+    locked: bool
+
+    def cancel(self) -> Promise[None]:
+        ...
+
+class Response:
+    ...
+
+class AbortSigal(EventTarget):
+    aborted: bool
+    reason: str
+
+    @overload
+    @classmethod
+    def abort(cls) -> AbortSigal:
+        ...
+
+    @overload
+    @classmethod
+    def abort(cls, reason: str) -> AbortSigal:
+        ...
+
+    @classmethod
+    def timeout(cls, time: int) -> AbortSigal:
+        ...
+
+    def throwIfAborted(self) -> None:
+        ...
+
+class FetchOptions(TypedDict):
+    method: NotRequired[str]
+    headers: NotRequired[dict[str, str]]
+    body: NotRequired[Any]
+    mode: NotRequired[str]
+    credentials: NotRequired[Literal["omit", "same-origin", "include"]]
+    cache: NotRequired[Literal["default", "no-store", "reload", "no-cache", "force-cache", "only-if-cached"]]
+    redirect: NotRequired[Literal["follow", "error", "manual"]]
+    referrer: NotRequired[str]
+    referrerPolicy: NotRequired[Literal["no-referrer", "no-referrer-when-downgrade", "same-origin", "origin", "strict-origin", "origin-when-cross-origin", "strict-origin-when-cross-origin", "unsafe-url"]]
+    integrity: NotRequired[str]
+    keepalive: NotRequired[bool]
+    signal: NotRequired[AbortSigal]
+
+T2 = TypeVar("T2")
+
+class Promise[T]:
+    @classmethod
+    def all(cls, values: Array[Promise[T2]]) -> Promise[T2]:
+        ...
+
+    @classmethod
+    def race(cls, values: Array[Promise[T2]]) -> Promise[T2]:
+        ...
+
+    @overload
+    @classmethod
+    def reject(cls) -> Promise[T]:
+        ...
+
+    @overload
+    @classmethod
+    def reject(cls, reason: str) -> Promise[T]:
+        ...
+
+    @overload
+    @classmethod
+    def resolve(cls) -> Promise[None]:
+        ...
+
+    @overload
+    @classmethod
+    def resolve(cls, value: T2) -> Promise[T2]:
+        ...
+
+    def then(self, onfulfilled: Callable[[T], T2]) -> Promise[T2]:
+        ...
+
+    def catch(self, onrejected: Callable[[Any], None]) -> Self:
+        ...
+
+    def finally_(self, onfinally: Callable[[], None]) -> Self:
+        ...
+
+    def __await__(self) -> T:
+        ...
+
+@overload
+def fetch(url: str) -> Promise[Response]:
+    ...
+
+@overload
+def fetch(url: str, **options: Unpack[FetchOptions]) -> Promise[Response]:
+    ...
 
 console = _Console()
 document = Document()
