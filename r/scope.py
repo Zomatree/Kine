@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Optional, TypeVar
 
 from .core import (ComponentFunction, Element, Listener, VComponent, VElement,
                    VNode, VPlaceholder, VString)
@@ -132,6 +132,9 @@ class Scope:
 
         elif node is None:
             return VPlaceholder()
+
+    def spawn(self, coro: Coroutine[Any, Any, T]) -> asyncio.Task[T]:
+        return asyncio.create_task(coro)
 
     def _reset(self):
         self.hook_idx = 0
