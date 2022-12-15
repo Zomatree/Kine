@@ -86,11 +86,11 @@ def app(cx: Scope):
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
-    <title>{name}</title>
+    <title>{{name}}</title>
 </head>
 <body>
     <div id="main"></div>
-    <script>{script}</script>
+    <script>{{script}}</script>
 </body>
 </html>
 """)
@@ -139,7 +139,7 @@ async function main() {{
 main();
 """
 
-    index = index_file.read_text().format(name=config["project"]["name"], script=script)
+    index = index_file.read_text().replace("{{name}}", config["project"]["name"]).replace("{{script}}", script)
     build_index = build_dir / "index.html"
     build_index.write_text(index)
 
