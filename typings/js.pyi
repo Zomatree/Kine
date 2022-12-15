@@ -1,5 +1,10 @@
-from typing import Any, Callable, Generator, Iterator, Literal, TypeAlias, TypedDict, overload, TypeVar, Generic
+from __future__ import annotations
+
+from typing import Any, Callable, Generator, Iterator, Literal, TypeAlias, TypedDict, overload, TypeVar, Generic, TYPE_CHECKING
 from typing_extensions import NotRequired, Self
+
+if TYPE_CHECKING:
+    from pyodide.ffi import Proxy
 
 T = TypeVar("T")
 
@@ -8,30 +13,30 @@ class Array(Generic[T], list[T]):
 
 class EventTarget:
     @overload
-    def addEventListener(self, type: str, listener: Any) -> None:
+    def addEventListener(self, type: str, listener: Proxy[Any]) -> None:
         ...
 
     @overload
-    def addEventListener(self, type: str, listener: Any, options: Any) -> None:
+    def addEventListener(self, type: str, listener: Proxy[Any], options: Any) -> None:
         ...
 
     @overload
-    def addEventListener(self, type: str, listener: Any, useCapture: bool) -> None:
+    def addEventListener(self, type: str, listener: Proxy[Any], useCapture: bool) -> None:
         ...
 
     def dispatchEvent(self, event: str) -> bool:
         ...
 
     @overload
-    def removeEventListener(self, type: str, listener: Any) -> None:
+    def removeEventListener(self, type: str, listener: Proxy[Any]) -> None:
         ...
 
     @overload
-    def removeEventListener(self, type: str, listener: Any, options: Any) -> None:
+    def removeEventListener(self, type: str, listener: Proxy[Any], options: Any) -> None:
         ...
 
     @overload
-    def removeEventListener(self, type: str, listener: Any, useCapture: bool) -> None:
+    def removeEventListener(self, type: str, listener: Proxy[Any], useCapture: bool) -> None:
         ...
 
 class NodeList:
@@ -474,7 +479,7 @@ class Headers:
     def set(self, name: str, value: str) -> None:
         ...
 
-    def forEach(self, callbackfn: Callable[[str], None] | Callable[[str, Self], None] | Callable[[str, str, Self], None]) -> None:
+    def forEach(self, callbackfn: Proxy[Callable[[str], None] | Callable[[str, Self], None] | Callable[[str, str, Self], None]]) -> None:
         ...
 
 class Blob:
@@ -538,7 +543,7 @@ class FormData:
     def set(self, name: str, value: str | Blob, fileName: str) -> None:
         ...
 
-    def forEach(self, callbackfn: Callable[[FormDataEntryValue], None] | Callable[[FormDataEntryValue, str], None] | Callable[[FormDataEntryValue, str, Self], None]) -> None:
+    def forEach(self, callbackfn: Proxy[Callable[[FormDataEntryValue], None] | Callable[[FormDataEntryValue, str], None] | Callable[[FormDataEntryValue, str, Self], None]]) -> None:
         ...
 
 class Body:
@@ -634,13 +639,13 @@ class Promise(Generic[T]):
     def resolve(cls, value: T2) -> Promise[T2]:
         ...
 
-    def then(self, onfulfilled: Callable[[T], T2]) -> Promise[T2]:
+    def then(self, onfulfilled: Proxy[Callable[[T], T2]]) -> Promise[T2]:
         ...
 
-    def catch(self, onrejected: Callable[[Any], None]) -> Self:
+    def catch(self, onrejected: Proxy[Callable[[Any], None]]) -> Self:
         ...
 
-    def finally_(self, onfinally: Callable[[], None]) -> Self:
+    def finally_(self, onfinally: Proxy[Callable[[], None]]) -> Self:
         ...
 
     def __await__(self) -> Generator[Any, Any, T]:
@@ -693,7 +698,7 @@ class URLSearchParams:
     def sort(self) -> None:
         ...
 
-    def forEach(self, callbackfn: Callable[[str], None] | Callable[[str, str], None] | Callable[[str, str, Self], None]) -> None:
+    def forEach(self, callbackfn: Proxy[Callable[[str], None] | Callable[[str, str], None] | Callable[[str, str, Self], None]]) -> None:
         ...
 
 class URL:
@@ -747,10 +752,10 @@ class WebSocket(EventTarget):
     binaryType: Literal["arraybuffer", "blob"]
     bufferedAmount: int
     extensions: str
-    onclose: Callable[[Self, CloseEvent], None] | None
-    onerror: Callable[[Self, Event], None] | None
-    onmessage: Callable[[Self, MessageEvent[Any]], None]
-    onopen: Callable[[Self, Event], None] | None
+    onclose: Proxy[Callable[[Self, CloseEvent], None]] | None
+    onerror: Proxy[Callable[[Self, Event], None]] | None
+    onmessage: Proxy[Callable[[Self, MessageEvent[Any]], None]] | None
+    onopen: Proxy[Callable[[Self, Event], None]] | None
     protocol: str
     readyState: int
     url: str

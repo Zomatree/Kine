@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any
 from typing_extensions import Unpack
 import js
+from pyodide.ffi import create_proxy
 
 class Response:
     def __init__(self, inner: js.Response):
@@ -50,21 +51,23 @@ class Websocket:
     def __init__(self, url: str):
         self.inner = js.WebSocket.new(url)
 
-        self.inner.addEventListener("close", self.on_close)
-        self.inner.addEventListener("error", self.on_error)
-        self.inner.addEventListener("open", self.on_open)
-        self.inner.addEventListener("message", self.on_message)
+        self.inner.addEventListener("close", create_proxy(self.on_close))
+        self.inner.addEventListener("error", create_proxy(self.on_error))
+        self.inner.addEventListener("open", create_proxy(self.on_open))
+        self.inner.addEventListener("message", create_proxy(self.on_message))
 
         self.state = WebsocketState(self.inner.readyState)
         self.messages = asyncio.Queue[Any]()
 
         self.close_code: int | None = None
         self.close_reason: str | None = None
+        self.closed: bool = False
 
     def on_close(self, event: js.CloseEvent):
         self.state = self.inner.readyState
         self.close_code = event.code
         self.close_reason = event.reason
+        self.closed = True
 
     def on_message(self, event: js.MessageEvent[Any]):
         self.state = self.inner.readyState
@@ -72,13 +75,11 @@ class Websocket:
 
     def on_error(self, event: js.Event):
         self.state = self.inner.readyState
-        self.messages.put_nowait(event.body)
 
     def on_open(self, event: js.Event):
         self.state = self.inner.readyState
-        self.messages.put_nowait(event.body)
 
-    async def send(self, data: Any):
+    def send(self, data: Any):
         self.inner.send(data)
 
     async def recv(self) -> Any:

@@ -1,6 +1,9 @@
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
-def create_proxy(f: T) -> T:
+class Proxy(Generic[T]):
+    _: T
+
+def create_proxy(f: T) -> Proxy[T]:
     ...
