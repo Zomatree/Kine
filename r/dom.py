@@ -54,6 +54,8 @@ class VirtualDom:
                     loop_task.add_done_callback(lambda _: message_task.cancel())
                     message_task.add_done_callback(done)
 
+                    await asyncio.wait([loop_task, message_task])
+
                 else:
                     self.pending_messages.appendleft(await self.messages.get())
 
