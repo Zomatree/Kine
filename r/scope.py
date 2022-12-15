@@ -134,7 +134,10 @@ class Scope:
             return VPlaceholder()
 
     def spawn(self, coro: Coroutine[Any, Any, T]) -> asyncio.Task[T]:
-        return asyncio.create_task(coro)
+        task =  asyncio.create_task(coro)
+        self.scopes.tasks.spawn(self.scope_id, task)
+
+        return task
 
     def _reset(self):
         self.hook_idx = 0

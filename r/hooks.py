@@ -27,8 +27,6 @@ def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> UseFutu
 
         task.add_done_callback(cb)
 
-        cx.scopes.tasks.spawn(cx.scope_id, task)
-
         return state
 
     return cx.use_hook(hook)
