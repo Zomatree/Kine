@@ -169,7 +169,16 @@ class Diff:
         new.id = element_id
         new.parent_id = old.parent_id
 
-        # todo diff attributes and listeners
+        if len(old.attributes) == len(new.attributes):
+            for (key, old_attr), new_attr in zip(old.attributes.items(), new.attributes.values()):
+                if old_attr != new_attr:
+                    self.mutations.append(SetAttribute(element_id, key, new_attr))
+        else:
+            for key in old.attributes:
+                self.mutations.append(RemoveAttribute(element_id, key))
+
+            for key, value in new.attributes:
+                self.mutations.append(SetAttribute(element_id, key, value))
 
         match old.children, new.children:
             case [], []:
