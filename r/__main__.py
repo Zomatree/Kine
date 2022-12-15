@@ -116,7 +116,8 @@ def wasm_build() -> None:
         with tarfile.open(output_file, "w:gz") as tar:
             tar.add(input_folder, arcname=os.path.basename(input_folder))
 
-    module_imports = "\n\t".join(f"await loadModule(pyodide, \"{name.name}\");" for _, name in modules)
+    module_names = [f'"{module.name}"' for _, module in modules]
+    module_imports = f"[{', '.join(module_names)}]"
 
     script = f"""
 async function loadModule(pyodide, name) {{
@@ -129,7 +130,9 @@ async function loadModule(pyodide, name) {{
 async function main() {{
     let pyodide = await loadPyodide({{args:["-OO"]}});
 
-    {module_imports}
+    for (mod of {module_imports}) {{
+        await loadModule(pyodide, mod);
+    }};
 
     pyodide.runPythonAsync("from src import main; await main()")
 }}
