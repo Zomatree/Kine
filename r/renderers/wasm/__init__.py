@@ -81,9 +81,6 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
 
             case diff.NewEventListener():
                 def callback(evt: Any, mod: diff.NewEventListener = mod):
-                    data = evt.to_py()
-                    js.console.log(str(data))
-
                     queue.put_nowait({
                         "method": "user_event",
                         "params": {

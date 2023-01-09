@@ -16,10 +16,10 @@ T = TypeVar("T")
 def use_state(cx: Scope, func: Callable[[], T]) -> UseState[T]:
     return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, func()))
 
-def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> T | None:
+def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> UseFuture[T]:
     def hook():
         state = UseFuture[T](cx, cx.hook_idx)
-        task = asyncio.create_task(func())
+        task = cx.spawn(func())
 
         def cb(task: asyncio.Task[T]):
             state.value = task.result()
@@ -27,11 +27,9 @@ def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> T | Non
 
         task.add_done_callback(cb)
 
-        cx.scopes.tasks.spawn(cx.scope_id, task)
-
         return state
 
-    return cx.use_hook(hook).value
+    return cx.use_hook(hook)
 
 class UseState(Generic[T]):
     def __init__(self, scope: Scope, idx: int, value: T):
