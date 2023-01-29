@@ -19,7 +19,7 @@ def app(cx: Scope):
             "Http request result:"
         ],
         p[
-            str(future) if future is not None else "Loading..."
+            str(future.value) if future.value is not None else "Loading..."
         ]
     ])
 

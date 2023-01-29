@@ -10,7 +10,7 @@ from .elements import Element
 from .utils import ElementId, ScopeId, TaskId
 
 if TYPE_CHECKING:
-    from .core import Node, P, VNode
+    from .core import Node, VNode
     from .dom import VirtualDom
 
 __all__ = ("Scope", "Scopes", "TaskQueue")
@@ -32,6 +32,7 @@ class Scope:
         self.frame_1 = VString("placeholder")
         self.hooks: list[Any] = []
         self.hook_idx = 0
+        self.children: tuple[Node, ...] = ()
 
     def use_hook(self: Scope, f: Callable[[], T]) -> T:
         hook_len = len(self.hooks)
@@ -106,9 +107,9 @@ class Scope:
     def next_frame(self):
         self.generation += 1
 
-    def render(self, node: Node[P]) -> VNode:
+    def render(self, node: Node) -> VNode:
         if isinstance(node, str):
-            vnode = VString(str(node))
+            vnode = VString(node)
             return vnode
 
         elif isinstance(node, Element):
@@ -216,8 +217,9 @@ class Scopes:
         scope = self.get_scope(scope_id)
         scope.hook_idx = 0
 
-        if not scope.component:
-            raise
+        assert scope.component is not None
+
+        scope.children = scope.component.children
 
         if node := scope.component.call(scope):
             scope.set_wip_frame(node)

@@ -16,7 +16,7 @@ class ElementArgs(TypedDict, total=False):
 
 class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
-        self.children: tuple[Node[...], ...] = ()
+        self.children: tuple[Node, ...] = ()
         self.listeners: dict[str, Callable[[Any], None]] = {}
 
         for name, value in list(attributes.items()):
@@ -26,7 +26,7 @@ class Element:
 
         self.attributes = attributes
 
-    def __getitem__(self, children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> Self:
+    def __getitem__(self, children: Node | tuple[Node, ...] | Generator[Node, None, None]) -> Self:
         if isinstance(children, Generator):
             children = tuple(children)
         elif isinstance(children, tuple):
@@ -38,13 +38,13 @@ class Element:
         return self
 
 class GetAttrProto(Protocol):
-    def __getitem__(self, children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> Self:
+    def __getitem__(self, children: Node | tuple[Node, ...] | Generator[Node, None, None]) -> Self:
         ...
 
 T = TypeVar("T", bound=GetAttrProto)
 
 class CGIMeta(type):
-    def __getitem__(cls: type[T], children: Node[...] | tuple[Node[...], ...] | Generator[Node[...], None, None]) -> T:
+    def __getitem__(cls: type[T], children: Node | tuple[Node, ...] | Generator[Node, None, None]) -> T:
         return cls()[children]
 
 class CGI(metaclass=CGIMeta):

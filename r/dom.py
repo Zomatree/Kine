@@ -49,13 +49,13 @@ class VirtualDom:
 
                     def done(t: asyncio.Task[ScheduleMessage]):
                         loop_task.cancel()
+
                         self.pending_messages.appendleft(t.result())
 
                     loop_task.add_done_callback(lambda _: message_task.cancel())
                     message_task.add_done_callback(done)
 
                     await asyncio.wait([loop_task, message_task])
-
                 else:
                     self.pending_messages.appendleft(await self.messages.get())
 
@@ -116,7 +116,7 @@ class VirtualDom:
             diff = Diff(self.scopes)
             ran_scopes: set[ScopeId] = set()
 
-            self.dirty_scopes = {scope_id for scope_id in self.dirty_scopes if scope_id in self.scopes.scopes}
+            self.dirty_scopes: set[ScopeId] = {scope_id for scope_id in self.dirty_scopes if scope_id in self.scopes.scopes}
 
             self.dirty_scopes = set(sorted(self.dirty_scopes, reverse=True))
 

@@ -22,7 +22,7 @@ class Handler(SimpleHTTPRequestHandler):
         if not os.path.exists(request_file_path):
             self.path = 'index.html'
 
-        return SimpleHTTPRequestHandler.do_GET(self)
+        return super().do_GET()
 
 cwd = pathlib.Path.cwd()
 config_file = cwd / "r.toml"

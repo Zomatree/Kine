@@ -57,22 +57,22 @@ def use_router(cx: Scope) -> UseRouter:
     return cx.consume_context(UseRouter)
 
 @component
-def link(cx: Scope, route: str, children: tuple[Node[...], ...]):
+def link(cx: Scope, route: str):
     return cx.render(a(
         href=route
     )[
-        children
+       cx.children
     ])
 
 @component
-def route(cx: Scope, route: str, child: Node[P]):
-    return cx.render(child)
+def route(cx: Scope, route: str):
+    return cx.render(cx.children[0])
 
 @component
-def router(cx: Scope, *children: Node[...]):
+def router(cx: Scope, *children: Node):
     router = cx.use_hook(lambda: cx.provide_context(UseRouter(cx)))
 
-    filtered_children: list[Node[...]] = []
+    filtered_children: list[Node] = []
 
     for child in children:
         match child:

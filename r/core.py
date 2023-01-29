@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import functools
 from collections import UserString
-from typing import (TYPE_CHECKING, Any, Callable, Concatenate, Generic,
+from typing import (TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic,
                     ParamSpec, TypeVar, Union)
 
 from .elements import Element
@@ -58,6 +58,7 @@ VNode = Union[VString, VElement, VPlaceholder, VComponent]
 class ComponentFunction(Generic[P]):
     def __init__(self, func: Callable[Concatenate[Scope, P], VNode], *args: P.args, **kwargs: P.kwargs):
         self.func = func
+        self.children: tuple[Node, ...] = ()
         self.id: ElementId | None = None
         self.scope_id: ScopeId | None = None
         self.parent_id: ElementId | None = None
@@ -72,6 +73,17 @@ class ComponentFunction(Generic[P]):
     def call(self, scope: Scope) -> VNode:
         return self.func(scope, *self.args, **self.kwargs)
 
+    def __getitem__(self, children: Node | tuple[Node, ...] | Generator[Node, Any, Any]):
+        if isinstance(children, Generator):
+            children = tuple(children)
+        elif isinstance(children, tuple):
+            pass
+        else:
+            children = (children,)
+
+        self.children = children
+        return self
+
 def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[Concatenate[P], ComponentFunction[P]]:
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
@@ -80,5 +92,5 @@ def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[Concaten
     return wrapper
 
 Component = Callable[Concatenate["Scope", P], "VNode"]
-Node = Union[str, Element, ComponentFunction[P], None]
-Nodes = list[Node[P]]
+Node = Union[str, Element, ComponentFunction[...], None]
+Nodes = list[Node]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import pathlib
-from typing import Any, Awaitable, ParamSpec, cast
+from typing import Any, Awaitable, Literal, ParamSpec, cast
 
 from aiohttp import web
 
@@ -29,10 +29,16 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
         edits = dom.rebuild()
         await ws.send_json(edits.serialize())
 
+        async def receive_wrapper():
+            try:
+                return await ws.receive_json()
+            except TypeError:
+                return True
+
         while True:
             futs = await asyncio.wait([
                 asyncio.ensure_future(dom.wait_for_work()),
-                asyncio.ensure_future(cast(Awaitable[dict[str, Any]], ws.receive_json())),
+                asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
             ], return_when=asyncio.FIRST_COMPLETED)
             dones, pending = futs
 
@@ -42,8 +48,13 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
             for done in dones:
                 try:
                     result = done.result()
-                except TypeError:
-                    return ws # closed ws
+                except (TypeError, RuntimeError):
+                    await ws.close()
+                    return ws
+
+                if result == True:
+                    await ws.close()
+                    return ws
 
                 if msg := result:
                     if msg["method"] == "user_event":
