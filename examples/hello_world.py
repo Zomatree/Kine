@@ -1,5 +1,5 @@
-from r import *
-from r.renderers.web import *
+from kine import *
+from kine.renderers.web import *
 
 import asyncio
 

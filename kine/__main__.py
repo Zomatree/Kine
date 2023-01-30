@@ -5,7 +5,7 @@ import toml
 import shutil
 import tarfile
 import os.path
-import r
+import kine
 import typing_extensions
 import types
 import importlib
@@ -24,24 +24,41 @@ class Handler(SimpleHTTPRequestHandler):
 
         return super().do_GET()
 
-cwd = pathlib.Path.cwd()
-config_file = cwd / "r.toml"
-build_dir = cwd / "build"
-src_dir = cwd / "src"
-index_file = cwd / "index.html"
-
 def get_library_root(library: types.ModuleType):
     return pathlib.Path(getattr(library, "__path__", [library.__file__])[-1])
 
-r_path = get_library_root(r)
+r_path = get_library_root(kine)
 typing_extensions_path = get_library_root(typing_extensions)
 
 @click.group()
 def cli():
+    """Cli for building Kine webassembly projects."""
     pass
 
 @cli.command()
+@click.argument("name")
+def new(name: str):
+    """Creates a new project with the foldername of NAME"""
+
+    try:
+        os.mkdir(name)
+    except FileExistsError:
+        return print("Folder already exists with that name")
+
+    os.chdir(name)
+    init((name,))
+
+@cli.command()
+@click.argument("name")
 def init(name: str | None = None):
+    """Initializes a project in the current directory with NAME or the current directories name"""
+
+    cwd = pathlib.Path.cwd()
+    config_file = cwd / "r.toml"
+    build_dir = cwd / "build"
+    src_dir = cwd / "src"
+    index_file = cwd / "index.html"
+
     config_file.write_text(
 f"""[project]
 name = "{name}"
@@ -52,9 +69,8 @@ dependancies = []
     src_dir.mkdir(exist_ok=True)
     init_file = src_dir / "__init__.py"
     init_file.write_text(
-"""import asyncio
-from r import *
-from r.renderers.wasm import *
+"""from kine import *
+from kine.renderers.wasm import *
 
 from .app import app
 
@@ -64,9 +80,8 @@ async def main():
 
     app_file = src_dir / "app.py"
     app_file.write_text(
-"""import asyncio
-from r import *
-from r.renderers.wasm import *
+"""from kine import *
+from kine.renderers.wasm import *
 
 @component
 def app(cx: Scope):
@@ -95,12 +110,24 @@ def app(cx: Scope):
 
 @cli.command()
 def clean():
+    """Cleans the build directory and all build artifacts"""
+
+    build_dir = pathlib.Path.cwd() / "build"
+
     shutil.rmtree(build_dir)
     build_dir.mkdir()
 
 @cli.command()
 def build() -> None:
-    clean()
+    """Builds the project"""
+
+    clean.main(standalone_mode=False)
+
+    cwd = pathlib.Path.cwd()
+    config_file = cwd / "r.toml"
+    build_dir = cwd / "build"
+    src_dir = cwd / "src"
+    index_file = cwd / "index.html"
 
     config = toml.loads(config_file.read_text())
 
@@ -145,11 +172,17 @@ main();
     build_index.write_text(index)
 
 @cli.command()
-def serve():
+@click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
+@click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
+def serve(port: int, host: str):
+    """Runs a http server with the built web app"""
+
     os.chdir("build")
-    httpd = HTTPServer(('', 8000), Handler)
-    print("Serving app on port 8000 ...")
+    httpd = HTTPServer((host, port), Handler)
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         sys.exit(0)
+
+cli()

@@ -89,7 +89,6 @@ class App(Adw.Application):
                         node = self.nodes[element_id]
                         self.parents[element_id] = parent
 
-                        node.set_parent(parent)
                         parent.insert_child_after(before_node, node)
 
                 case diff.Remove():
@@ -111,7 +110,7 @@ class App(Adw.Application):
             self.set_node_label(parent, child)
         else:
             parent.append(child)
-            child.set_parent(parent)
+            child.insert_after(parent, parent.get_last_child())
 
     def set_node_label(self, node: Gtk.Widget, text: str):
         if isinstance(node, Gtk.Label):

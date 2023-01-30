@@ -4,7 +4,7 @@ import asyncio
 from collections import deque
 from typing import Callable, TypeVar, cast
 
-from r.core import ComponentFunction
+from kine.core import ComponentFunction
 
 from .diff import AppendChildren, Diff, Mutations
 from .messages import (DirtyAll, EventMessage, Immediate, NewTask,

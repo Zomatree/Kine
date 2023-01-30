@@ -1,17 +1,13 @@
-# R
-
-*(temporary name until i find an actual name)*
-
+# Kine
 
 A react style gui framework in python.
-
 
 
 ### Example
 
 ```py
 import asyncio
-from r import *
+from kine import *
 
 @component
 def app(cx: Scope):

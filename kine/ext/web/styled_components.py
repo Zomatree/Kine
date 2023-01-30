@@ -2,8 +2,8 @@ from typing import Any, Callable, TypeVar
 import random
 import string
 
-from r import *
-from r.renderers import web_elements
+from kine import *
+from kine.renderers import web_elements
 
 T = TypeVar("T")
 

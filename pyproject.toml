@@ -1,17 +1,40 @@
-[tool.poetry]
-name = "r"
-version = "0.1.0"
-description = "A react style gui framework in python."
-authors = ["Zomatree <me@zomatree.live>"]
-license = "MIT"
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kine"
+description = 'A react style gui framework in python'
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Zomatree", email = "me@zomatree.live" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython"
+]
+dependencies = [
+  "aiohttp==3.8.3",
+  "toml==0.10.2",
+  "typing_extnesions==4.4.0"
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://github.com/Zomatree/kine#readme"
+Issues = "https://github.com/Zomatree/kine/issues"
+Source = "https://github.com/Zomatree/kine"
+
+[tool.hatch.version]
+path = "kine/__init__.py"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["311"]
 
 [tool.pyright]
 typeCheckingMode = "strict"
