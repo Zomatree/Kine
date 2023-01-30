@@ -1,13 +1,17 @@
 # Kine
 
-A react style gui framework in python.
+![Logo and name](.github/logo_name.png)
+
+A react style GUI framework in python.
 
 
 ### Example
 
 ```py
 import asyncio
+
 from kine import *
+from kine.renderers.web import *
 
 @component
 def app(cx: Scope):
@@ -19,7 +23,7 @@ def app(cx: Scope):
         )[
             "Minus"
         ],
-        str(value.get()),
+        f"{value.get()}",
         button(
             onclick=lambda _: value.modify(lambda v: v + 1)
         )[
