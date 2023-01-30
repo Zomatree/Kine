@@ -1,4 +1,4 @@
-import argparse
+import click
 import pathlib
 import sys
 import toml
@@ -36,14 +36,12 @@ def get_library_root(library: types.ModuleType):
 r_path = get_library_root(r)
 typing_extensions_path = get_library_root(typing_extensions)
 
-parser = argparse.ArgumentParser("r")
-parser.add_argument("command")
+@click.group()
+def cli():
+    pass
 
-args = parser.parse_args()
-
-def wasm_init(name: str | None = None):
-    name = name or cwd.name
-
+@cli.command()
+def init(name: str | None = None):
     config_file.write_text(
 f"""[project]
 name = "{name}"
@@ -95,12 +93,15 @@ def app(cx: Scope):
 </html>
 """)
 
-def wasm_clean():
+@cli.command()
+def clean():
     shutil.rmtree(build_dir)
     build_dir.mkdir()
 
-def wasm_build() -> None:
-    wasm_clean()
+@cli.command()
+def build() -> None:
+    clean()
+
     config = toml.loads(config_file.read_text())
 
     modules = [
@@ -143,11 +144,8 @@ main();
     build_index = build_dir / "index.html"
     build_index.write_text(index)
 
-if args.command == "build":
-    wasm_build()
-elif args.command == "init":
-    wasm_init()
-elif args.command == "serve":
+@cli.command()
+def serve():
     os.chdir("build")
     httpd = HTTPServer(('', 8000), Handler)
     print("Serving app on port 8000 ...")
