@@ -1,6 +1,6 @@
-from ... import component, Scope, ComponentFunction, Node
+from ... import component, Scope
 from ..web_elements import *
-from typing import ParamSpec, cast
+from typing import ParamSpec
 import js
 
 __all__ = ("UseRouter", "use_router", "link", "route", "router")
@@ -66,25 +66,20 @@ def link(cx: Scope, route: str):
 
 @component
 def route(cx: Scope, route: str):
-    return cx.render(cx.children[0])
+    router = cx.consume_context(UseRouter)
+
+    matches, dynamic_parts = router.matches_route(route)
+
+    if matches:
+        router.route_parameters = dynamic_parts
+        children = cx.children
+    else:
+        children = ()
+
+    return cx.render(div[children])
 
 @component
-def router(cx: Scope, *children: Node):
-    router = cx.use_hook(lambda: cx.provide_context(UseRouter(cx)))
+def router(cx: Scope):
+    cx.use_hook(lambda: cx.provide_context(UseRouter(cx)))
 
-    filtered_children: list[Node] = []
-
-    for child in children:
-        match child:
-            case ComponentFunction() if child.func == route.__wrapped__:  # type: ignore
-                matches, dynamic_parts = router.matches_route(cast(str, child.args[0]))
-
-                if matches:
-                    router.route_parameters = dynamic_parts
-                    filtered_children.append(child)
-                else:
-                    filtered_children.append(None)
-            case _:
-                filtered_children.append(child)
-
-    return cx.render(div[tuple(filtered_children)])
+    return cx.render(div[cx.children])
