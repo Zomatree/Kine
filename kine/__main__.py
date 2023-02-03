@@ -27,13 +27,12 @@ class Handler(SimpleHTTPRequestHandler):
 def get_library_root(library: types.ModuleType):
     return pathlib.Path(getattr(library, "__path__", [library.__file__])[-1])
 
-r_path = get_library_root(kine)
+kine_path = get_library_root(kine)
 typing_extensions_path = get_library_root(typing_extensions)
 
 @click.group()
 def cli():
     """Cli for building Kine webassembly projects."""
-    pass
 
 @cli.command()
 @click.argument("name")
@@ -118,13 +117,14 @@ def clean():
     build_dir.mkdir()
 
 @cli.command()
-def build() -> None:
+@click.pass_context
+def build(ctx: click.Context):
     """Builds the project"""
 
-    clean.main(standalone_mode=False)
+    ctx.invoke(clean)
 
     cwd = pathlib.Path.cwd()
-    config_file = cwd / "r.toml"
+    config_file = cwd / "kine.toml"
     build_dir = cwd / "build"
     src_dir = cwd / "src"
     index_file = cwd / "index.html"
@@ -133,7 +133,7 @@ def build() -> None:
 
     modules = [
         (src_dir, build_dir / "src.tar.gz"),
-        (r_path, build_dir / "r.tar.gz"),
+        (kine_path, build_dir / "kine.tar.gz"),
         (typing_extensions_path, build_dir / "typing_extensions.tar.gz")
     ]
 
@@ -179,6 +179,8 @@ def serve(port: int, host: str):
 
     os.chdir("build")
     httpd = HTTPServer((host, port), Handler)
+
+    print(f"Running server on http://{host}:{port}")
 
     try:
         httpd.serve_forever()
