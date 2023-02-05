@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 from .core import VComponent, VElement, VNode, VPlaceholder, VString
@@ -108,7 +108,7 @@ class Mutations:
         self.dirty_scopes.append(scope_id)
 
     def serialize(self) -> list[dict[str, Any]]:
-        return [mod.__dict__ | {"type": mod.type} for mod in self.modifications]
+        return [asdict(mod) for mod in self.modifications]
 
 
 class Diff:
@@ -194,8 +194,8 @@ class Diff:
 
     def diff_component_nodes(self, parent_id: ElementId, old: VComponent, new: VComponent):
         scope_id = old.scope_id
-        if scope_id is None:
-            raise Exception
+
+        assert scope_id is not None
 
         if old is new:
             return
@@ -225,7 +225,7 @@ class Diff:
 
     def diff_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
         old_is_keyed = bool(old[0].key)
-        new_is_keyed = bool(old[0].key)
+        new_is_keyed = bool(new[0].key)
 
         if old_is_keyed and new_is_keyed:
             self.diff_keyed_children(parent_id, old, new)
