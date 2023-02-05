@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import (TYPE_CHECKING, Any, Generic, Literal, TypeVar, Union,
-                    get_args)
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, Union, get_args
 
 if TYPE_CHECKING:
     from .utils import ElementId, ScopeId
 
 T = TypeVar("T")
+
 
 class BaseEvent(Generic[T]):
     type: T
@@ -26,6 +26,7 @@ class BaseEvent(Generic[T]):
 
         return cls.table[message_type](**data)
 
+
 @dataclass
 class EventMessage(BaseEvent[Literal["EventMessage"]]):
     scope_id: ScopeId | None
@@ -35,13 +36,16 @@ class EventMessage(BaseEvent[Literal["EventMessage"]]):
     bubbles: bool
     data: Any
 
+
 @dataclass
 class Immediate(BaseEvent[Literal["Immediate"]]):
     scope_id: ScopeId
 
+
 @dataclass
 class DirtyAll(BaseEvent[Literal["DirtyAll"]]):
     pass
+
 
 @dataclass
 class NewTask(BaseEvent[Literal["NewTask"]]):

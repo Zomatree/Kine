@@ -40,3 +40,7 @@ python = ["311"]
 typeCheckingMode = "strict"
 reportPrivateUsage = "none"
 reportImportCycles = "none"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]

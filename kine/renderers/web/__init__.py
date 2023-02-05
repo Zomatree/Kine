@@ -18,6 +18,7 @@ file = pathlib.Path(__file__)
 with open(file.parent / "interpreter.js") as f:
     interpreter = f.read()
 
+
 async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "127.0.0.1:8080"):
     web_app = web.Application()
 
@@ -36,10 +37,13 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                 return True
 
         while True:
-            futs = await asyncio.wait([
-                asyncio.ensure_future(dom.wait_for_work()),
-                asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
-            ], return_when=asyncio.FIRST_COMPLETED)
+            futs = await asyncio.wait(
+                [
+                    asyncio.ensure_future(dom.wait_for_work()),
+                    asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
+                ],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
             dones, pending = futs
 
             for task in pending:
@@ -59,7 +63,16 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                 if msg := result:
                     if msg["method"] == "user_event":
                         payload = msg["params"]
-                        dom.handle_message(messages.EventMessage(scope_id=None, priority=0, element_id=payload["mounted_dom_id"], name=payload["event"], bubbles=False, data=payload["contents"]))
+                        dom.handle_message(
+                            messages.EventMessage(
+                                scope_id=None,
+                                priority=0,
+                                element_id=payload["mounted_dom_id"],
+                                name=payload["event"],
+                                bubbles=False,
+                                data=payload["contents"],
+                            )
+                        )
 
                 mutations = dom.work_with_deadline(lambda: False)
 
@@ -67,7 +80,8 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                     await ws.send_json(mutation.serialize())
 
     async def index(request: web.Request) -> web.Response:
-        return web.Response(body=f"""
+        return web.Response(
+            body=f"""
 <!DOCTYPE html>
 <html>
     <head>
@@ -81,7 +95,9 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
         main();
         </script>
     </body>
-</html>""", content_type="text/html")
+</html>""",
+            content_type="text/html",
+        )
 
     web_app.add_routes([web.get("/app", ws_handle), web.get("/", index)])
     await web._run_app(web_app)  # type: ignore

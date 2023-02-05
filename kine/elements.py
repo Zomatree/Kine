@@ -7,12 +7,12 @@ from typing_extensions import Self, Unpack
 if TYPE_CHECKING:
     from .core import Node
 
-__all__ = (
-    "Element",
-)
+__all__ = ("Element",)
+
 
 class ElementArgs(TypedDict, total=False):
     pass
+
 
 class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
@@ -37,15 +37,19 @@ class Element:
         self.children = children
         return self
 
+
 class GetAttrProto(Protocol):
     def __getitem__(self, children: Node | tuple[Node, ...] | Generator[Node, None, None]) -> Self:
         ...
 
+
 T = TypeVar("T", bound=GetAttrProto)
+
 
 class CGIMeta(type):
     def __getitem__(cls: type[T], children: Node | tuple[Node, ...] | Generator[Node, None, None]) -> T:
         return cls()[children]
+
 
 class CGI(metaclass=CGIMeta):
     pass

@@ -9,10 +9,12 @@ ScopeId = NewType("ScopeId", int)
 TaskId = NewType("TaskId", tuple[int, ScopeId])
 ElementId = NewType("ElementId", int)
 
+
 async def select(*futures: Future[T]) -> tuple[int, T]:
     new_futures: list[Future[tuple[int, T]]] = []
 
     for i, fut in enumerate(futures):
+
         async def wrapper(i: int = i):
             return i, await fut
 
@@ -28,6 +30,7 @@ class Lis:
     output: list[int]
     predecessors: list[int]
     starts: list[int]
+
 
 def find_lis(items: list[int]) -> Lis:
     length = len(items)
@@ -59,7 +62,7 @@ def find_lis(items: list[int]) -> Lis:
                 hi = mid
 
         if items[i] < items[lis.starts[lo]]:
-            if lo  > 0:
+            if lo > 0:
                 lis.predecessors[i] = lis.starts[lo - 1]
 
             lis.starts[lo] = i

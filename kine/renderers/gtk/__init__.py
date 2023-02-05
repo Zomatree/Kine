@@ -9,16 +9,18 @@ from ...utils import ElementId
 from .elements import *
 
 import gi
-gi.require_version('Gtk', '4.0')
-gi.require_version('Adw', '1')
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw
 
 P = ParamSpec("P")
 
+
 class App(Adw.Application):
     def __init__(self, dom: VirtualDom, **kwargs):
         super().__init__(**kwargs)
-        self.connect('activate', self.on_activate)
+        self.connect("activate", self.on_activate)
 
         self.dom = dom
         self.nodes: dict[ElementId, Gtk.Widget | str] = {}
@@ -138,6 +140,7 @@ class App(Adw.Application):
                 return Gtk.Entry()
             case _:
                 raise Exception(name)
+
 
 async def start_gtk(app: ComponentFunction[P], window_size: tuple[int, int] = (1280, 720)):
     dom = VirtualDom(app)

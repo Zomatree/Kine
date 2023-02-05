@@ -13,6 +13,7 @@ from .components import *
 
 P = ParamSpec("P")
 
+
 async def start_wasm(app: ComponentFunction[P]):
     dom = VirtualDom(app)
 
@@ -29,30 +30,43 @@ async def start_wasm(app: ComponentFunction[P]):
     calculate_diffs(event_queue, nodes, edits)
 
     while True:
-            futs = await asyncio.wait([
+        futs = await asyncio.wait(
+            [
                 asyncio.ensure_future(dom.wait_for_work()),
                 asyncio.ensure_future(event_queue.get()),
-            ], return_when=asyncio.FIRST_COMPLETED)
-            dones, pending = futs
+            ],
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        dones, pending = futs
 
-            for task in pending:
-                task.cancel()
+        for task in pending:
+            task.cancel()
 
-            for done in dones:
-                try:
-                    result = done.result()
-                except TypeError:
-                    return
+        for done in dones:
+            try:
+                result = done.result()
+            except TypeError:
+                return
 
-                if msg := result:
-                    if msg["method"] == "user_event":
-                        payload = msg["params"]
-                        dom.handle_message(messages.EventMessage(scope_id=None, priority=0, element_id=payload["mounted_dom_id"], name=payload["event"], bubbles=False, data=payload["contents"]))
+            if msg := result:
+                if msg["method"] == "user_event":
+                    payload = msg["params"]
+                    dom.handle_message(
+                        messages.EventMessage(
+                            scope_id=None,
+                            priority=0,
+                            element_id=payload["mounted_dom_id"],
+                            name=payload["event"],
+                            bubbles=False,
+                            data=payload["contents"],
+                        )
+                    )
 
-                mutations = dom.work_with_deadline(lambda: False)
+            mutations = dom.work_with_deadline(lambda: False)
 
-                for mutation in mutations:
-                    calculate_diffs(event_queue, nodes, mutation)
+            for mutation in mutations:
+                calculate_diffs(event_queue, nodes, mutation)
+
 
 def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element | js.Text], mutation: diff.Mutations):
     for mod in mutation.modifications:
@@ -80,15 +94,14 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
                 nodes[mod.root] = element
 
             case diff.NewEventListener():
+
                 def callback(evt: Any, mod: diff.NewEventListener = mod):
-                    queue.put_nowait({
-                        "method": "user_event",
-                        "params": {
-                            "event": mod.event_name,
-                            "mounted_dom_id": mod.root,
-                            "contents": data
+                    queue.put_nowait(
+                        {
+                            "method": "user_event",
+                            "params": {"event": mod.event_name, "mounted_dom_id": mod.root, "contents": data},
                         }
-                    })
+                    )
 
                 proxy_func = create_proxy(callback)
 

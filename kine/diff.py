@@ -10,10 +10,12 @@ from .utils import ElementId, ScopeId, find_lis
 if TYPE_CHECKING:
     from .scope import Scopes
 
+
 @dataclass
 class PushRoot:
     type = "PushRoot"
     root: ElementId
+
 
 @dataclass
 class AppendChildren:
@@ -21,11 +23,13 @@ class AppendChildren:
     root: ElementId
     children: list[ElementId]
 
+
 @dataclass
 class ReplaceWith:
     type = "ReplaceWith"
     root: ElementId
     nodes: list[ElementId]
+
 
 @dataclass
 class InsertAfter:
@@ -33,16 +37,19 @@ class InsertAfter:
     root: ElementId
     nodes: list[ElementId]
 
+
 @dataclass
 class InsertBefore:
     type = "InsertBefore"
     root: ElementId
     nodes: list[ElementId]
 
+
 @dataclass
 class Remove:
     type = "Remove"
     root: ElementId
+
 
 @dataclass
 class CreateTextNode:
@@ -50,16 +57,19 @@ class CreateTextNode:
     root: ElementId
     text: str
 
+
 @dataclass
 class CreateElement:
     type = "CreateElement"
     root: ElementId
     tag: str
 
+
 @dataclass
 class CreatePlaceholder:
     type = "CreatePlaceholder"
     root: ElementId
+
 
 @dataclass
 class NewEventListener:
@@ -68,11 +78,13 @@ class NewEventListener:
     scope: ScopeId
     root: ElementId
 
+
 @dataclass
 class SetText:
     type = "SetText"
     root: ElementId
     text: str
+
 
 @dataclass
 class SetAttribute:
@@ -81,20 +93,38 @@ class SetAttribute:
     field: str
     value: Any
 
+
 @dataclass
 class RemoveAttribute:
     type = "RemoveAttribute"
     root: ElementId
     field: str
 
+
 @dataclass
 class PopRoot:
     type = "PopRoot"
 
 
-Modification = PushRoot | AppendChildren | ReplaceWith | InsertAfter | InsertBefore | Remove | CreateTextNode | CreateElement | CreatePlaceholder | NewEventListener | SetText | SetAttribute | RemoveAttribute | PopRoot
+Modification = (
+    PushRoot
+    | AppendChildren
+    | ReplaceWith
+    | InsertAfter
+    | InsertBefore
+    | Remove
+    | CreateTextNode
+    | CreateElement
+    | CreatePlaceholder
+    | NewEventListener
+    | SetText
+    | SetAttribute
+    | RemoveAttribute
+    | PopRoot
+)
 
 MAX_N = (1 << 32) - 1  # 32 bit int max size
+
 
 class Mutations:
     def __init__(self):
@@ -233,13 +263,13 @@ class Diff:
             self.diff_unkeyed_children(parent_id, old, new)
 
     def diff_keyed_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
-        if (offsets := self.diff_keyed_ends(parent_id, old, new)):
+        if offsets := self.diff_keyed_ends(parent_id, old, new):
             left_offset, right_offset = offsets
         else:
             return
 
-        old_middle = old[left_offset:len(old) - right_offset]
-        new_middle = old[left_offset:len(new) - right_offset]
+        old_middle = old[left_offset : len(old) - right_offset]
+        new_middle = old[left_offset : len(new) - right_offset]
 
         if not new_middle:
             self.remove_nodes(old_middle, True)
@@ -291,7 +321,6 @@ class Diff:
 
             return
 
-
         for old_node in old:
             assert old_node.key
 
@@ -313,7 +342,7 @@ class Diff:
         last = lis_seq[-1]
 
         if last < (len(new) - 1):
-            for idx, new_node in enumerate(new[last + 1:]):
+            for idx, new_node in enumerate(new[last + 1 :]):
                 new_idx = idx + last + 1
                 old_index = new_index_to_old_index[new_idx]
 
@@ -334,7 +363,7 @@ class Diff:
 
         for next_idx in lis_iter:
             if last - next_idx > 1:
-                for idx, new_node in enumerate(new[next_idx + 1:last]):
+                for idx, new_node in enumerate(new[next_idx + 1 : last]):
                     new_idx = idx + next_idx + 1
                     old_index = new_index_to_old_index[new_idx]
 
@@ -465,7 +494,6 @@ class Diff:
                     node.scope_id = None
                     self.scopes.remove_scope(scope_id)
 
-
     def remove_nodes(self, nodes: list[VNode], gen_muts: bool):
         for node in nodes:
             match node:
@@ -560,7 +588,12 @@ class Diff:
         self.create_children(parent_id, nodes, children_nodes)
         self.mutations.append(AppendChildren(parent_id, children_nodes))
 
-    def create_children(self, parent_id: ElementId, nodes: list[VNode], children_nodes: list[ElementId], ):
+    def create_children(
+        self,
+        parent_id: ElementId,
+        nodes: list[VNode],
+        children_nodes: list[ElementId],
+    ):
         for node in nodes:
             self.create_node(parent_id, node, children_nodes)
 

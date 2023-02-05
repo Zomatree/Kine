@@ -56,13 +56,11 @@ class UseRouter:
 def use_router(cx: Scope) -> UseRouter:
     return cx.consume_context(UseRouter)
 
+
 @component
 def link(cx: Scope, route: str):
-    return cx.render(a(
-        href=route
-    )[
-       cx.children
-    ])
+    return cx.render(a(href=route)[cx.children])
+
 
 @component
 def route(cx: Scope, route: str):
@@ -77,6 +75,7 @@ def route(cx: Scope, route: str):
         children = ()
 
     return cx.render(div[children])
+
 
 @component
 def router(cx: Scope):

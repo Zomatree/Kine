@@ -9,6 +9,7 @@ T = TypeVar("T")
 
 STYLES: dict[str, str] = {}
 
+
 def styled_component(element: type, styling: str) -> Callable[..., ComponentFunction[...]]:
     random_chars = "".join(random.choices(string.ascii_lowercase, k=10))
 
@@ -18,14 +19,10 @@ def styled_component(element: type, styling: str) -> Callable[..., ComponentFunc
 
     @component
     def inner_compponent(cx: Scope, *args: Node, **kwargs: Any):
-        return cx.render(element(
-            class_=class_name,
-            **kwargs
-        )[
-            cx.children
-        ])
+        return cx.render(element(class_=class_name, **kwargs)[cx.children])
 
     return inner_compponent
+
 
 def generate_styling() -> str:
     parts: list[str] = []
@@ -35,13 +32,9 @@ def generate_styling() -> str:
 
     return "\n".join(parts)
 
+
 @component
 def styled_component_provider(cx: Scope):
     styling = generate_styling()
 
-    return cx.render(web_elements.div[
-        web_elements.style[
-            styling
-        ],
-        *cx.children
-    ])
+    return cx.render(web_elements.div[web_elements.style[styling], *cx.children])

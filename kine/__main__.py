@@ -14,25 +14,30 @@ from http.server import HTTPServer
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import urlparse
 
+
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         urlparts = urlparse(self.path)
-        request_file_path = urlparts.path.strip('/')
+        request_file_path = urlparts.path.strip("/")
 
         if not os.path.exists(request_file_path):
-            self.path = 'index.html'
+            self.path = "index.html"
 
         return super().do_GET()
+
 
 def get_library_root(library: types.ModuleType):
     return pathlib.Path(getattr(library, "__path__", [library.__file__])[-1])
 
+
 kine_path = get_library_root(kine)
 typing_extensions_path = get_library_root(typing_extensions)
+
 
 @click.group()
 def cli():
     """Cli for building Kine webassembly projects."""
+
 
 @cli.command()
 @click.argument("name")
@@ -47,6 +52,7 @@ def new(name: str):
     os.chdir(name)
     init((name,))
 
+
 @cli.command()
 @click.argument("name")
 def init(name: str | None = None):
@@ -59,27 +65,29 @@ def init(name: str | None = None):
     index_file = cwd / "index.html"
 
     config_file.write_text(
-f"""[project]
+        f"""[project]
 name = "{name}"
 dependancies = []
-""")
+"""
+    )
 
     build_dir.mkdir(exist_ok=True)
     src_dir.mkdir(exist_ok=True)
     init_file = src_dir / "__init__.py"
     init_file.write_text(
-"""from kine import *
+        """from kine import *
 from kine.renderers.wasm import *
 
 from .app import app
 
 async def main():
     await start_wasm(app())
-""")
+"""
+    )
 
     app_file = src_dir / "app.py"
     app_file.write_text(
-"""from kine import *
+        """from kine import *
 from kine.renderers.wasm import *
 
 @component
@@ -89,9 +97,11 @@ def app(cx: Scope):
             "Hello, World!"
         ]
     ])
-""")
+"""
+    )
 
-    index_file.write_text("""<!DOCTYPE html>
+    index_file.write_text(
+        """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -105,7 +115,9 @@ def app(cx: Scope):
     <script>{{script}}</script>
 </body>
 </html>
-""")
+"""
+    )
+
 
 @cli.command()
 def clean():
@@ -115,6 +127,7 @@ def clean():
 
     shutil.rmtree(build_dir)
     build_dir.mkdir()
+
 
 @cli.command()
 @click.pass_context
@@ -134,7 +147,7 @@ def build(ctx: click.Context):
     modules = [
         (src_dir, build_dir / "src.tar.gz"),
         (kine_path, build_dir / "kine.tar.gz"),
-        (typing_extensions_path, build_dir / "typing_extensions.tar.gz")
+        (typing_extensions_path, build_dir / "typing_extensions.tar.gz"),
     ]
 
     for dep in config["project"]["dependancies"]:
@@ -171,6 +184,7 @@ main();
     build_index = build_dir / "index.html"
     build_index.write_text(index)
 
+
 @cli.command()
 @click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
 @click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
@@ -186,5 +200,6 @@ def serve(port: int, host: str):
         httpd.serve_forever()
     except KeyboardInterrupt:
         sys.exit(0)
+
 
 cli()

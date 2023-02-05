@@ -9,12 +9,24 @@ if TYPE_CHECKING:
     from .scope import Scope
 
 
-__all__ = ("use_state", "use_future", "UseState", "UseFuture", "GlobalState", "GlobalStateCallback", "use_global_state", "use_set", "use_read")
+__all__ = (
+    "use_state",
+    "use_future",
+    "UseState",
+    "UseFuture",
+    "GlobalState",
+    "GlobalStateCallback",
+    "use_global_state",
+    "use_set",
+    "use_read",
+)
 
 T = TypeVar("T")
 
+
 def use_state(cx: Scope, func: Callable[[], T]) -> UseState[T]:
     return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, func()))
+
 
 def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> UseFuture[T]:
     def hook():
@@ -30,6 +42,7 @@ def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> UseFutu
         return state
 
     return cx.use_hook(hook)
+
 
 class UseState(Generic[T]):
     def __init__(self, scope: Scope, idx: int, value: T):
@@ -52,13 +65,16 @@ class UseState(Generic[T]):
         func(value)
         self.set(value)
 
+
 class UseFuture(Generic[T]):
     def __init__(self, scope: Scope, idx: int):
         self.scope = scope
         self.idx = idx
         self.value: T | None = None
 
+
 GlobalStateCallback = Callable[[], T]
+
 
 class GlobalState:
     def __init__(self, scope: Scope):
@@ -77,6 +93,7 @@ class GlobalState:
             value = self.states[state] = state()
             return value
 
+
 def use_global_state(cx: Scope) -> GlobalState:
     def hook():
         try:
@@ -86,6 +103,7 @@ def use_global_state(cx: Scope) -> GlobalState:
 
     return cx.use_hook(hook)
 
+
 def use_read(cx: Scope, state: GlobalStateCallback[T]) -> T:
     root = use_global_state(cx)
     value = root.get(state)
@@ -93,6 +111,7 @@ def use_read(cx: Scope, state: GlobalStateCallback[T]) -> T:
     root.refs.setdefault(state, set()).add(cx.scope_id)
 
     return value
+
 
 def use_set(cx: Scope, state: GlobalStateCallback[T]) -> Callable[[T], None]:
     root = use_global_state(cx)

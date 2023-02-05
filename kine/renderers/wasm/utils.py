@@ -7,6 +7,7 @@ from typing_extensions import Unpack
 import js
 from pyodide.ffi import create_proxy
 
+
 class Response:
     def __init__(self, inner: js.Response):
         self.inner = inner
@@ -18,34 +19,41 @@ class Response:
         data = await self.inner.json()
         return data.to_py()
 
+
 async def fetch(url: str, **kwargs: Unpack[js._FetchOptions]) -> Response:
     return Response(await js.fetch(url, kwargs))
+
 
 async def get(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
     kwargs["method"] = "GET"
 
     return await fetch(url, **kwargs)
 
+
 async def post(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
     kwargs["method"] = "POST"
 
     return await fetch(url, **kwargs)
+
 
 async def patch(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
     kwargs["method"] = "PATCH"
 
     return await fetch(url, **kwargs)
 
+
 async def delete(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
     kwargs["method"] = "DELETE"
 
     return await fetch(url, **kwargs)
+
 
 class WebsocketState(Enum):
     CONNECTING = js.WebSocket.CONNECTING
     OPEN = js.WebSocket.OPEN
     CLOSING = js.WebSocket.CLOSING
     CLOSED = js.WebSocket.CLOSED
+
 
 class Websocket:
     def __init__(self, url: str):
@@ -103,4 +111,3 @@ class Websocket:
             raise StopAsyncIteration("Websocket closed")
 
         return self.recv()
-

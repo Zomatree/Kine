@@ -3,8 +3,7 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, Optional, TypeVar
 
-from .core import (ComponentFunction, Element, Listener, VComponent, VElement,
-                   VNode, VPlaceholder, VString)
+from .core import ComponentFunction, Element, Listener, VComponent, VElement, VNode, VPlaceholder, VString
 from .messages import EventMessage, Immediate
 from .elements import Element
 from .utils import ElementId, ScopeId, TaskId
@@ -19,7 +18,9 @@ T = TypeVar("T")
 
 
 class Scope:
-    def __init__(self, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, container: ElementId, scopes: Scopes):
+    def __init__(
+        self, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, container: ElementId, scopes: Scopes
+    ):
         self.scope_id = scope_id
         self.parent_scope = parent_scope
         self.component: ComponentFunction[...] | None = None
@@ -113,14 +114,13 @@ class Scope:
             return vnode
 
         elif isinstance(node, Element):
-
             nodes: list[VNode] = []
 
             vnode = VElement(
                 node.__class__.__name__,
                 nodes,
                 node.attributes,  # type: ignore
-                [Listener(name, func) for name, func in node.listeners.items()]
+                [Listener(name, func) for name, func in node.listeners.items()],
             )
 
             for child in node.children:
@@ -135,7 +135,7 @@ class Scope:
             return VPlaceholder()
 
     def spawn(self, coro: Coroutine[Any, Any, T]) -> asyncio.Task[T]:
-        task =  asyncio.create_task(coro)
+        task = asyncio.create_task(coro)
         self.scopes.tasks.spawn(self.scope_id, task)
 
         return task
@@ -145,6 +145,7 @@ class Scope:
         self.parent_scope = None
         self.generation = 0
         self.contexts.clear()
+
 
 class Scopes:
     dom: VirtualDom
@@ -227,6 +228,7 @@ class Scopes:
             scope.set_wip_frame(VPlaceholder())
 
         scope.next_frame()
+
 
 class TaskQueue:
     def __init__(self):

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import functools
 from collections import UserString
-from typing import (TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic,
-                    ParamSpec, TypeVar, Union)
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, ParamSpec, TypeVar, Union
 
 from .elements import Element
 
@@ -16,11 +15,13 @@ T = TypeVar("T")
 
 __all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes")
 
+
 class Listener:
     def __init__(self, name: str, func: Callable[[Any], None]):
         self.name = name
         self.func = func
         self.element_id: ElementId | None = None
+
 
 class VString(UserString):
     def __init__(self, value: str):
@@ -28,6 +29,7 @@ class VString(UserString):
         self.parent_id: ElementId | None = None
         self.key = None
         super().__init__(value)
+
 
 class VElement:
     def __init__(self, tag: str, children: list[VNode], attributes: dict[str, Any], listeners: list[Listener]):
@@ -39,11 +41,13 @@ class VElement:
         self.listeners = listeners
         self.key = attributes.get("key")
 
+
 class VPlaceholder:
     def __init__(self):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
         self.key = None
+
 
 class VComponent:
     def __init__(self, func: ComponentFunction[...], parent_scope: ScopeId, key: str | None):
@@ -53,7 +57,9 @@ class VComponent:
         self.parent_scope = parent_scope
         self.key = key
 
+
 VNode = Union[VString, VElement, VPlaceholder, VComponent]
+
 
 class ComponentFunction(Generic[P]):
     def __init__(self, func: Callable[Concatenate[Scope, P], VNode], *args: P.args, **kwargs: P.kwargs):
@@ -84,12 +90,14 @@ class ComponentFunction(Generic[P]):
         self.children = children
         return self
 
+
 def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[Concatenate[P], ComponentFunction[P]]:
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
         return ComponentFunction(func, *args, **kwargs)
 
     return wrapper
+
 
 Component = Callable[Concatenate["Scope", P], "VNode"]
 Node = Union[str, Element, ComponentFunction[...], None]

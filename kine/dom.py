@@ -7,8 +7,7 @@ from typing import Callable, TypeVar, cast
 from kine.core import ComponentFunction
 
 from .diff import AppendChildren, Diff, Mutations
-from .messages import (DirtyAll, EventMessage, Immediate, NewTask,
-                       ScheduleMessage)
+from .messages import DirtyAll, EventMessage, Immediate, NewTask, ScheduleMessage
 from .scope import Scopes
 from .utils import ElementId, ScopeId
 
@@ -27,7 +26,6 @@ class VirtualDom:
     async def _task(self):
         while True:
             for task_id, task in list(self.scopes.tasks.tasks.items()):
-
                 if task.done():
                     del self.scopes.tasks.tasks[task_id]
 
@@ -43,7 +41,6 @@ class VirtualDom:
 
             if not self.pending_messages:
                 if self.scopes.tasks.tasks:
-
                     loop_task = asyncio.ensure_future(self._task())
                     message_task = asyncio.ensure_future(self.messages.get())
 
@@ -116,7 +113,9 @@ class VirtualDom:
             diff = Diff(self.scopes)
             ran_scopes: set[ScopeId] = set()
 
-            self.dirty_scopes: set[ScopeId] = {scope_id for scope_id in self.dirty_scopes if scope_id in self.scopes.scopes}
+            self.dirty_scopes: set[ScopeId] = {
+                scope_id for scope_id in self.dirty_scopes if scope_id in self.scopes.scopes
+            }
 
             self.dirty_scopes = set(sorted(self.dirty_scopes, reverse=True))
 
