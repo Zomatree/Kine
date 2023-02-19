@@ -15,10 +15,10 @@ async def select(*futures: Future[T]) -> tuple[int, T]:
 
     for i, fut in enumerate(futures):
 
-        async def wrapper(i: int = i):
+        async def wrapper(i: int, fut: Future[T]):
             return i, await fut
 
-        new_futures.append(asyncio.ensure_future(wrapper()))
+        new_futures.append(asyncio.ensure_future(wrapper(i, fut)))
 
     (task,), _ = await asyncio.wait(new_futures, return_when=asyncio.FIRST_COMPLETED)
 

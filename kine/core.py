@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import functools
 from collections import UserString
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, ParamSpec, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, ParamSpec, TypeAlias, TypeVar, Union
 
 from .elements import Element
 
@@ -58,7 +58,7 @@ class VComponent:
         self.key = key
 
 
-VNode = Union[VString, VElement, VPlaceholder, VComponent]
+VNode: TypeAlias = Union[VString, VElement, VPlaceholder, VComponent]
 
 
 class ComponentFunction(Generic[P]):
@@ -91,7 +91,7 @@ class ComponentFunction(Generic[P]):
         return self
 
 
-def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[Concatenate[P], ComponentFunction[P]]:
+def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[P, ComponentFunction[P]]:
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
         return ComponentFunction(func, *args, **kwargs)
@@ -99,6 +99,6 @@ def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[Concaten
     return wrapper
 
 
-Component = Callable[Concatenate["Scope", P], "VNode"]
-Node = Union[str, Element, ComponentFunction[...], None]
-Nodes = list[Node]
+Component: TypeAlias = Callable[Concatenate["Scope", P], "VNode"]
+Node: TypeAlias = Union[str, Element, ComponentFunction[...], None]
+Nodes: TypeAlias = list[Node]

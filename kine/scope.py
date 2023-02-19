@@ -9,7 +9,7 @@ from .elements import Element
 from .utils import ElementId, ScopeId, TaskId
 
 if TYPE_CHECKING:
-    from .core import Node, VNode
+    from .core import Node
     from .dom import VirtualDom
 
 __all__ = ("Scope", "Scopes", "TaskQueue")
