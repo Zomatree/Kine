@@ -10,8 +10,9 @@ import typing_extensions
 import types
 import importlib
 import os
-from http.server import HTTPServer
-from http.server import SimpleHTTPRequestHandler
+import pipdeptree
+import importlib.metadata as import_meta
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse
 
 
@@ -34,6 +35,34 @@ kine_path = get_library_root(kine)
 typing_extensions_path = get_library_root(typing_extensions)
 
 
+def get_all_dependancies(deps: list[str]) -> list[str]:
+    libs = pipdeptree.get_installed_distributions(True, True)
+
+    tree = pipdeptree.PackageDAG.from_pkgs(libs)
+    dep_tree = tree.filter(deps, [])
+
+    import_names: list[str] = []
+
+    for pkg in dep_tree:
+        pkg: pipdeptree.DistPackage
+
+        name: str = pkg.project_name
+
+        distro = import_meta.distribution(name)
+
+        files = distro.files
+
+        if not files:
+            raise Exception(f"Cannot find path data for package {name}")
+
+        library_files = [file for file in files if not file.parts[0].endswith("dist-info")]
+
+        lib_name = library_files[-1].parts[0]
+        import_names.append(lib_name.removesuffix(".py"))
+
+    return import_names
+
+
 @click.group()
 def cli():
     """Cli for building Kine webassembly projects."""
@@ -41,7 +70,8 @@ def cli():
 
 @cli.command()
 @click.argument("name")
-def new(name: str):
+@click.pass_context
+def new(ctx: click.Context, name: str):
     """Creates a new project with the foldername of NAME"""
 
     try:
@@ -59,7 +89,7 @@ def init(name: str | None = None):
     """Initializes a project in the current directory with NAME or the current directories name"""
 
     cwd = pathlib.Path.cwd()
-    config_file = cwd / "r.toml"
+    config_file = cwd / "kine.toml"
     build_dir = cwd / "build"
     src_dir = cwd / "src"
     index_file = cwd / "index.html"
@@ -150,8 +180,10 @@ def build(ctx: click.Context):
         (typing_extensions_path, build_dir / "typing_extensions.tar.gz"),
     ]
 
-    for dep in config["project"]["dependancies"]:
-        modules.append((get_library_root(importlib.import_module(dep)), build_dir / f"{dep}.tar.gz"))
+    deps = config["project"]["dependancies"]
+
+    for lib_name in get_all_dependancies(deps):
+        modules.append((get_library_root(importlib.import_module(lib_name)), build_dir / f"{lib_name}.tar.gz"))
 
     for input_folder, output_file in modules:
         with tarfile.open(output_file, "w:gz") as tar:

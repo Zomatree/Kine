@@ -21,7 +21,8 @@ classifiers = [
 dependencies = [
   "aiohttp==3.8.3",
   "toml==0.10.2",
-  "typing_extensions==4.4.0"
+  "typing_extensions==4.4.0",
+  "pipdeptree==2.3.3"
 ]
 dynamic = ["version"]
 
