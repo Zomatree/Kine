@@ -1,5 +1,5 @@
 from ... import component, Scope
-from ..web_elements import *
+from ...renderers.web_elements import *
 from typing import ParamSpec
 import js
 
