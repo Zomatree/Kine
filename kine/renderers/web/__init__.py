@@ -5,6 +5,7 @@ import pathlib
 from typing import Any, Awaitable, Literal, ParamSpec, cast
 
 from aiohttp import web
+import msgpack
 
 from ... import ComponentFunction, messages
 from ...dom import VirtualDom
@@ -28,11 +29,12 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
 
         dom = VirtualDom(app)
         edits = dom.rebuild()
-        await ws.send_json(edits.serialize())
+        print(edits.serialize())
+        await ws.send_bytes(msgpack.dumps(edits.serialize()))
 
         async def receive_wrapper():
             try:
-                return await ws.receive_json()
+                return msgpack.loads(await ws.receive_bytes())
             except TypeError:
                 return True
 
@@ -85,14 +87,14 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js" integrity="sha512-harMiusNxs02ryf3eqc3iQalz2RSd0z38vzOyuFwvQyW046h2m+/47WiDmPW9soh/p71WQMRSkhSynEww3/bOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         {headers}
     </head>
     <body>
         <div id="main"></div>
         <script>
-        var WS_ADDR = "ws://{addr}/app";
         {interpreter}
-        main();
+        main("ws://{addr}/app");
         </script>
     </body>
 </html>""",
