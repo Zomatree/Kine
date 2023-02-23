@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 from .core import VComponent, VElement, VNode, VPlaceholder, VString
@@ -138,7 +138,7 @@ class Mutations:
         self.dirty_scopes.append(scope_id)
 
     def serialize(self) -> list[dict[str, Any]]:
-        return [asdict(mod) for mod in self.modifications]
+        return [mod.__dict__ | {"type": mod.type} for mod in self.modifications]
 
 
 class Diff:
