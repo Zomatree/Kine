@@ -121,6 +121,7 @@ class Scope:
                 nodes,
                 node.attributes,  # type: ignore
                 [Listener(name, func) for name, func in node.listeners.items()],
+                node._key,
             )
 
             for child in node.children:
@@ -156,7 +157,7 @@ class Scopes:
         self.element_id = ElementId(0)
         self.tasks = TaskQueue()
         self.element_idx = 0
-        self.root = VElement("div", [], {}, [])
+        self.root = VElement("div", [], {}, [], None)
         self.nodes: dict[ElementId, VNode] = {}
         self.root.id = self.reserve_node(self.root)
 

@@ -32,14 +32,16 @@ class VString(UserString):
 
 
 class VElement:
-    def __init__(self, tag: str, children: list[VNode], attributes: dict[str, Any], listeners: list[Listener]):
+    def __init__(
+        self, tag: str, children: list[VNode], attributes: dict[str, Any], listeners: list[Listener], key: str | None
+    ):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
         self.tag = tag
         self.children = children
         self.attributes = attributes
         self.listeners = listeners
-        self.key = attributes.get("key")
+        self.key = key
 
 
 class VPlaceholder:

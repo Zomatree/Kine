@@ -18,6 +18,7 @@ class Element:
     def __init__(self, **attributes: Unpack[ElementArgs]):
         self.children: tuple[Node, ...] = ()
         self.listeners: dict[str, Callable[[Any], None]] = {}
+        self._key = None
 
         for name, value in list(attributes.items()):
             if name.startswith("on"):
@@ -35,6 +36,10 @@ class Element:
             children = (children,)
 
         self.children = children
+        return self
+
+    def key(self, key: str) -> Self:
+        self._key = key
         return self
 
 
