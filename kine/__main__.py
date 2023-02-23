@@ -199,9 +199,10 @@ async function loadModule(pyodide, name) {{
 
     pyodide.unpackArchive(buff, "gztar");
 }}
+let pyodide;
 
 async function main() {{
-    let pyodide = await loadPyodide({{args:["-OO"]}});
+    pyodide = await loadPyodide({{args:["-OO"]}});
 
     for (mod of {module_imports}) {{
         await loadModule(pyodide, mod);
