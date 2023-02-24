@@ -98,9 +98,7 @@ var IPC = /** @class */ (function () {
                     case 1:
                         data = _a.sent();
                         view = new Uint8Array(data);
-                        console.log(view);
                         edits = msgpack.decode(view);
-                        console.log(edits);
                         this.interpreter.handleEdits(edits);
                         return [2 /*return*/];
                 }
@@ -191,7 +189,6 @@ var Interpreter = /** @class */ (function () {
         try {
             for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
                 var child = children_1_1.value;
-                console.log(node, child, this.nodes[child]);
                 node.appendChild(this.nodes[child]);
             }
         }
@@ -221,6 +218,7 @@ var Interpreter = /** @class */ (function () {
             finally { if (e_2) throw e_2.error; }
         }
         ;
+        console.log(node, els);
         node.replaceWith.apply(node, __spreadArray([], __read(els), false));
     };
     Interpreter.prototype.InsertAfter = function (root, nodes) {
@@ -441,7 +439,7 @@ var Interpreter = /** @class */ (function () {
                     var target = event.target;
                     if (target != null) {
                         var realId = target.getAttribute("data-kine-id");
-                        var shouldPreventDefault = target.getAttribute("r-prevent-default");
+                        var shouldPreventDefault = target.getAttribute("kine-prevent-default");
                         if (event.type === "click") {
                             // todo call prevent default if it's the right type of event
                             if (shouldPreventDefault !== "onclick") {
@@ -467,7 +465,7 @@ var Interpreter = /** @class */ (function () {
                             target = target.parentElement;
                             realId = target.getAttribute("data-kine-id");
                         }
-                        shouldPreventDefault = target.getAttribute("r-prevent-default");
+                        shouldPreventDefault = target.getAttribute("kine-prevent-default");
                         var contents = serialize_event(event);
                         if (shouldPreventDefault === "on".concat(event.type)) {
                             event.preventDefault();
@@ -540,6 +538,9 @@ var Interpreter = /** @class */ (function () {
                 break;
             case "SetLastNode":
                 this.SetLastNode(edit.id);
+                break;
+            case "EvalMessage":
+                eval(edit.code);
                 break;
         }
     };

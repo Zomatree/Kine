@@ -5,8 +5,11 @@ import pathlib
 from typing import Any, Awaitable, Literal, ParamSpec, cast
 
 from aiohttp import web
+from kine import Scope
 import msgpack
+from ...ext.web.cookies import _Cookies, EvalMessage
 
+from ...utils import ScopeId
 from ... import ComponentFunction, messages
 from ...dom import VirtualDom
 
@@ -19,17 +22,38 @@ file = pathlib.Path(__file__)
 with open(file.parent / "interpreter.js") as f:
     interpreter = f.read()
 
+class WebVDom(VirtualDom):
+    def __init__(self, app: ComponentFunction[...], custom_messages: asyncio.Queue[EvalMessage]):
+        super().__init__(app)
+        self.custom_messages = custom_messages
+
+def use_eval(cx: Scope, code: str) -> Callable[[], None]:
+    def inner():
+        msg = EvalMessage()
+        msg.code = code
+
+        dom = cast(WebVDom, cx.scopes.dom)
+        dom.custom_messages.put_nowait(msg)
+        cx.schedule_update()
+
+    return inner
 
 async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "127.0.0.1:8080"):
     web_app = web.Application()
 
     async def ws_handle(request: web.Request):
+        cookies = request.cookies
+
         ws = web.WebSocketResponse()
         await ws.prepare(request)
 
-        dom = VirtualDom(app)
+        custom_messages = asyncio.Queue[EvalMessage]()
+        dom = WebVDom(app, custom_messages)
+
+        root_scope = dom.scopes.get_scope(ScopeId(0))
+        root_scope.provide_context(_Cookies(cookies))
+
         edits = dom.rebuild()
-        print(edits.serialize())
         await ws.send_bytes(msgpack.dumps(edits.serialize()))
 
         async def receive_wrapper():
@@ -39,13 +63,14 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                 return True
 
         while True:
-            futs = await asyncio.wait(
-                [
-                    asyncio.ensure_future(dom.wait_for_work()),
-                    asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
-                ],
-                return_when=asyncio.FIRST_COMPLETED,
+            futs = await asyncio.wait([
+                asyncio.ensure_future(dom.wait_for_work()),
+                asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
+                asyncio.ensure_future(custom_messages.get())
+            ],
+                return_when=asyncio.FIRST_COMPLETED
             )
+
             dones, pending = futs
 
             for task in pending:
@@ -62,7 +87,10 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                     await ws.close()
                     return ws
 
-                if msg := result:
+                elif isinstance(result, EvalMessage):
+                    await ws.send_bytes(msgpack.dumps([{"type": "EvalMessage", "code": result.code}]))
+
+                elif msg := result:
                     if msg["method"] == "user_event":
                         payload = msg["params"]
                         dom.handle_message(
@@ -79,7 +107,7 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                 mutations = dom.work_with_deadline(lambda: False)
 
                 for mutation in mutations:
-                    await ws.send_json(mutation.serialize())
+                    await ws.send_bytes(msgpack.dumps(mutation.serialize()))
 
     async def index(request: web.Request) -> web.Response:
         return web.Response(
@@ -88,6 +116,7 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
 <html>
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js" integrity="sha512-harMiusNxs02ryf3eqc3iQalz2RSd0z38vzOyuFwvQyW046h2m+/47WiDmPW9soh/p71WQMRSkhSynEww3/bOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js" integrity="sha512-wT7uPE7tOP6w4o28u1DN775jYjHQApdBnib5Pho4RB0Pgd9y7eSkAV1BTqQydupYDB9GBhTcQQzyNMPMV3cAew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         {headers}
     </head>
     <body>

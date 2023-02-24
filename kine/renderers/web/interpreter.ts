@@ -27,7 +27,8 @@ type EditEvent = TypedEditEvent<"AppendChildren", {children: number[]}>
     | TypedEditEvent<"NextSibling", {}>
     | TypedEditEvent<"ParentNode", {}>
     | TypedEditEvent<"StoreWithId", {id: number}>
-    | TypedEditEvent<"SetLastNode", {id: number}>;
+    | TypedEditEvent<"SetLastNode", {id: number}>
+    | TypedEditEvent<"EvalMessage", {code: string}>;
 
 type DomEvent = TypedEvent<"copy" | "cut" | "paste", ClipboardEvent>
     | TypedEvent<"compositionend" | "compositionstart" | "compositionupdate", CompositionEvent>
@@ -76,10 +77,7 @@ class IPC {
         this.ws.onmessage = async (event: MessageEvent<Blob>) => {
             let data = await event.data.arrayBuffer();
             let view = new Uint8Array(data);
-            console.log(view);
-
             let edits = msgpack.decode(view);
-            console.log(edits);
             this.interpreter.handleEdits(edits);
         };
     }
@@ -189,18 +187,19 @@ class Interpreter {
         let node = root != null ? this.nodes[root] : this.lastNode;
 
         for (let child of children) {
-            console.log(node, child, this.nodes[child]);
             node.appendChild(this.nodes[child]);
         }
     }
 
     ReplaceWith(root: number | null, nodes: number[]) {
-        let node = root != null ?this.nodes[root] : this.lastNode;
+        let node = root != null ? this.nodes[root] : this.lastNode;
         let els: (HTMLElement | Text)[] = [];
 
         for (let new_node of nodes) {
             els.push(this.nodes[new_node]);
         };
+
+        console.log(node, els);
 
         node.replaceWith(...els);
     }
@@ -407,7 +406,7 @@ class Interpreter {
                     if (target != null) {
                         let realId = target.getAttribute(`data-kine-id`);
                         let shouldPreventDefault = target.getAttribute(
-                            `r-prevent-default`
+                            `kine-prevent-default`
                         );
 
                         if (event.type === "click") {
@@ -441,7 +440,7 @@ class Interpreter {
                         }
 
                         shouldPreventDefault = target.getAttribute(
-                            `r-prevent-default`
+                            `kine-prevent-default`
                         );
 
                         let contents = serialize_event(event);
@@ -528,6 +527,9 @@ class Interpreter {
                 break;
             case "SetLastNode":
                 this.SetLastNode(edit.id);
+                break;
+            case "EvalMessage":
+                eval(edit.code);
                 break;
         }
     }
