@@ -3,6 +3,9 @@ from typing_extensions import Unpack
 
 from ..elements import Element as BaseElement, CGI
 
+class InputEvent(TypedDict):
+    value: str
+    values: dict[str, str]
 
 class ElementArgs(TypedDict, total=False):
     accesskey: str
@@ -56,15 +59,15 @@ class ElementArgs(TypedDict, total=False):
     href: str
     prevent_default: str
 
-    onclick: Callable[[Any], None]
-    oninput: Callable[[Any], None]
+    onclick: Callable[[Any], Any]
+    oninput: Callable[[InputEvent], Any]
 
     extras: dict[
         str, Any
     ]  # typeddict doesnt have to way to have extra none-static keys so i have to shove them in there own key
 
 
-mapped_attributes = {"prevent_default": "r-prevent-default", "class_": "class"}
+mapped_attributes = {"prevent_default": "kine-prevent-default", "class_": "class"}
 
 
 class Element(BaseElement):
