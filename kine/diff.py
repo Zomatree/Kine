@@ -463,7 +463,7 @@ class Diff:
             case VElement() as node:
                 self.create_element_node(parent_id, node, nodes)
             case VPlaceholder() as node:
-                self.create_placeholder_node(node)
+                self.create_placeholder_node(node, nodes)
             case VComponent() as node:
                 self.create_componet_node(parent_id, node, nodes)
 
@@ -563,10 +563,11 @@ class Diff:
 
         nodes.append(element_id)
 
-    def create_placeholder_node(self, node: VPlaceholder):
+    def create_placeholder_node(self, node: VPlaceholder, nodes: list[ElementId]):
         element_id = self.scopes.reserve_node(node)
         node.id = element_id
         self.mutations.append(CreatePlaceholder(element_id))
+        nodes.append(element_id)
 
     def create_componet_node(self, parent_id: ElementId, node: VComponent, nodes: list[ElementId]):
         parent_scope = self.current_scope()
