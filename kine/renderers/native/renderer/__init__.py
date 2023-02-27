@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 import weakref
 import pyglet
+
+pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+pyglet.gl.glDisable(pyglet.gl.GL_DEPTH_TEST)
 
 
 class BaseWidgetMeta(type):
@@ -17,6 +21,8 @@ class BaseWidget(metaclass=BaseWidgetMeta):
         self.x = 0
         self.y = 0
         self.calculate_size = True
+        self.border_width = 0
+        self.border_color = (0, 0, 0, 255)
         self.width = 0
         self.height = 0
         self.padding = 0
@@ -37,7 +43,14 @@ class BaseWidget(metaclass=BaseWidgetMeta):
 
     def setup(self):
         self.background = pyglet.shapes.BorderedRectangle(
-            0, 0, 0, 0, border=0, color=self.background_color, batch=self.batch, group=self.background_group
+            0,
+            0,
+            0,
+            0,
+            border=self.border_width,
+            color=self.background_color,
+            batch=self.batch,
+            group=self.background_group,
         )
 
     def add_child(self, widget: BaseWidget):
@@ -57,29 +70,55 @@ class BaseWidget(metaclass=BaseWidgetMeta):
     def is_intersecting(self, position: tuple[int, int]):
         return self.x <= position[0] <= (self.x + self.width) and self.y <= position[1] <= (self.y + self.height)
 
+    @property
+    def opacity(self) -> int:
+        try:
+            return self.color[3]  # type: ignore
+        except IndexError:
+            return 255
+
+    @opacity.setter
+    def opactity(self, value: int):
+        self.color = (self.color[0], self.color[1], self.color[2], value)
+
+    @property
+    def background_opacity(self) -> int:
+        try:
+            return self.background_color[3]  # type: ignore
+        except IndexError:
+            return 255
+
+    @background_opacity.setter
+    def background_opacity(self, value: int):
+        self.background_color = (self.background_color[0], self.background_color[1], self.background_color[2], value)
+
     def update(self, window: Window):
         self.background.x = self.x
         self.background.y = self.y
 
         self.background.opacity = self.background_color[3]
-        self.background.color = self.background_color
 
+        self.background.border_color = self.border_color
+        self.background._border = self.border_width
+        self.background.color = self.background_color[0:3]
         width, height = self.calculate_bounding_box()
 
         if self.calculate_size:
             self.width = width
             self.height = height
 
-        self.background.width = self.width + (self.padding * 2)
-        self.background.height = self.height + (self.padding * 2)
+        self.background.width = self.width
+        self.background.height = self.height
 
     def draw(self, window: Window):
-        # print("drawing", self.__class__.__name__, "at", self.x, self.y)
         self.update(window)
+        # print("drawing", self.__class__.__name__, "at", self.x, self.y)
         self.batch.draw()
 
         for child in self.children:
+            pyglet.gl.glDisable(pyglet.gl.GL_DEPTH_TEST)
             child.draw(window)
+            pyglet.gl.glEnable(pyglet.gl.GL_DEPTH_TEST)
 
     def on_hover(self):
         self.is_hover = True
@@ -94,52 +133,65 @@ class BaseWidget(metaclass=BaseWidgetMeta):
         self.is_click = False
 
 
-class Row(BaseWidget):
+class Flex(BaseWidget):
+    def __init__(self, direction: Literal["row", "column"] = "row"):
+        super().__init__()
+        self.direction = direction
+
     def calculate_bounding_box(self) -> tuple[int, int]:
-        width = 0
-        height = 0
+        gap = self.padding + self.border_width
+        width = gap
+        height = gap
 
-        for child in self.children:
-            child.x = self.x + width + self.padding + child.margin
-            child.y = self.y + self.padding + child.margin
-            width += self.padding + child.margin
+        if self.direction == "row":
+            for child in self.children:
+                width += child.margin
 
-            child_width, child_height = child.calculate_bounding_box()
-            margin_height = child_height + (child.margin * 2)
+                child.x = self.x + width
+                child.y = self.y + child.margin + gap
 
-            if margin_height > height:
-                height = margin_height
+                child_width, child_height = child.calculate_bounding_box()
+                margin_height = child_height + (child.margin * 2) + gap
 
-            width += child_width + self.padding + child.margin
+                if margin_height > height:
+                    height = margin_height
 
-        return (width - self.padding, height)
+                width += child_width + child.margin
+        else:
+            for child in self.children:
+                height += child.margin
+
+                child.x = self.x + child.margin + gap
+                child.y = self.y + height
+
+                child_width, child_height = child.calculate_bounding_box()
+                margin_width = child_width + (child.margin * 2) + gap
+
+                if margin_width > width:
+                    width = margin_width
+
+                height += child_height + child.margin
+
+        width += gap
+        height += gap
+
+        return (width, height)
 
 
-class Column(BaseWidget):
-    def calculate_bounding_box(self) -> tuple[int, int]:
-        width = 0
-        height = 0
+class Row(Flex):
+    def __init__(self):
+        super().__init__("row")
 
-        for child in self.children:
-            child.x = self.x + self.padding + child.margin
-            child.y = self.y + height + self.padding + child.margin
-            height += self.padding + child.margin
 
-            child_width, child_height = child.calculate_bounding_box()
-            margin_width = child_width + (child.margin * 2)
-
-            if margin_width > width:
-                width = margin_width
-
-            height += child_height + self.padding + child.margin
-
-        return (width, height - self.padding)
+class Column(Flex):
+    def __init__(self):
+        super().__init__("column")
 
 
 class Label(BaseWidget):
     def __init__(self, text: str):
         super().__init__()
-        self.background_color = (0, 0, 0, 0)
+        self.background_color = (255, 255, 255, 0)
         self.text = text
 
     def setup(self):
@@ -150,21 +202,20 @@ class Label(BaseWidget):
         super().update(window)
 
         self.label.text = self.text
-        self.label.x = self.x
-        self.label.y = self.y
+        self.label.x = self.x + self.padding
+        self.label.y = self.y + self.padding
+
         self.label.color = self.color
+        self.background.color = self.parent.background_color  # opactity is just broken for some reason
 
     def calculate_bounding_box(self) -> tuple[int, int]:
-        return (self.label.content_width, self.label.content_height)
-
-
-class Block(BaseWidget):
-    pass
+        return (self.label.content_width + self.padding * 2, self.label.content_height + self.padding * 2)
 
 
 class Rectangle(BaseWidget):
     def __init__(self, width: int, height: int):
         super().__init__()
+        self.calculate_size = False
         self.width = width
         self.height = height
 
@@ -172,20 +223,25 @@ class Rectangle(BaseWidget):
         return (self.width, self.height)
 
 
-class Button(BaseWidget):
+class Button(Flex):
     def __init__(self):
         super().__init__()
-        self.padding = 5
-        self.background_color = (200, 200, 200, 255)
+        self.border_width = 1
+        self.padding = 2
+        self.background_color = (0xF0, 0xF0, 0xF0, 255)
+        self.hover_background_color = (255, 255, 255, 255)
+        self._original_color = self.background_color
+        self.border_color = (0x76, 0x76, 0x76, 0xFF)
 
     def on_hover(self):
         super().on_hover()
-        self.background.color = (255, 255, 255, 255)
+        self._original_color = self.background_color
+        self.background_color = self.hover_background_color
         self.call_listeners("hover")
 
     def on_unhover(self):
         super().on_unhover()
-        self.background.color = self.background_color
+        self.background_color = self._original_color
         self.call_listeners("unhover")
 
     def on_click(self):
@@ -200,16 +256,29 @@ def recursive_find_at_pos(widgets: list[BaseWidget], position: tuple[int, int]) 
 
     for widget in widgets:
         if widget.is_intersecting(position):
+            # print(f"intersecting {widget.__class__.__name__} at {position}")
             found.append(widget)
             found.extend(recursive_find_at_pos(widget.children, position))
 
     return found
 
 
+class Root(Row):
+    def __init__(self):
+        super().__init__()
+        self.calculate_size = False
+
+    def update(self, window: Window):
+        self.width = window.width
+        self.height = window.height
+
+        super().update(window)
+
+
 class Window(pyglet.window.Window):
     def __init__(self):
         super().__init__()
-        self.root = Row()
+        self.root = Root()
         self.root.calculate_size = False
         self.root.width = self.width
         self.root.height = self.height
@@ -280,46 +349,19 @@ class Window(pyglet.window.Window):
         self.clear()
         self.root.draw(self)
 
+    def run(self):
+        event_loop = pyglet.app.EventLoop()
+        event_loop.run()
+
 
 def main():
     window = Window()
+    window.root.padding = 5
 
-    row = Row()
-    row.margin = 10
-    row.padding = 5
-    row.background_color = (255, 0, 0, 255)
+    for i in range(10):
+        button = Button()
+        button.add_child(Label(str(i)))
 
-    rect = Rectangle(30, 10)
-    rect.background_color = (0, 255, 0, 255)
-    row.add_child(rect)
+        window.add_child(button)
 
-    text = Label("Hello World")
-    text.background_color = (0, 255, 0, 255)
-    text.color = (0, 0, 255, 100)
-    row.add_child(text)
-
-    rect = Rectangle(30, 20)
-    rect.background_color = (0, 255, 0, 255)
-    row.add_child(rect)
-
-    column = Column()
-    column.background_color = (0, 255, 0, 255)
-
-    rect = Rectangle(10, 20)
-    rect.margin = 5
-    column.add_child(rect)
-
-    rect = Rectangle(10, 20)
-    rect.margin = 10
-    column.add_child(rect)
-
-    row.add_child(column)
-
-    rect = Rectangle(50, 1)
-    rect.background_color = (0, 255, 0, 255)
-    row.add_child(rect)
-
-    window.add_child(row)
-
-    event_loop = pyglet.app.EventLoop()
-    event_loop.run()
+    window.run()
