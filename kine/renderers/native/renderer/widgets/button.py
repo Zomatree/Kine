@@ -7,7 +7,7 @@ class Button(Flex):
     def __init__(self):
         super().__init__()
         self.border_width = 1
-        self.padding = 2
+        self.padding = 5
         self.regular_background_color = (0xF0, 0xF0, 0xF0, 255)
         self.hover_background_color = (255, 255, 255, 255)
         self.border_color = (0x76, 0x76, 0x76, 0xFF)
