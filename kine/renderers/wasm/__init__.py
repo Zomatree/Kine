@@ -99,7 +99,7 @@ def calculate_diffs(queue: asyncio.Queue[Any], nodes: dict[ElementId, js.Element
                     queue.put_nowait(
                         {
                             "method": "user_event",
-                            "params": {"event": mod.event_name, "mounted_dom_id": mod.root, "contents": data},
+                            "params": {"event": mod.event_name, "mounted_dom_id": mod.root, "contents": evt},
                         }
                     )
 
