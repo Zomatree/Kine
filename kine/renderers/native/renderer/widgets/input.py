@@ -14,7 +14,7 @@ class Input(Label):
     def __init__(self, text: str = ""):
         super().__init__(text=text)
         self._text = list(text)
-        self.padding = 5
+        self.padding = 6
         self.cursor_position = 0
         self.border_color = (0, 0, 0, 255)
         self.border_width = 1

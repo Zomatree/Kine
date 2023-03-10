@@ -14,7 +14,23 @@ def main():
     window = Window()
     window.root.padding = 5
 
-    window.add_child(Input())
+    messages = Column()
+    input = Input()
+    button = Button()
+    button.add_child(Label("Enter"))
+
+    row = Row()
+    row.add_child(input)
+    row.add_child(button)
+
+    def on_click():
+        label = Label(input.text)
+        input.text = ""
+
+        messages.add_child(label)
+
+    window.add_child(messages)
+    window.add_child(row)
 
     window.root.print_tree()
     window.run()

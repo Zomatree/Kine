@@ -42,6 +42,7 @@ python = ["311"]
 typeCheckingMode = "strict"
 reportPrivateUsage = "none"
 reportImportCycles = "none"
+reportMissingTypeStubs = "none"
 
 [tool.black]
 line-length = 120

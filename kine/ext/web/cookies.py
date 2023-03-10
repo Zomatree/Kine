@@ -9,11 +9,14 @@ from ... import Scope, messages
 
 T = TypeVar("T")
 
+
 class EvalMessage(messages.BaseEvent[Literal["EvalMessage"]]):
     code: str
 
+
 class _Cookies(dict[str, str]):
     pass
+
 
 class Cookies:
     def __init__(self, cx: Scope):
@@ -39,6 +42,7 @@ class Cookies:
         msg.code = f"Cookies.set({repr(name)}, {repr(value)})"
         self.dom.custom_messages.put_nowait(msg)
         self.cx.schedule_update()
+
 
 def use_cookies(cx: Scope) -> Cookies:
     return cx.use_hook(lambda: Cookies(cx))

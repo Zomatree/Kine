@@ -3,9 +3,9 @@ from typing import Generic, TypeVar
 T = TypeVar("T")
 
 
-class Proxy(Generic[T]):
+class JsProxy(Generic[T]):
     _: T
 
 
-def create_proxy(f: T) -> Proxy[T]:
+def create_proxy(f: T) -> JsProxy[T]:
     ...

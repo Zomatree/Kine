@@ -2,47 +2,46 @@ from __future__ import annotations
 
 import asyncio
 from enum import Enum
-from typing import Any
+import json
+from typing import TYPE_CHECKING, Any, NotRequired
 from typing_extensions import Unpack
 import js
 from pyodide.ffi import create_proxy
+from pyodide.http import pyfetch, FetchResponse
+
+if TYPE_CHECKING:
+
+    class FetchOptions(js._FetchOptions):
+        json: NotRequired[Any]
 
 
-class Response:
-    def __init__(self, inner: js.Response):
-        self.inner = inner
+async def fetch(url: str, **kwargs: Unpack[FetchOptions]) -> FetchResponse:
+    if (data := kwargs.pop("json", None)) is not None:
+        kwargs.setdefault("headers", {})["content-type"] = "application/json"
+        kwargs["body"] = json.dumps(data)
 
-    async def text(self) -> str:
-        return await self.inner.text()
-
-    async def json(self) -> Any:
-        data = await self.inner.json()
-        return data.to_py()
+    return await pyfetch(url, **kwargs)
 
 
-async def fetch(url: str, **kwargs: Unpack[js._FetchOptions]) -> Response:
-    return Response(await js.fetch(url, kwargs))
-
-
-async def get(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
+async def get(url: str, /, **kwargs: Unpack[FetchOptions]) -> FetchResponse:
     kwargs["method"] = "GET"
 
     return await fetch(url, **kwargs)
 
 
-async def post(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
+async def post(url: str, /, **kwargs: Unpack[FetchOptions]) -> FetchResponse:
     kwargs["method"] = "POST"
 
     return await fetch(url, **kwargs)
 
 
-async def patch(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
+async def patch(url: str, /, **kwargs: Unpack[FetchOptions]) -> FetchResponse:
     kwargs["method"] = "PATCH"
 
     return await fetch(url, **kwargs)
 
 
-async def delete(url: str, /, **kwargs: Unpack[js._FetchOptions]) -> Response:
+async def delete(url: str, /, **kwargs: Unpack[FetchOptions]) -> FetchResponse:
     kwargs["method"] = "DELETE"
 
     return await fetch(url, **kwargs)

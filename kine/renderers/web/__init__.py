@@ -22,10 +22,12 @@ file = pathlib.Path(__file__)
 with open(file.parent / "interpreter.js") as f:
     interpreter = f.read()
 
+
 class WebVDom(VirtualDom):
     def __init__(self, app: ComponentFunction[...], custom_messages: asyncio.Queue[EvalMessage]):
         super().__init__(app)
         self.custom_messages = custom_messages
+
 
 def use_eval(cx: Scope, code: str) -> Callable[[], None]:
     def inner():
@@ -37,6 +39,7 @@ def use_eval(cx: Scope, code: str) -> Callable[[], None]:
         cx.schedule_update()
 
     return inner
+
 
 async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "127.0.0.1:8080"):
     web_app = web.Application()
@@ -63,12 +66,13 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                 return True
 
         while True:
-            futs = await asyncio.wait([
-                asyncio.ensure_future(dom.wait_for_work()),
-                asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
-                asyncio.ensure_future(custom_messages.get())
-            ],
-                return_when=asyncio.FIRST_COMPLETED
+            futs = await asyncio.wait(
+                [
+                    asyncio.ensure_future(dom.wait_for_work()),
+                    asyncio.ensure_future(cast(Awaitable[Literal[True] | dict[str, Any]], receive_wrapper())),
+                    asyncio.ensure_future(custom_messages.get()),
+                ],
+                return_when=asyncio.FIRST_COMPLETED,
             )
 
             dones, pending = futs

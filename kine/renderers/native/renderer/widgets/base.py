@@ -65,6 +65,12 @@ class BaseWidget(metaclass=BaseWidgetMeta):
             group=self.background_group,
         )
 
+    def _set_window(self, window: Window):
+        self.window = window
+
+        for child in self.children:
+            child._set_window(window)
+
     def add_child(self, widget: BaseWidget):
         widget.parent = weakref.proxy(self)
         widget.window = self.window

@@ -4,12 +4,11 @@ import asyncio
 from collections import deque
 from typing import Callable, TypeVar, cast
 
-from kine.core import ComponentFunction
-
+from .core import ComponentFunction
 from .diff import AppendChildren, Diff, Mutations
 from .messages import DirtyAll, EventMessage, Immediate, NewTask, ScheduleMessage
 from .scope import Scopes
-from .utils import ElementId, ScopeId
+from .utils import ElementId, ScopeId, select
 
 T = TypeVar("T")
 
@@ -25,14 +24,12 @@ class VirtualDom:
 
     async def _task(self):
         while True:
-            for task_id, task in list(self.scopes.tasks.tasks.items()):
-                if task.done():
-                    del self.scopes.tasks.tasks[task_id]
+            task_id, _ = await select(*self.scopes.tasks.tasks.items())
+
+            del self.scopes.tasks.tasks[task_id]
 
             if not self.scopes.tasks.tasks:
                 return
-            else:
-                await asyncio.sleep(0)
 
     async def wait_for_work(self):
         while True:
@@ -41,18 +38,24 @@ class VirtualDom:
 
             if not self.pending_messages:
                 if self.scopes.tasks.tasks:
-                    loop_task = asyncio.ensure_future(self._task())
-                    message_task = asyncio.ensure_future(self.messages.get())
+                    # loop_task = asyncio.ensure_future(self._task())
+                    # message_task = asyncio.ensure_future(self.messages.get())
 
-                    def done(t: asyncio.Task[ScheduleMessage]):
-                        loop_task.cancel()
+                    # def done(t: asyncio.Task[ScheduleMessage]):
+                    #     loop_task.cancel()
 
-                        self.pending_messages.appendleft(t.result())
+                    #     self.pending_messages.appendleft(t.result())
 
-                    loop_task.add_done_callback(lambda _: message_task.cancel())
-                    message_task.add_done_callback(done)
+                    # loop_task.add_done_callback(lambda _: message_task.cancel())
+                    # message_task.add_done_callback(done)
 
-                    await asyncio.wait([loop_task, message_task])
+                    # await asyncio.wait([loop_task, message_task])
+                    is_message, message = await select((True, self.messages.get()), (False, self._task()))
+
+                    if is_message:
+                        assert message
+
+                        self.pending_messages.appendleft(message)
                 else:
                     self.pending_messages.appendleft(await self.messages.get())
 

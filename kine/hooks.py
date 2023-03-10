@@ -3,8 +3,6 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar
 
-from .utils import ScopeId
-
 if TYPE_CHECKING:
     from .scope import Scope
 
@@ -80,11 +78,6 @@ class GlobalState:
     def __init__(self, scope: Scope):
         self.scope = scope
         self.states: dict[GlobalStateCallback[Any], Any] = {}
-        self.refs: dict[Any, set[ScopeId]] = {}
-
-    def require_update(self, state: GlobalStateCallback[Any]):
-        for ref in self.refs[state]:
-            self.scope.scopes.dom.dirty_scopes.add(ref)
 
     def get(self, state: GlobalStateCallback[T]) -> T:
         if state in self.states:
@@ -108,8 +101,6 @@ def use_read(cx: Scope, state: GlobalStateCallback[T]) -> T:
     root = use_global_state(cx)
     value = root.get(state)
 
-    root.refs.setdefault(state, set()).add(cx.scope_id)
-
     return value
 
 
@@ -119,6 +110,6 @@ def use_set(cx: Scope, state: GlobalStateCallback[T]) -> Callable[[T], None]:
     def callback(value: T):
         root.states[state] = value
 
-        root.require_update(state)
+        cx.schedule_update()
 
     return callback

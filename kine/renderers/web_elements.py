@@ -3,9 +3,11 @@ from typing_extensions import Unpack
 
 from ..elements import Element as BaseElement, CGI
 
+
 class InputEvent(TypedDict):
     value: str
     values: dict[str, str]
+
 
 class ElementArgs(TypedDict, total=False):
     accesskey: str

@@ -37,18 +37,11 @@ async def start_wasm(app: ComponentFunction[P]):
             ],
             return_when=asyncio.FIRST_COMPLETED,
         )
-        dones, pending = futs
 
-        for task in pending:
-            task.cancel()
+        dones, _ = futs
 
         for done in dones:
-            try:
-                result = done.result()
-            except TypeError:
-                return
-
-            if msg := result:
+            if msg := done.result():
                 if msg["method"] == "user_event":
                     payload = msg["params"]
                     dom.handle_message(

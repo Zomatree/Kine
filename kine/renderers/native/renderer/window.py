@@ -17,8 +17,13 @@ class Window(pyglet.window.Window):
         self.after: dict[str, dict[int, Callable[[tuple[int, int], Any], bool]]] = {}
         self.selected: BaseWidget | None = None
 
+    def set_cursor(self, cursor: str | None):
+        cursor = self.get_system_mouse_cursor(cursor)
+        self.set_mouse_cursor(cursor)
+
     def add_child(self, widget: BaseWidget):
         self.root.add_child(widget)
+        widget._set_window(self)
 
     def add_after(self, name: str, f: Callable[[tuple[int, int], Any], bool]):
         cbs = self.after.setdefault(name, {})
@@ -32,6 +37,8 @@ class Window(pyglet.window.Window):
 
     def recursive_run_at_position(self, pos: tuple[int, int], data: Any, f: Callable[[BaseWidget, Any], bool]):
         widgets = recursive_find_at_pos(self.root.children, pos)
+        print(widgets)
+
         for widget in reversed(widgets):
             should_stop = f(widget, data)
 
@@ -44,6 +51,7 @@ class Window(pyglet.window.Window):
 
             def after(pos: tuple[int, int], _: Any) -> bool:
                 if widget.is_hover and not widget.is_intersecting(pos):
+                    print("unhover")
                     widget.on_unhover()
 
                     return True
@@ -83,6 +91,7 @@ class Window(pyglet.window.Window):
                     return False
 
                 self.add_after("mouse", select_after)
+                return True
 
         return False
 
@@ -95,6 +104,7 @@ class Window(pyglet.window.Window):
         self.root.draw(self)
 
     def on_text(self, text: str):
+        print(text, self.selected)
         if widget := self.selected:
             widget.on_text(text)
 

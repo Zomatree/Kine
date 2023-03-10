@@ -12,7 +12,7 @@ import importlib
 import os
 import pipdeptree
 import importlib.metadata as import_meta
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
 
@@ -225,14 +225,14 @@ def serve(port: int, host: str):
     """Runs a http server with the built web app"""
 
     os.chdir("build")
-    httpd = HTTPServer((host, port), Handler)
+    httpd = ThreadingHTTPServer((host, port), Handler)
 
     print(f"Running server on http://{host}:{port}")
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        sys.exit(0)
+        httpd.shutdown()
 
 
 cli()

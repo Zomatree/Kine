@@ -1,26 +1,30 @@
 import asyncio
-from asyncio import Future
+from asyncio import Task
 from dataclasses import dataclass
-from typing import NewType, TypeVar
+from typing import Awaitable, NewType, TypeVar
 
 T = TypeVar("T")
+U = TypeVar("U")
 
 ScopeId = NewType("ScopeId", int)
 TaskId = NewType("TaskId", tuple[int, ScopeId])
 ElementId = NewType("ElementId", int)
 
 
-async def select(*futures: Future[T]) -> tuple[int, T]:
-    new_futures: list[Future[tuple[int, T]]] = []
+async def select(*futures: tuple[T, Awaitable[U]]) -> tuple[T, U]:
+    new_futures: list[Task[tuple[T, U]]] = []
 
-    for i, fut in enumerate(futures):
+    for v, fut in futures:
 
-        async def wrapper(i: int, fut: Future[T]):
-            return i, await fut
+        async def wrapper(i: T, fut: Awaitable[U]):
+            return v, await fut
 
-        new_futures.append(asyncio.ensure_future(wrapper(i, fut)))
+        new_futures.append(asyncio.create_task(wrapper(v, fut)))
 
-    (task,), _ = await asyncio.wait(new_futures, return_when=asyncio.FIRST_COMPLETED)
+    (task,), pending = await asyncio.wait(new_futures, return_when=asyncio.FIRST_COMPLETED)
+
+    for t in pending:
+        t.cancel()
 
     return task.result()
 
