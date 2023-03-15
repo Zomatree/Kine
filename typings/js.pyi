@@ -283,6 +283,21 @@ class Window:
     document: Document
     localStorage: Storage
     sessionStorage: Storage
+    history: History
+
+class History:
+    length: int
+    scrollRestoration: str
+    state: Any
+
+    def back(self) -> None: ...
+    def forward(self) -> None: ...
+    @overload
+    def go(self) -> None: ...
+    @overload
+    def go(self, delta: int) -> None: ...
+    def pushState(self, state: Any, unused: str, url: str) -> None: ...
+    def replaceState(self, stateObj: Any, unused: str, url: str) -> None: ...
 
 class ReadableStream:
     locked: bool

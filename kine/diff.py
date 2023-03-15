@@ -254,13 +254,24 @@ class Diff:
         new.id = element_id
 
     def diff_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
-        old_is_keyed = bool(old[0].key)
-        new_is_keyed = bool(new[0].key)
+        match old, new:
+            case [], []:
+                pass
 
-        if old_is_keyed and new_is_keyed:
-            self.diff_keyed_children(parent_id, old, new)
-        else:
-            self.diff_unkeyed_children(parent_id, old, new)
+            case [], new_children:
+                self.create_and_append_children(parent_id, new_children)
+
+            case old_children, []:
+                self.remove_nodes(old_children, True)
+
+            case old_children, new_children:
+                old_keyed = old_children[0].key
+                new_keyed = new_children[0].key
+
+                if old_keyed and new_keyed:
+                    self.diff_keyed_children(parent_id, old_children, new_children)
+                else:
+                    self.diff_unkeyed_children(parent_id, old_children, new_children)
 
     def diff_keyed_children(self, parent_id: ElementId, old: list[VNode], new: list[VNode]):
         if offsets := self.diff_keyed_ends(parent_id, old, new):
@@ -465,18 +476,21 @@ class Diff:
             case VPlaceholder() as node:
                 self.create_placeholder_node(node, nodes)
             case VComponent() as node:
-                self.create_componet_node(parent_id, node, nodes)
+                self.create_component_node(parent_id, node, nodes)
 
     def replace_inner(self, node: VNode, nodes: list[ElementId]):
         match node:
             case VString() | VPlaceholder():
-                element_id = cast(ElementId, node.id)
+                element_id = node.id
+                assert element_id
 
                 self.mutations.append(ReplaceWith(element_id, nodes))
                 self.scopes.remove_node(element_id)
 
             case VElement() as node:
-                element_id = cast(ElementId, node.id)
+                element_id = node.id
+                assert element_id
+
                 self.mutations.append(ReplaceWith(element_id, nodes))
                 self.remove_nodes(node.children, False)
                 self.scopes.remove_node(element_id)
@@ -569,7 +583,7 @@ class Diff:
         self.mutations.append(CreatePlaceholder(element_id))
         nodes.append(element_id)
 
-    def create_componet_node(self, parent_id: ElementId, node: VComponent, nodes: list[ElementId]):
+    def create_component_node(self, parent_id: ElementId, node: VComponent, nodes: list[ElementId]):
         parent_scope = self.current_scope()
 
         if (scope_id := node.scope_id) is None:

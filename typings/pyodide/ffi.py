@@ -9,3 +9,7 @@ class JsProxy(Generic[T]):
 
 def create_proxy(f: T) -> JsProxy[T]:
     ...
+
+
+def to_js(v: T) -> JsProxy[T]:
+    ...

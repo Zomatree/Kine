@@ -2,6 +2,7 @@ from ... import component, Scope
 from ...renderers.web_elements import *
 from typing import ParamSpec
 import js
+import pyodide.ffi
 
 __all__ = ("UseRouter", "use_router", "link", "route", "router")
 
@@ -17,7 +18,7 @@ class UseRouter:
 
     def push_route(self, route: str):
         self.current_route = route
-        js.document.location.pathname = route
+        js.window.history.pushState(pyodide.ffi.to_js({}), "", route)
 
         self.scope.root_scope().schedule_update()
 
