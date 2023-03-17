@@ -20,13 +20,18 @@ class Button(Flex):
     def on_hover(self):
         super().on_hover()
         self.background_color = self.hover_background_color
+
+        assert self.window
         self.window.set_cursor("hand")
         self.call_listeners("hover")
 
     def on_unhover(self):
         super().on_unhover()
         self.background_color = self.regular_background_color
+
+        assert self.window
         self.window.set_cursor(None)
+
         self.call_listeners("unhover")
 
     def on_click(self):

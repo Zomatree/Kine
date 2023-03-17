@@ -1,6 +1,5 @@
 import click
 import pathlib
-import sys
 import toml
 import shutil
 import tarfile

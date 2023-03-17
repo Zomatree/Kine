@@ -156,10 +156,14 @@ class BaseWidget(metaclass=BaseWidgetMeta):
 
     def on_select(self):
         self.is_select = True
+
+        assert self.window
         self.window.selected = self
 
     def on_unselect(self):
         self.is_select = False
+
+        assert self.window
         self.window.selected = None
 
     def on_text(self, text: str):

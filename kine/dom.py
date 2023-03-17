@@ -38,24 +38,25 @@ class VirtualDom:
 
             if not self.pending_messages:
                 if self.scopes.tasks.tasks:
-                    # loop_task = asyncio.ensure_future(self._task())
-                    # message_task = asyncio.ensure_future(self.messages.get())
+                    loop_task = asyncio.ensure_future(self._task())
+                    message_task = asyncio.ensure_future(self.messages.get())
 
-                    # def done(t: asyncio.Task[ScheduleMessage]):
-                    #     loop_task.cancel()
+                    def done(t: asyncio.Task[ScheduleMessage]):
+                        loop_task.cancel()
 
-                    #     self.pending_messages.appendleft(t.result())
+                        if not t.cancelled():
+                            self.pending_messages.appendleft(t.result())
 
-                    # loop_task.add_done_callback(lambda _: message_task.cancel())
-                    # message_task.add_done_callback(done)
+                    loop_task.add_done_callback(lambda _: message_task.cancel())
+                    message_task.add_done_callback(done)
 
-                    # await asyncio.wait([loop_task, message_task])
-                    is_message, message = await select((True, self.messages.get()), (False, self._task()))
+                    await asyncio.wait([loop_task, message_task])
+                    # is_message, message = await select((True, self.messages.get()), (False, self._task()))
+                    # print(is_message, message)
+                    # if is_message:
+                    #     assert message
 
-                    if is_message:
-                        assert message
-
-                        self.pending_messages.appendleft(message)
+                    #     self.pending_messages.appendleft(message)
                 else:
                     self.pending_messages.appendleft(await self.messages.get())
 

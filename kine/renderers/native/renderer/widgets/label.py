@@ -36,6 +36,7 @@ class Label(BaseWidget):
         self.label.font_size = self.font_size
 
         self.label.color = self.color
+        assert self.parent
         self.background.color = self.parent.background_color  # opactity is just broken for some reason
 
     def calculate_bounding_box(self) -> tuple[int, int]:
