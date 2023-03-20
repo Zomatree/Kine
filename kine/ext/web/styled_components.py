@@ -1,4 +1,4 @@
-from typing import Any, Callable, TypeVar
+from typing import Callable, TypeVar, Unpack
 import random
 import string
 
@@ -18,8 +18,11 @@ def styled_component(element: type, styling: str) -> Callable[..., ComponentFunc
     STYLES[class_name] = styling
 
     @component
-    def inner_compponent(cx: Scope, *args: Node, **kwargs: Any):
-        return cx.render(element(class_=class_name, **kwargs)[cx.children])
+    def inner_compponent(cx: Scope, **kwargs: Unpack[web_elements.ElementArgs]):
+        existing_classes = kwargs.get("class_", "")
+        kwargs["class_"] = f"{class_name} {existing_classes}"
+
+        return cx.render(element(**kwargs)[cx.children])
 
     return inner_compponent
 
