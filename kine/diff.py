@@ -12,12 +12,6 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class PushRoot:
-    type = "PushRoot"
-    root: ElementId
-
-
-@dataclass
 class AppendChildren:
     type = "AppendChildren"
     root: ElementId
@@ -80,6 +74,12 @@ class NewEventListener:
 
 
 @dataclass
+class RemoveEventListener:
+    type = "RemoveEventListener"
+    event_name: str
+    root: ElementId
+
+@dataclass
 class SetText:
     type = "SetText"
     root: ElementId
@@ -101,14 +101,8 @@ class RemoveAttribute:
     field: str
 
 
-@dataclass
-class PopRoot:
-    type = "PopRoot"
-
-
 Modification = (
-    PushRoot
-    | AppendChildren
+    AppendChildren
     | ReplaceWith
     | InsertAfter
     | InsertBefore
@@ -120,7 +114,7 @@ Modification = (
     | SetText
     | SetAttribute
     | RemoveAttribute
-    | PopRoot
+    | RemoveEventListener
 )
 
 MAX_N = (1 << 32) - 1  # 32 bit int max size
@@ -198,6 +192,45 @@ class Diff:
         self.scopes.update_node(new, element_id)
         new.id = element_id
         new.parent_id = old.parent_id
+
+        """
+        if old.listeners.len() == new.listeners.len() {
+            for (old_l, new_l) in old.listeners.iter().zip(new.listeners.iter()) {
+                new_l.mounted_node.set(old_l.mounted_node.get());
+                if old_l.event != new_l.event {
+                    self.mutations
+                        .remove_event_listener(old_l.event, root.as_u64());
+                    self.mutations.new_event_listener(new_l, cur_scope_id);
+                }
+            }
+        } else {
+            for listener in old.listeners {
+                self.mutations
+                    .remove_event_listener(listener.event, root.as_u64());
+            }
+            for listener in new.listeners {
+                listener.mounted_node.set(Some(root));
+                self.mutations.new_event_listener(listener, cur_scope_id);
+            }
+        }
+        """
+
+        scope_id = self.current_scope()
+
+        if len(old.listeners) == len(new.listeners):
+            for (old_l, new_l) in zip(old.listeners, new.listeners):
+                new_l.element_id = old_l.element_id
+
+                if old_l.name != new_l.name:
+                    self.mutations.append(RemoveEventListener(old_l.name, element_id))
+                    self.mutations.append(NewEventListener(new_l.name, scope_id, element_id))
+        else:
+            for listener in old.listeners:
+                self.mutations.append(RemoveEventListener(listener.name, element_id))
+
+            for listener in new.listeners:
+                listener.element_id = element_id
+                self.mutations.append(NewEventListener(listener.name, scope_id, element_id))
 
         if len(old.attributes) == len(new.attributes):
             for (key, old_attr), new_attr in zip(old.attributes.items(), new.attributes.values()):

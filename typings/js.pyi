@@ -63,7 +63,7 @@ class Node(EventTarget):
     nodeType: int
     nodeValue: str
     ownerDocument: Document
-    parentElement: Element
+    parentElement: Element | None
     parentNode: Node
     previousSibling: Node | None
     textContent: Node | None
@@ -203,6 +203,7 @@ class Element(Node):
     def replaceChildren(self, *param: Node) -> None: ...
     def replaceWith(self, *param: Node) -> None: ...
     def setAttribute(self, name: str, value: str) -> bool: ...
+    def getAttribute(self, qualifiedName: str) -> str | None: ...
 
 class CharacterData(Node):
     data: str
@@ -530,7 +531,7 @@ class Message:
     type: Literal["request", "response", "event"]
 
 class Event(Message):
-    type: Literal["event"]
+    type: str
     event: str
     body: Any | None
 
@@ -575,6 +576,7 @@ class WebSocket(EventTarget):
     @overload
     @classmethod
     def new(cls, url: str | URL, protocols: str | Array[str]) -> Self: ...
+
 
 console = _Console()
 document = Document()
