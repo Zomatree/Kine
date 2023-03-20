@@ -55,12 +55,23 @@ class UseRouter:
 
 
 def use_router(cx: Scope) -> UseRouter:
-    return cx.consume_context(UseRouter)
-
+    try:
+        return cx.consume_context(UseRouter)
+    except LookupError as e:
+        e.add_note("No router found, make sure to wrap your root component in the `router` component.")
+        raise e
 
 @component
 def link(cx: Scope, route: str):
-    return cx.render(a(href=route)[cx.children])
+    router = use_router(cx)
+
+    return cx.render(a(
+        href=route,
+        prevent_default="onclick",
+        onclick=lambda _: router.push_route(route)
+    )[
+        cx.children
+    ])
 
 
 @component
