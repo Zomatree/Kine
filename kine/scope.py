@@ -65,7 +65,7 @@ class Scope:
                 except KeyError:
                     parent_scope = parent_scope.parent_scope
 
-            raise KeyError from None
+            raise LookupError from None
 
     def provide_root_context(self, context: T) -> T:
         return self.root_scope().provide_context(context)
