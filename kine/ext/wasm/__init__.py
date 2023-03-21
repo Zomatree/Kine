@@ -1,7 +1,6 @@
-from spec import TypeVar
 from ... import component, Scope
 from ...renderers.web_elements import *
-from typing import ParamSpec, overload
+from typing import ParamSpec, overload, TypeVar
 import js
 import pyodide.ffi
 
