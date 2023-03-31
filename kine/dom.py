@@ -50,7 +50,7 @@ class VirtualDom:
                     loop_task.add_done_callback(lambda _: message_task.cancel())
                     message_task.add_done_callback(done)
 
-                    await asyncio.wait([loop_task, message_task])
+                    await asyncio.wait([loop_task, message_task], return_when=asyncio.FIRST_COMPLETED)
                     # is_message, message = await select((True, self.messages.get()), (False, self._task()))
                     # print(is_message, message)
                     # if is_message:

@@ -13,7 +13,7 @@ from typing import (
     Generic,
     TYPE_CHECKING,
 )
-from typing_extensions import NotRequired, Self
+from typing_extensions import Self
 
 if TYPE_CHECKING:
     from pyodide.ffi import JsProxy
@@ -21,6 +21,9 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 class Array(Generic[T], list[T]):
+    pass
+
+class Object:
     pass
 
 class EventTarget:
@@ -43,7 +46,7 @@ class NodeList:
 
     def __iter__(self) -> Iterator[Node]: ...
     def __len__(self) -> int: ...
-    def entries(self) -> Iterator[Array[Any[Any]]]: ...
+    def entries(self) -> Iterator[Array[Any]]: ...
     @overload
     def forEach(self, callback: Any) -> None: ...
     @overload
@@ -285,6 +288,432 @@ class Window:
     localStorage: Storage
     sessionStorage: Storage
     history: History
+    navigator: Navigator
+
+class ClipboardItemOptions:
+    presentationStyle: Literal["unspecified", "inline", "attachment"]
+
+class ClipboardItem:
+    def __init__(self, data: Object, options: ClipboardItemOptions) -> None: ...
+
+class Clipboard(EventTarget):
+    def read(self) -> Promise[ClipboardItem]: ...
+    def readText(self) -> Promise[str]: ...
+    def write(self, data: list[ClipboardItem]) -> Promise[None]: ...
+    def writeText(self, newClipText: str) -> Promise[None]: ...
+
+class CredentialsContainer:
+    @overload
+    def create(self) -> Promise[Credential]: ...
+    @overload
+    def create(self, options: Any) -> Promise[Credential]: ...
+
+    @overload
+    def get(self) -> Promise[Credential]: ...
+    @overload
+    def get(self, options: Any) -> Promise[Credential]: ...
+
+    def preventSilentAccess(self) -> Promise[None]: ...
+    def store(self, credentials: Credential) -> Promise[None]: ...
+
+class Credential:
+    id: str
+    type: Literal["password", "federated", "public-key"]
+
+class Geolocation:
+    def clearWatch(self, id: int) -> None: ...
+
+    @overload
+    def getCurrentPosition(self, success: JsProxy[Callable[[GeolocationPosition], Any]]) -> None: ...
+    @overload
+    def getCurrentPosition(self, success: JsProxy[Callable[[GeolocationPosition], Any]], error: JsProxy[Callable[[GeolocationPositionError], Any]]) -> None: ...
+    @overload
+    def getCurrentPosition(self, success: JsProxy[Callable[[GeolocationPosition], Any]], error: JsProxy[Callable[[GeolocationPositionError], Any]], options: GeolocationGetCurrentPositionOptions) -> None: ...
+
+class GeolocationGetCurrentPositionOptions:
+    maximumAge: int
+    timeout: int
+    enableHighAccuracy: bool
+
+class GeolocationPosition:
+    coords: GeolocationCoords
+    timestamp: int
+
+class GeolocationCoords:
+    accuracy: float
+    altitude: float
+    altitudeAccuracy: float
+    heading: float
+    latitude: float
+    longitude: float
+    speed: float
+
+class GeolocationPositionError:
+    code: Literal[0, 1, 2]
+    message: str
+
+class LockManager:
+    @overload
+    def request(self, name: str, callback: JsProxy[Callable[[], Any]]) -> Promise[None]: ...
+    @overload
+    def request(self, name: str, options: LockManagerRequestOptions, callback: JsProxy[Callable[[], Any]]) -> Promise[None]: ...
+
+class LockManagerRequestOptions:
+    mode: Literal["exclusive", "shared"]
+    ifAvailable: bool
+    steal: bool
+    signal: AbortSigal
+
+class MediaCapabilities:
+    def decodingInfo(self, configuration: MediaCapabilitiesDecodinginfoConfiguration) -> Promise[MediaCapabilitiesDecodingInfo]: ...
+
+class MediaCapabilitiesDecodinginfoConfiguration:
+    type: Literal["file", "media-source", "webrtc"]
+    video: MediaCapabilitiesDecodinginfoVideoConfiguration
+    audio: MediaCapabilitiesDecodinginfoAudioConfiguration
+
+class MediaCapabilitiesDecodinginfoVideoConfiguration:
+    contentType: str
+    width: int
+    height: int
+    bitrate: int
+    framerate: int
+
+class MediaCapabilitiesDecodinginfoAudioConfiguration:
+    contentType: str
+    channels: int
+    bitrate: int
+    samplerate: int
+
+class MediaCapabilitiesDecodingInfo:
+    supported: bool
+    smooth: bool
+    powerEfficient: bool
+
+class MediaDeviceInfo:
+    deviceId: str
+    groupId: str
+    kind: Literal["videoinput", "audiosource", "audiooutput"]
+    label: str
+
+    def toJSON(self) -> Any: ...
+
+class MediaStream(EventTarget):
+    @overload
+    def __init__(self) -> None: ...
+    @overload
+    def __init__(self, stream: MediaStream) -> None: ...
+    @overload
+    def __init__(self, tracks: list[MediaStreamTrack]) -> None: ...
+
+    active: bool
+    id: str
+
+    def addTrack(self, track: MediaStreamTrack) -> None: ...
+    def clone(self) -> Self: ...
+    def getAudioTracks(self) -> list[MediaStreamTrack]: ...
+    def getTrackById(self, id: str) -> MediaStreamTrack | None: ...
+    def getTracks(self) -> list[MediaStreamTrack]: ...
+    def getVideoTracks(self) -> list[MediaStreamTrack]: ...
+    def removeTrack(self, track: MediaStreamTrack) -> None: ...
+
+class MediaStreamTrack(EventTarget):
+    contentHint: str
+    enabled: bool
+    id: str
+    kind: Literal["audio", "video"]
+    label: str
+    muted: bool
+    readyState: Literal["live", "ended"]
+
+    @overload
+    def applyContraints(self) -> Promise[None]: ...
+    @overload
+    def applyContraints(self, constraints: Any) -> Promise[None]: ...
+
+    def clone(self) -> Self: ...
+    def getCapabilities(self) -> Any: ...
+    def getConstraints(self) -> Any: ...
+    def getSettings(self) -> Any: ...
+    def stop(self) -> None: ...
+
+class MediaDevices(EventTarget):
+    def enumerateDevices(self) -> Promise[list[MediaDeviceInfo]]: ...
+
+    @overload
+    def getDisplayMedia(self) -> Promise[MediaStream]: ...
+    @overload
+    def getDisplayMedia(self, options: MediaDevicesGetDisplayMediaOptions) -> Promise[MediaStream]: ...
+
+
+class MediaDevicesGetDisplayMediaOptions:
+    video: bool
+    audio: bool
+    preferCurrentTag: bool
+    selfBrowserSurface: Literal["include", "exclude"]
+    surfaceSwitching: Literal["include", "exclude"]
+    systemAudio: Literal["include", "exclude"]
+
+class MediaSession:
+    metadata: MediaMetadata
+    playbackState: Literal["none", "paused", "playing"]
+
+    def setActionHandler(self, type: Literal["hangup", "nextslide", "nexttrack", "pause", "play", "previousslide", "previoustrack", "seekbackward", "seekforward", "seekto", "skipad", "stop", "stop", "togglecamera", "togglemicrophone"], callback: JsProxy[Callable[[ActionHandle], None]]) -> None: ...
+    def setPositionState(self, stateDict: StateDict) -> None: ...
+
+class MediaMetadata:
+    def __init__(self, metadata: MediaMetadata) -> None: ...
+
+    title: str
+    artist: str
+    album: str
+    artwork: list[MediaImage]
+
+class MediaImage:
+    src: str
+    sizes: list[Any]
+    type: str
+
+class ActionHandle:
+    action: str
+    fastSeek: bool
+    seekoffset: float
+    seekTime: float
+
+class StateDict:
+    duration: float
+    playbackRate: float
+    position: float
+
+class Permissions:
+    def query(self, permissionDescriptor: PermissionDescriptor) -> Promise[PermissionStatus]: ...
+    def revoke(self, descriptor: PermissionDescriptor) -> Promise[PermissionStatus]: ...
+
+class PermissionDescriptor:
+    name: str
+    userVisibleOnly: bool
+    sysex: bool
+
+class PermissionStatus(EventTarget):
+    name: str
+    state: Literal["granted", "denied", "prompt"]
+    status: Literal["granted", "denied", "prompt"]
+
+class ServiceWorkerContainer(EventTarget):
+    controller: ServiceWorker
+    ready: Promise[ServiceWorkerRegistration]
+
+class ServiceWorker(EventTarget):
+    scriptURL: str
+    state: Literal["parsed", "installing", "installed", "activating", "activated", "redundant"]
+
+    @overload
+    def postMessage(self, message: Any) -> None: ...
+    @overload
+    def postMessage(self, message: Any, options: ServiceWorkerPostMessageOptions) -> None: ...
+    @overload
+    def postMessage(self, message: Any, transfer: list[ArrayBuffer | MessagePort | ImageBitmap]) -> None: ...
+
+class ArrayBuffer:
+    def __init__(self, length: int) -> None: ...
+
+    byteLength: int
+
+    def isView(self, value: Any) -> bool: ...
+
+    @overload
+    def slice(self, begin: int) -> Self: ...
+    @overload
+    def slice(self, begin: int, end: int) -> Self: ...
+
+class MessagePort(EventTarget):
+    def postMessage(self, message: Any, transferList: list[Any]) -> None: ...
+    def start(self) -> None: ...
+    def close(self) -> None: ...
+
+class ImageBitmap:
+    height: int
+    width: int
+
+    def close(self) -> None: ...
+
+class ServiceWorkerPostMessageOptions:
+    transfer: list[ArrayBuffer | MessagePort | ImageBitmap]
+
+class ServiceWorkerRegistration(EventTarget):
+    active: Literal["activating", "activated"] | None
+    installing: ServiceWorker | None
+    navigationPreload: NavigationPreloadManager
+    pushManager: PushManager
+    waiting: ServiceWorker | None
+    updateViaCache: str
+
+    @overload
+    def getNotifications(self) -> Promise[list[Notification]]: ...
+    @overload
+    def getNotifications(self, options: ServiceWorkerRegistrationGetNotificationsOptions) -> Promise[list[Notification]]: ...
+
+    @overload
+    def showNotification(self, title: str) -> Promise[None]: ...
+    @overload
+    def showNotification(self, title: str, options: NotificationOptions) -> Promise[None]: ...
+
+    def unregister(self) -> Promise[bool]: ...
+    def update(self) -> Promise[ServiceWorkerRegistration]: ...
+
+class NavigationPreloadManager:
+    def enable(self) -> Promise[None]: ...
+    def disable(self) -> Promise[None]: ...
+    def setHeaderValue(self, value: str) -> Promise[None]: ...
+    def getState(self) -> Promise[NavigationPreloadManagerState]: ...
+
+class NavigationPreloadManagerState:
+    enabled: bool
+    headerValue: str
+
+class PushManager:
+    def getSubscription(self) -> Promise[PushSubscription]: ...
+
+    @overload
+    def permissionState(self) -> Promise[Literal["granted", "denied", "prompt"]]: ...
+    @overload
+    def permissionState(self, options: PushOptions) -> Promise[Literal["granted", "denied", "prompt"]]: ...
+
+    def subscribe(self, options: PushOptions) -> Promise[PushSubscription]: ...
+
+class PushOptions:
+    userVisibleOnly: bool
+    applicationServerKey: str
+
+DOMHighResTimeStamp: TypeAlias = float
+
+class PushSubscription:
+    endpoint: str
+    expirationtime: DOMHighResTimeStamp
+    options: PushOptions
+
+    def getKey(self, name: Literal["p256dh", "auth"]) -> ArrayBuffer: ...
+    def toJSON(self) -> Any: ...
+    def unsubscribe(self) -> Promise[bool]: ...
+
+class Notification(EventTarget):
+    def __init__(self, title: str, options: NotificationOptions) -> None: ...
+
+    permission: Literal["denied", "granted", "default"]
+    maxActions: int
+
+    body: str
+    dir: Literal["auto", "ltr", "rtl"]
+    icon: str
+    lang: str
+    silent: bool
+    tag: str
+    timestamp: int
+    badge: str
+    image: str
+    virate: list[int] | int
+    renotify: bool
+    actions: list[NotificationOptionsAction]
+
+class NotificationOptions:
+    body: str
+    dir: Literal["auto", "ltr", "rtl"]
+    icon: str
+    lang: str
+    silent: bool
+    tag: str
+    timestamp: int
+    badge: str
+    image: str
+    virate: list[int] | int
+    renotify: bool
+    actions: list[NotificationOptionsAction]
+
+class NotificationOptionsAction:
+    action: str
+    title: str
+    icon: str
+
+class ServiceWorkerRegistrationGetNotificationsOptions:
+    tag: str
+
+class StorageManager:
+    def estimate(self) -> Promise[StorageEstimate]: ...
+    def getDirectory(self) -> Promise[FileSystemDirectoryHandle]: ...
+    def persist(self) -> Promise[bool]: ...
+    def persisted(self) -> Promise[bool]: ...
+
+class FileSystemHandle:
+    kind: Literal["file", "directory"]
+    name: str
+
+    def isSameEntry(self, fileSystemHandle: FileSystemHandle) -> bool: ...
+
+class FileSystemDirectoryHandle(FileSystemHandle):
+    pass
+
+class StorageEstimate:
+    quote: int
+    usage: int
+
+class Navigator:
+    clipboard: Clipboard
+    cookieEnabled: bool
+    credentials: CredentialsContainer
+    geolocation: Geolocation
+    hardwareConcurrency: int
+    language: str | None
+    languages: list[str]
+    locks: LockManager
+    mediaCapabilities: MediaCapabilities
+    mediaDevices: MediaDevices
+    mediaSession: MediaSession
+    onLine: bool
+    pdfPreviewEnabled: bool
+    permissions: Permissions
+    serviceWorker: ServiceWorkerContainer
+    storage: StorageManager
+    userActivation: UserActivation
+    userAgentData: NavigatorUAData
+    userActivation: UserActivation
+    userAgent: str
+    virtualKeyboard: VirtualKeyboard
+    wakeLock: WakeLock
+    webdriver: bool
+    windowControlsOverlay: WindowControlsOverlay
+
+    @overload
+    def canShare(self) -> bool: ...
+    @overload
+    def canShare(self, data: str | list[File]) -> bool: ...
+
+    def getBattery(self) -> Promise[BatteryManager]: ...
+    def getGamepads(self) -> list[Gamepad]: ...
+
+    @overload
+    def registerProtocolHandler(self, scheme: str, url: str) -> None: ...
+    @overload
+    def registerProtocolHandler(self, scheme: str, url: str, title: str) -> None: ...
+
+    def requestMediaKeySystemAccess(self, keySystem: str, supportedConfigurations: list[Any]) -> Promise[MediaKeySystemAccess]: ...
+
+    @overload
+    def requestMIDIAccess(self) -> Promise[MIDIAccess]: ...
+    @overload
+    def requestMIDIAccess(self, MIDIOptions: MIDIOptions) -> Promise[MIDIAccess]: ...
+
+    @overload
+    def sendBeacon(self, url: str) -> bool: ...
+    @overload
+    def sendBeacon(self, url: str, data: ArrayBuffer | TypedArray | DataView | Blob | FormData | URLSearchParams) -> bool: ...
+
+    def share(self, data: str | list[File]) -> Promise[None]: ...
+    def unregisterProtocolHandler(self, scheme: str, url: str) -> None: ...
+    def vibrate(self, pattern: int | list[int]) -> bool: ...
+
+class MIDIOptions:
+    sysex: bool
+    software: bool
 
 class History:
     length: int
@@ -391,30 +820,29 @@ class AbortSigal(EventTarget):
     def timeout(cls, time: int) -> AbortSigal: ...
     def throwIfAborted(self) -> None: ...
 
-class _FetchOptions(TypedDict):
-    method: NotRequired[str]
-    headers: NotRequired[dict[str, str]]
-    body: NotRequired[Any]
-    mode: NotRequired[str]
-    credentials: NotRequired[Literal["omit", "same-origin", "include"]]
-    cache: NotRequired[Literal["default", "no-store", "reload", "no-cache", "force-cache", "only-if-cached"]]
-    redirect: NotRequired[Literal["follow", "error", "manual"]]
-    referrer: NotRequired[str]
-    referrerPolicy: NotRequired[
-        Literal[
-            "no-referrer",
-            "no-referrer-when-downgrade",
-            "same-origin",
-            "origin",
-            "strict-origin",
-            "origin-when-cross-origin",
-            "strict-origin-when-cross-origin",
-            "unsafe-url",
-        ]
+class _FetchOptions(TypedDict, total=False):
+    method: str
+    headers: dict[str, str]
+    body: Any
+    mode: str
+    credentials: Literal["omit", "same-origin", "include"]
+    cache: Literal["default", "no-store", "reload", "no-cache", "force-cache", "only-if-cached"]
+    redirect: Literal["follow", "error", "manual"]
+    referrer: str
+    referrerPolicy:  Literal[
+        "no-referrer",
+        "no-referrer-when-downgrade",
+        "same-origin",
+        "origin",
+        "strict-origin",
+        "origin-when-cross-origin",
+        "strict-origin-when-cross-origin",
+        "unsafe-url",
     ]
-    integrity: NotRequired[str]
-    keepalive: NotRequired[bool]
-    signal: NotRequired[AbortSigal]
+
+    integrity: str
+    keepalive: bool
+    signal: AbortSigal
 
 T2 = TypeVar("T2")
 
@@ -524,7 +952,7 @@ RequestInfo: TypeAlias = Request | str
 @overload
 def fetch(url: RequestInfo | URL) -> Promise[Response]: ...
 @overload
-def fetch(url: RequestInfo | URL, options: _FetchOptions) -> Promise[Response]: ...
+def fetch(url: RequestInfo | URL, options: JsProxy[_FetchOptions]) -> Promise[Response]: ...
 
 class Message:
     seq: int

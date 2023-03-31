@@ -43,6 +43,7 @@ typeCheckingMode = "strict"
 reportPrivateUsage = "none"
 reportImportCycles = "none"
 reportMissingTypeStubs = "none"
+reportMissingModuleSource = "none"
 
 [tool.black]
 line-length = 120
