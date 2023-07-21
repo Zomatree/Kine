@@ -1,10 +1,33 @@
 from io import StringIO
-from typing import Any, Literal, Unpack
-from .ffi import JsProxy
-from ..js import _FetchOptions
+from typing import Any, Literal, TypedDict, Unpack
+from js import AbortSignal
+
+class _FetchOptions(TypedDict, total=False):
+    method: str
+    headers: dict[str, str]
+    body: Any
+    mode: str
+    credentials: Literal["omit", "same-origin", "include"]
+    cache: Literal["default", "no-store", "reload", "no-cache", "force-cache", "only-if-cached"]
+    redirect: Literal["follow", "error", "manual"]
+    referrer: str
+    referrerPolicy: Literal[
+        "no-referrer",
+        "no-referrer-when-downgrade",
+        "same-origin",
+        "origin",
+        "strict-origin",
+        "origin-when-cross-origin",
+        "strict-origin-when-cross-origin",
+        "unsafe-url",
+    ]
+
+    integrity: str
+    keepalive: bool
+    signal: AbortSignal
 
 class FetchResponse:
-    def __init__(self, url: str, js_response: JsProxy[Any]) -> None: ...
+    def __init__(self, url: str, js_response: Any) -> None: ...
     async def bytes(self) -> bytes: ...
     def clone(self) -> FetchResponse: ...
     async def json(self, **kwargs: Any) -> Any: ...

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import pathlib
-from typing import Any, Awaitable, Literal, ParamSpec, cast
+from typing import Any, Awaitable, Callable, Literal, ParamSpec, cast
 
 from aiohttp import web
 from kine import Scope
@@ -19,9 +19,8 @@ P = ParamSpec("P")
 
 file = pathlib.Path(__file__)
 
-with open(file.parent / "interpreter.js") as f:
-    interpreter = f.read()
-
+interpreter = (file.parent / "interpreter.js").read_text()
+libs = (file.parent / "libs.js").read_text()
 
 class WebVDom(VirtualDom):
     def __init__(self, app: ComponentFunction[...], custom_messages: asyncio.Queue[EvalMessage]):
@@ -119,8 +118,9 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js" integrity="sha512-harMiusNxs02ryf3eqc3iQalz2RSd0z38vzOyuFwvQyW046h2m+/47WiDmPW9soh/p71WQMRSkhSynEww3/bOA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js" integrity="sha512-wT7uPE7tOP6w4o28u1DN775jYjHQApdBnib5Pho4RB0Pgd9y7eSkAV1BTqQydupYDB9GBhTcQQzyNMPMV3cAew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+        {libs}
+        </script>
         {headers}
     </head>
     <body>

@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generic, ParamSpec
+from typing import TYPE_CHECKING, Generic, ParamSpec, TypedDict, Any, Callable
 import js
 from pyodide.ffi import create_proxy
 import asyncio
-
-if TYPE_CHECKING:
-    from pyodide.ffi import JsProxy
 
 from ... import ComponentFunction, messages, diff
 from ...dom import VirtualDom, ElementId
@@ -16,15 +13,17 @@ from ...ext.wasm import *
 
 P = ParamSpec("P")
 
+
 class GlobalEvent(TypedDict):
-    callback: JsProxy[Callable[..., Any]]
+    callback: Callable[..., Any]
     active: int
+
 
 class App(Generic[P]):
     def __init__(self, app: ComponentFunction[P]) -> None:
         self.dom = VirtualDom(app)
         self.globals: dict[str, GlobalEvent] = {}
-        self.locals: dict[str, dict[str, JsProxy[Callable[..., Any]]]] = {}
+        self.locals: dict[str, dict[str, Callable[..., Any]]] = {}
         self.event_queue = asyncio.Queue[Any]()
 
         main = js.document.getElementById("main")
@@ -107,7 +106,6 @@ class App(Generic[P]):
 
                         real_id = target.getAttribute("data-kine-id")
 
-
                         while real_id is None:
                             if target.parentElement == None:
                                 return
@@ -141,14 +139,12 @@ class App(Generic[P]):
                         if real_id == None:
                             return
 
-                        self.event_queue.put_nowait({
-                            "method": "user_event",
-                            "params": {
-                                "event": mod.event_name,
-                                "mounted_dom_id": mod.root,
-                                "contents": contents
+                        self.event_queue.put_nowait(
+                            {
+                                "method": "user_event",
+                                "params": {"event": mod.event_name, "mounted_dom_id": mod.root, "contents": contents},
                             }
-                            })
+                        )
 
                     proxy_func = create_proxy(callback)
 
@@ -277,7 +273,59 @@ class App(Generic[P]):
                         node.removeEventListener(mod.event_name, handler)
 
     def should_bubble(self, event_name: str) -> bool:
-        return event_name in ["copy", "cut", "paste", "compositionend", "compositionstart", "compositionupdate", "keydown", "keypress", "keyup", "focusout", "focusin", "change", "input", "invalid", "reset", "submit", "click", "contextmenu", "doubleclick", "dblclick", "drag", "dragend", "dragleave", "dragover", "dragstart", "drop", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointermove", "pointerup", "pointercancel", "gotpointercapture", "lostpointercapture", "pointerover", "pointerout", "select", "touchcancel", "touchend", "touchmove", "touchstart", "wheel", "encrypted", "animationstart", "animationend", "animationiteration", "transitionend", "toggle"]
+        return event_name in [
+            "copy",
+            "cut",
+            "paste",
+            "compositionend",
+            "compositionstart",
+            "compositionupdate",
+            "keydown",
+            "keypress",
+            "keyup",
+            "focusout",
+            "focusin",
+            "change",
+            "input",
+            "invalid",
+            "reset",
+            "submit",
+            "click",
+            "contextmenu",
+            "doubleclick",
+            "dblclick",
+            "drag",
+            "dragend",
+            "dragleave",
+            "dragover",
+            "dragstart",
+            "drop",
+            "mousedown",
+            "mousemove",
+            "mouseout",
+            "mouseover",
+            "mouseup",
+            "pointerdown",
+            "pointermove",
+            "pointerup",
+            "pointercancel",
+            "gotpointercapture",
+            "lostpointercapture",
+            "pointerover",
+            "pointerout",
+            "select",
+            "touchcancel",
+            "touchend",
+            "touchmove",
+            "touchstart",
+            "wheel",
+            "encrypted",
+            "animationstart",
+            "animationend",
+            "animationiteration",
+            "transitionend",
+            "toggle",
+        ]
 
     # i frankly cannot be bothered to re-type all of js's events to python
     def transform_event(self, event: Any) -> dict[str, Any]:
@@ -296,7 +344,7 @@ class App(Generic[P]):
                     "location": event.location,
                     "repeat": event.repeat,
                     "which": event.which,
-                    "code": event.code
+                    "code": event.code,
                 }
             case "change":
                 if event.target.type in ("checkbox", "radio"):
@@ -304,20 +352,14 @@ class App(Generic[P]):
                 else:
                     value = event.target.value or event.target.textContent
 
-                return {
-                    "value": value,
-                    "values": {}
-                }
+                return {"value": value, "values": {}}
             case "input" | "invalid" | "reset" | "submit":
                 value = event.target.value or event.target.textContent
 
                 if event.target.type == "checkbox":
                     value = event.target.checked
 
-                return {
-                    "value": value,
-                    "values": {}
-                }
+                return {"value": value, "values": {}}
             case "click" | "contextmenu" | "doubleclick" | "dblclick" | "drag" | "dragend" | "dragenter" | "dragexit" | "dragleave" | "dragover" | "dragstart" | "drop" | "mousedown" | "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover" | "mouseup":
                 return {
                     "alt_key": event.altKey,
@@ -333,7 +375,7 @@ class App(Generic[P]):
                     "page_y": event.pageY,
                     "screen_x": event.screenX,
                     "screen_y": event.screenY,
-                    "shift_key": event.shiftKey
+                    "shift_key": event.shiftKey,
                 }
             case "pointerdown" | "pointermove" | "pointerup" | "pointercancel" | "gotpointercapture" | "lostpointercapture" | "pointerenter" | "pointerleave" | "pointerover" | "pointerout":
                 return {
@@ -358,29 +400,30 @@ class App(Generic[P]):
                     "tilt_y": event.tiltY,
                     "twist": event.twist,
                     "pointer_type": event.pointerType,
-                    "is_primary": event.isPrimary
+                    "is_primary": event.isPrimary,
                 }
             case "touchcancel" | "touchend" | "touchmove" | "touchstart":
                 return {
                     "alt_key": event.altKey,
                     "ctrl_key": event.ctrlKey,
                     "meta_key": event.metaKey,
-                    "shift_key": event.shiftKey
+                    "shift_key": event.shiftKey,
                 }
             case "wheel":
                 return {
                     "animation_name": event.animationName,
                     "elapsed_time": event.elapsedTime,
-                    "pseudo_element": event.pseudoElement
+                    "pseudo_element": event.pseudoElement,
                 }
             case "transitionend":
                 return {
                     "property_name": event.propertyName,
                     "elapsed_time": event.elapsedTime,
-                    "pseudo_element": event.pseudoElement
+                    "pseudo_element": event.pseudoElement,
                 }
             case _:
                 return {}
+
 
 async def start_wasm(app_func: ComponentFunction[P]):
     app = App(app_func)

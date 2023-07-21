@@ -61,6 +61,7 @@ def use_router(cx: Scope) -> UseRouter:
         e.add_note("No router found, make sure to wrap your root component in the `router` component.")
         raise e
 
+
 @component
 def link(cx: Scope, route: str):
     router = use_router(cx)
@@ -95,7 +96,9 @@ def router(cx: Scope):
 
     return cx.render(div[cx.children])
 
+
 T = TypeVar("T")
+
 
 class Storage:
     def __init__(self, cx: Scope, backing: js.Storage):
@@ -150,8 +153,10 @@ class Storage:
     def __setitem__(self, key: str, value: str):
         self.set(key, value)
 
+
 def use_local_storage(cx: Scope) -> Storage:
     return cx.use_hook(lambda: Storage(cx, js.window.localStorage))
+
 
 def use_session_storage(cx: Scope) -> Storage:
     return cx.use_hook(lambda: Storage(cx, js.window.sessionStorage))

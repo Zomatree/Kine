@@ -1,15 +1,6 @@
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
-
-class JsProxy(Generic[T]):
-    _: T
-
-
-def create_proxy(f: T) -> JsProxy[T]:
-    ...
-
-
-def to_js(v: T) -> JsProxy[T]:
-    ...
+def create_proxy(f: T) -> T: ...
+def to_js(v: T) -> T: ...

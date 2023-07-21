@@ -79,6 +79,7 @@ class RemoveEventListener:
     event_name: str
     root: ElementId
 
+
 @dataclass
 class SetText:
     type = "SetText"
@@ -218,7 +219,7 @@ class Diff:
         scope_id = self.current_scope()
 
         if len(old.listeners) == len(new.listeners):
-            for (old_l, new_l) in zip(old.listeners, new.listeners):
+            for old_l, new_l in zip(old.listeners, new.listeners):
                 new_l.element_id = old_l.element_id
 
                 if old_l.name != new_l.name:

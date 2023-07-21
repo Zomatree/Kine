@@ -43,9 +43,7 @@ def get_all_dependancies(deps: list[str]) -> list[str]:
     import_names: list[str] = []
 
     for pkg in dep_tree:
-        pkg: pipdeptree.DistPackage
-
-        name: str = pkg.project_name
+        name = pkg.project_name
 
         distro = import_meta.distribution(name)
 

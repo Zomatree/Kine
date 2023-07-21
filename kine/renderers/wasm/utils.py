@@ -10,7 +10,6 @@ from pyodide.ffi import create_proxy
 from pyodide.http import pyfetch, FetchResponse
 
 if TYPE_CHECKING:
-
     class FetchOptions(js._FetchOptions):
         json: NotRequired[Any]
 
@@ -76,7 +75,7 @@ class Websocket:
         self.close_reason = event.reason
         self.closed = True
 
-    def on_message(self, event: js.MessageEvent[Any]):
+    def on_message(self, event: js.MessageEvent):
         self.state = self.inner.readyState
         self.messages.put_nowait(event.data.to_py())
 
