@@ -46,7 +46,6 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
         await web._run_app(server, port=api_port, host=host)
 
     else:
-        print([sys.executable, "-m", "kine", "run", "--host", host, "--port", str(web_port)])
         web_p = subprocess.Popen([sys.executable, "-m", "kine", "run", "--host", host, "--port", str(web_port)])
         api_p = subprocess.Popen([sys.executable, "-c", "import src, asyncio; asyncio.run(src.main())"], env={**os.environ, "KINE_RUN_API": "1"})
 
