@@ -28,14 +28,7 @@ def use_state(cx: Scope, func: Callable[[], T]) -> UseState[T]:
 
 def use_future(cx: Scope, func: Callable[[], Coroutine[Any, Any, T]]) -> UseFuture[T]:
     def hook():
-        state = UseFuture[T](cx, cx.hook_idx)
-        task = cx.spawn(func())
-
-        def cb(task: asyncio.Task[T]):
-            state.value = task.result()
-            cx.scopes.dom.dirty_scopes.add(cx.scope_id)
-
-        task.add_done_callback(cb)
+        state = UseFuture[T](cx, cx.hook_idx, func)
 
         return state
 
@@ -65,11 +58,23 @@ class UseState(Generic[T]):
 
 
 class UseFuture(Generic[T]):
-    def __init__(self, scope: Scope, idx: int):
+    def __init__(self, scope: Scope, idx: int, func: Callable[[], Coroutine[Any, Any, T]]):
         self.scope = scope
         self.idx = idx
         self.value: T | None = None
+        self.func = func
+        self.task = self.restart()
 
+    def restart(self) -> asyncio.Task[T]:
+        task = self.scope.spawn(self.func())
+
+        def cb(task: asyncio.Task[T]):
+            self.value = task.result()
+            self.scope.scopes.dom.dirty_scopes.add(self.scope.scope_id)
+
+        task.add_done_callback(cb)
+
+        return task
 
 GlobalStateCallback = Callable[[], T]
 
