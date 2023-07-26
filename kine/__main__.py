@@ -1,4 +1,5 @@
 import asyncio
+from inspect import iscoroutinefunction
 import click
 import pathlib
 import toml
@@ -162,10 +163,28 @@ def clean():
 def build(ctx: click.Context):
     """Builds the project"""
 
-    ctx.invoke(clean)
-
     cwd = pathlib.Path.cwd()
     config_file = cwd / "kine.toml"
+
+    if not config_file.exists():
+        return print("No kine.toml file found")
+
+    try:
+        module = importlib.import_module("src")
+    except ImportError as e:
+        if e.name == "src":
+            return print("No src folder found for project")
+        else:
+            raise e from None
+
+    if not (main := getattr(module, "main", None)):
+        return print("Project has no main function")
+
+    if not iscoroutinefunction(main):
+        return print("Main function is not an async function")
+
+    ctx.invoke(clean)
+
     build_dir = cwd / "build"
     src_dir = cwd / "src"
     index_file = cwd / "index.html"
