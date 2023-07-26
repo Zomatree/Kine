@@ -1,5 +1,9 @@
 import asyncio
+from email.policy import default
 from inspect import iscoroutinefunction
+import subprocess
+import sys
+from typing import Any
 import click
 import pathlib
 import toml
@@ -164,32 +168,14 @@ def build(ctx: click.Context):
     """Builds the project"""
 
     cwd = pathlib.Path.cwd()
-    config_file = cwd / "kine.toml"
 
-    if not config_file.exists():
-        return print("No kine.toml file found")
-
-    try:
-        module = importlib.import_module("src")
-    except ImportError as e:
-        if e.name == "src":
-            return print("No src folder found for project")
-        else:
-            raise e from None
-
-    if not (main := getattr(module, "main", None)):
-        return print("Project has no main function")
-
-    if not iscoroutinefunction(main):
-        return print("Main function is not an async function")
+    (_, config) = get_and_verify_project(cwd)
 
     ctx.invoke(clean)
 
     build_dir = cwd / "build"
     src_dir = cwd / "src"
     index_file = cwd / "index.html"
-
-    config = toml.loads(config_file.read_text())
 
     modules = [
         (src_dir, build_dir / "src.tar.gz"),
@@ -255,18 +241,46 @@ def serve(port: int, host: str):
 @click.pass_context
 @click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
 @click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
-def run(ctx: click.Context, port: int, host: str):
+@click.option("--api/--no-api", type=bool, default=False)
+def run(ctx: click.Context, port: int, host: str, api: bool):
     """Builds and runs the project"""
-    ctx.invoke(build)
-    ctx.invoke(serve)
+
+    if api:
+        subprocess.run([sys.executable, "-m", "kine", "fullstack"], env={**os.environ, "KINE_RUN_API": "1"})
+    else:
+        ctx.invoke(build)
+        ctx.invoke(serve)
 
 @cli.command()
 @click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
 @click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
 def fullstack(port: int, host: str):
     """Builds and runs the project"""
-    src = importlib.import_module("src")
 
-    asyncio.run(src.main())
+    (module, _) = get_and_verify_project(pathlib.Path.cwd())
+
+    asyncio.run(module.main())
+
+def get_and_verify_project(path: pathlib.Path) -> tuple[types.ModuleType, dict[str, Any]]:
+    config_file = path / "kine.toml"
+
+    if not config_file.exists():
+        exit("No kine.toml file found")
+
+    try:
+        module = importlib.import_module("src")
+    except ImportError as e:
+        if e.name == "src":
+            exit("No src folder found for project")
+        else:
+            raise e from None
+
+    if not (main := getattr(module, "main", None)):
+        exit("Project has no main function")
+
+    if not iscoroutinefunction(main):
+        exit("Main function is not an async function")
+
+    return (module, toml.loads(config_file.read_text()))
 
 cli()
