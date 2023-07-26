@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextvars
 import json
 import sys
@@ -17,7 +19,7 @@ R = TypeVar("R")
 
 api_url = ""
 
-REQUEST = contextvars.ContextVar[web.Request]("request")
+REQUEST: contextvars.ContextVar[web.Request] = contextvars.ContextVar("request")
 IS_WEB_PLATFORM = sys.platform == "emscripten"
 IS_SERVER_PLATFORM = not IS_WEB_PLATFORM
 SERVER_FUNCS: list[Callable[..., Coroutine[Any, Any, Any]]] = []
