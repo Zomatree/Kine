@@ -1,19 +1,25 @@
+import contextvars
 import json
 import sys
 import os
 import subprocess
 
-from typing import Any, Callable, Coroutine, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, ParamSpec, TypeVar
 
 from kine import *
 from kine.renderers.wasm import App
+
+if TYPE_CHECKING:
+    from aiohttp import web
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
 api_url = ""
 
-WEB_PLATFORM = "emscripten"
+REQUEST = contextvars.ContextVar[web.Request]("request")
+IS_WEB_PLATFORM = sys.platform == "emscripten"
+IS_SERVER_PLATFORM = not IS_WEB_PLATFORM
 SERVER_FUNCS: list[Callable[..., Coroutine[Any, Any, Any]]] = []
 
 async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.0.1", api_port: int = 8000, web_port: int = 8080):
@@ -21,7 +27,7 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
 
     api_url = f"{host}:{api_port}"
 
-    if sys.platform == WEB_PLATFORM:
+    if IS_WEB_PLATFORM:
         app = App(app_func)
         await app.start()
 
@@ -34,6 +40,8 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
 
         for func in SERVER_FUNCS:
             async def wrapper(request: web.Request, func: Callable[..., Coroutine[Any, Any, Any]] = func) -> web.Response:
+                REQUEST.set(request)
+
                 body = await request.json()
 
                 response = await func(*body["args"], **body["kwargs"])
@@ -53,7 +61,7 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
         api_p.wait()
 
 def server(f: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, Coroutine[Any, Any, R]]:
-    if sys.platform == WEB_PLATFORM:
+    if IS_WEB_PLATFORM:
         from pyodide.http import pyfetch
 
         async def inner(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -68,3 +76,6 @@ def server(f: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, Coroutine[Any,
         SERVER_FUNCS.append(f)
 
         return f
+
+def request() -> web.Request:
+    return REQUEST.get()
