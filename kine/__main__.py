@@ -1,3 +1,4 @@
+import asyncio
 import click
 import pathlib
 import toml
@@ -231,5 +232,22 @@ def serve(port: int, host: str):
     except KeyboardInterrupt:
         httpd.shutdown()
 
+@cli.command()
+@click.pass_context
+@click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
+@click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
+def run(ctx: click.Context, port: int, host: str):
+    """Builds and runs the project"""
+    ctx.invoke(build)
+    ctx.invoke(serve)
+
+@cli.command()
+@click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
+@click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
+def fullstack(port: int, host: str):
+    """Builds and runs the project"""
+    src = importlib.import_module("src")
+
+    asyncio.run(src.main())
 
 cli()

@@ -39,6 +39,7 @@ reportPrivateUsage = "none"
 reportImportCycles = "none"
 reportMissingTypeStubs = "none"
 reportMissingModuleSource = "none"
+reportWildcardImportFromLibrary = "none"
 
 [tool.black]
 line-length = 120

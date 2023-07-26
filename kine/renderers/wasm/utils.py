@@ -3,16 +3,18 @@ from __future__ import annotations
 import asyncio
 from enum import Enum
 import json
-from typing import TYPE_CHECKING, Any, NotRequired
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 from typing_extensions import Unpack
 import js
 from pyodide.ffi import create_proxy
 from pyodide.http import pyfetch, FetchResponse
 
 if TYPE_CHECKING:
-    class FetchOptions(js._FetchOptions):
+    class FetchOptions(TypedDict):
         json: NotRequired[Any]
-
+        headers: NotRequired[dict[str, str]]
+        body: NotRequired[str]
+        method: NotRequired[str]
 
 async def fetch(url: str, **kwargs: Unpack[FetchOptions]) -> FetchResponse:
     if (data := kwargs.pop("json", None)) is not None:

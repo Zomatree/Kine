@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from ... import component, Scope
 from ...renderers.web_elements import *
-from typing import ParamSpec, overload, TypeVar
-import js
-import pyodide.ffi
+from typing import TYPE_CHECKING, ParamSpec, overload, TypeVar
+
+if TYPE_CHECKING:
+    import js
 
 __all__ = ("UseRouter", "use_router", "link", "route", "router")
 
@@ -12,11 +15,14 @@ P = ParamSpec("P")
 
 class UseRouter:
     def __init__(self, cx: Scope):
+        import js
         self.scope = cx
         self.current_route = js.document.location.pathname
         self.route_parameters: dict[str, str] = {}
 
     def push_route(self, route: str):
+        import pyodide.ffi
+
         self.current_route = route
         js.window.history.pushState(pyodide.ffi.to_js({}), "", route)
 
@@ -155,8 +161,12 @@ class Storage:
 
 
 def use_local_storage(cx: Scope) -> Storage:
+    import js
+
     return cx.use_hook(lambda: Storage(cx, js.window.localStorage))
 
 
 def use_session_storage(cx: Scope) -> Storage:
+    import js
+
     return cx.use_hook(lambda: Storage(cx, js.window.sessionStorage))

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Generic, ParamSpec, TypedDict, Any, Callable
-import js
-from pyodide.ffi import create_proxy
 import asyncio
 
 from ... import ComponentFunction, messages, diff
@@ -21,6 +19,8 @@ class GlobalEvent(TypedDict):
 
 class App(Generic[P]):
     def __init__(self, app: ComponentFunction[P]) -> None:
+        import js
+
         self.dom = VirtualDom(app)
         self.globals: dict[str, GlobalEvent] = {}
         self.locals: dict[str, dict[str, Callable[..., Any]]] = {}
@@ -72,6 +72,9 @@ class App(Generic[P]):
                     self.calculate_diffs(mutation)
 
     def calculate_diffs(self, mutation: diff.Mutations):
+        import js
+        from pyodide.ffi import create_proxy
+
         for mod in mutation.modifications:
             match mod:
                 case diff.AppendChildren():
@@ -100,7 +103,6 @@ class App(Generic[P]):
 
                     def callback(event: Any, mod: diff.NewEventListener = mod):
                         target = event.target
-
                         if not target:
                             return
 
@@ -153,7 +155,7 @@ class App(Generic[P]):
                     if TYPE_CHECKING:
                         assert isinstance(node, js.Element)
 
-                    node.setAttribute("data-r-id", str(mod.root))
+                    node.setAttribute("data-kine-id", str(mod.root))
 
                     if self.should_bubble(mod.event_name):
                         g = self.globals.get(mod.event_name)
