@@ -1,5 +1,4 @@
 import asyncio
-from email.policy import default
 from inspect import iscoroutinefunction
 import subprocess
 import sys
@@ -249,11 +248,9 @@ def run(ctx: click.Context, port: int, host: str, api: bool):
         subprocess.run([sys.executable, "-m", "kine", "fullstack"], env={**os.environ, "KINE_RUN_API": "1"})
     else:
         ctx.invoke(build)
-        ctx.invoke(serve)
+        ctx.invoke(serve, port=port, host=host)
 
 @cli.command()
-@click.option("--port", "-p", default=8080, type=int, help="The port to run the http server on")
-@click.option("--host", "-h", default="127.0.0.1", help="The host to run the http server on")
 def fullstack(port: int, host: str):
     """Builds and runs the project"""
 
