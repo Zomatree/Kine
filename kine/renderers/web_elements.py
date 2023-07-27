@@ -184,7 +184,7 @@ class ElementArgs(TypedDict, total=False):
     ]  # typeddict doesnt have to way to have extra none-static keys so i have to shove them in there own key
 
 
-mapped_attributes = {"prevent_default": "kine-prevent-default", "class_": "class"}
+mapped_attributes = {"prevent_default": "kine-prevent-default", "class_": "class", "for_": "for", "is_": "is"}
 
 
 class Element(BaseElement):
