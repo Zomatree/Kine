@@ -251,7 +251,7 @@ def run(ctx: click.Context, port: int, host: str, api: bool):
         ctx.invoke(serve, port=port, host=host)
 
 @cli.command()
-def fullstack(port: int, host: str):
+def fullstack():
     """Builds and runs the project"""
 
     (module, _) = get_and_verify_project(pathlib.Path.cwd())

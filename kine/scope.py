@@ -29,8 +29,8 @@ class Scope:
         self.scopes = scopes
         self.contexts: dict[Any, Any] = {}
         self.generation = 0
-        self.frame_0 = VString("placeholder")
-        self.frame_1 = VString("placeholder")
+        self.frame_0: tuple[VNode, tuple[Any, ...], dict[str, Any]] = (VPlaceholder(), (), {})
+        self.frame_1: tuple[VNode, tuple[Any, ...], dict[str, Any]] = (VPlaceholder(), (), {})
         self.hooks: list[Any] = []
         self.hook_idx = 0
         self.children: tuple[Node, ...] = ()
@@ -81,29 +81,29 @@ class Scope:
     def schedule_update(self):
         self.scopes.dom.messages.put_nowait(Immediate(self.scope_id))
 
-    def wip_frame(self) -> VNode:
+    def wip_frame(self) -> tuple[VNode, tuple[Any, ...], dict[str, Any]]:
         if self.generation & 1 == 0:
             return self.frame_0
         else:
             return self.frame_1
 
-    def fin_frame(self) -> VNode:
+    def fin_frame(self) -> tuple[VNode, tuple[Any, ...], dict[str, Any]]:
         if self.generation & 1 == 1:
             return self.frame_0
         else:
             return self.frame_1
 
-    def set_wip_frame(self, node: VNode):
+    def set_wip_frame(self, node: VNode, args: tuple[Any, ...], kwargs: dict[str, Any]):
         if self.generation & 1 == 0:
-            self.frame_0 = node
+            self.frame_0 = (node, args, kwargs)
         else:
-            self.frame_1 = node
+            self.frame_1 = (node, args, kwargs)
 
-    def set_fin_frame(self, node: VNode):
+    def set_fin_frame(self, node: VNode, args: tuple[Any, ...], kwargs: dict[str, Any]):
         if self.generation & 1 == 1:
-            self.frame_0 = node
+            self.frame_0 = (node, args, kwargs)
         else:
-            self.frame_1 = node
+            self.frame_1 = (node, args, kwargs)
 
     def next_frame(self):
         self.generation += 1
@@ -219,17 +219,23 @@ class Scopes:
         scope = self.get_scope(scope_id)
         scope.hook_idx = 0
 
-        assert scope.component is not None
+        component = scope.component
+        assert component is not None
 
-        scope.children = scope.component.children
+        scope.children = component.children
 
-        if node := scope.component.call(scope):
-            scope.set_wip_frame(node)
+        if scope.generation != 0 and not component.dont_memorize:
+            finished_node, args, kwargs = scope.fin_frame()
+
+            if args == component.args and kwargs == component.kwargs and not scope.hooks:
+                node = finished_node
+            else:
+                node = component.call(scope)
         else:
-            scope.set_wip_frame(VPlaceholder())
+            node = component.call(scope)
 
+        scope.set_wip_frame(node, component.args, component.kwargs)
         scope.next_frame()
-
 
 class TaskQueue:
     def __init__(self):

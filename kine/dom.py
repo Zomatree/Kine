@@ -92,7 +92,7 @@ class VirtualDom:
 
         diff_state.scope_stack.append(scope_id)
 
-        node = self.scopes.get_scope(scope_id).fin_frame()
+        node = self.scopes.get_scope(scope_id).fin_frame()[0]
         created: list[ElementId] = []
         root_id = cast(ElementId, self.scopes.root.id)
 

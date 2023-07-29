@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 P = ParamSpec("P")
 T = TypeVar("T")
 
-__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes")
+__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes", "no_memo")
 
 
 class Listener:
@@ -22,6 +22,8 @@ class Listener:
         self.func = func
         self.element_id: ElementId | None = None
 
+    def __repr__(self) -> str:
+        return f"<Listener name={self.name!r} func={self.func!r} element_id={self.element_id!r}>"
 
 class VString(UserString):
     def __init__(self, value: str):
@@ -30,6 +32,8 @@ class VString(UserString):
         self.key = None
         super().__init__(value)
 
+    def __repr__(self) -> str:
+        return f"<VString id={self.id!r} data={super().__repr__()}>"
 
 class VElement:
     def __init__(
@@ -43,6 +47,8 @@ class VElement:
         self.listeners = listeners
         self.key = key
 
+    def __repr__(self) -> str:
+        return f"<VString id={self.id!r} tag={self.tag!r} children={self.children!r}>"
 
 class VPlaceholder:
     def __init__(self):
@@ -50,15 +56,20 @@ class VPlaceholder:
         self.parent_id: ElementId | None = None
         self.key = None
 
+    def __repr__(self) -> str:
+        return f"<VPlaceholder id={self.id!r}>"
+
 
 class VComponent:
     def __init__(self, func: ComponentFunction[...], parent_scope: ScopeId, key: str | None):
         self.parent_id: ElementId | None = None
         self.scope_id: ScopeId | None = None
-        self.comp_func = func
+        self.func = func
         self.parent_scope = parent_scope
         self.key = key
 
+    def __repr__(self) -> str:
+        return f"<VComponent scope_id={self.scope_id!r} func={self.func!r}>"
 
 VNode: TypeAlias = Union[VString, VElement, VPlaceholder, VComponent]
 
@@ -73,6 +84,7 @@ class ComponentFunction(Generic[P]):
         self._key: str | None = None
         self.args = args
         self.kwargs = kwargs
+        self.dont_memorize: bool = False
 
     def key(self, key: str):
         self._key = key
@@ -100,6 +112,14 @@ def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[P, Compo
 
     return wrapper
 
+def no_memo(func: Callable[P, ComponentFunction[P]]) -> Callable[P, ComponentFunction[P]]:
+    @functools.wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs):
+        component = func(*args, **kwargs)
+        component.dont_memorize = True
+        return component
+
+    return wrapper
 
 Component: TypeAlias = Callable[Concatenate["Scope", P], "VNode"]
 Node: TypeAlias = Union[str, Element, ComponentFunction[...], None]

@@ -145,8 +145,8 @@ class Diff:
 
     def diff_scope(self, parent_id: ElementId, scope_id: ScopeId):
         scope = self.scopes.get_scope(scope_id)
-        old = scope.wip_frame()
-        new = scope.fin_frame()
+        old = scope.wip_frame()[0]
+        new = scope.fin_frame()[0]
 
         self.scope_stack.append(scope_id)
 
@@ -193,28 +193,6 @@ class Diff:
         self.scopes.update_node(new, element_id)
         new.id = element_id
         new.parent_id = old.parent_id
-
-        """
-        if old.listeners.len() == new.listeners.len() {
-            for (old_l, new_l) in old.listeners.iter().zip(new.listeners.iter()) {
-                new_l.mounted_node.set(old_l.mounted_node.get());
-                if old_l.event != new_l.event {
-                    self.mutations
-                        .remove_event_listener(old_l.event, root.as_u64());
-                    self.mutations.new_event_listener(new_l, cur_scope_id);
-                }
-            }
-        } else {
-            for listener in old.listeners {
-                self.mutations
-                    .remove_event_listener(listener.event, root.as_u64());
-            }
-            for listener in new.listeners {
-                listener.mounted_node.set(Some(root));
-                self.mutations.new_event_listener(listener, cur_scope_id);
-            }
-        }
-        """
 
         scope_id = self.current_scope()
 
@@ -264,16 +242,17 @@ class Diff:
         if old is new:
             return
 
-        if old.comp_func.func == new.comp_func.func:
+        if old.func.func == new.func.func:
             with self.scope(scope_id):
+                scope = self.scopes.get_scope(scope_id)
+                scope.component = new.func
+
                 new.scope_id = scope_id
 
                 self.scopes.run_scope(scope_id)
                 self.mutations.mark_dirty(scope_id)
 
-                scope = self.scopes.get_scope(scope_id)
-
-                self.diff_node(parent_id, scope.wip_frame(), scope.fin_frame())
+                self.diff_node(parent_id, scope.wip_frame()[0], scope.fin_frame()[0])
 
         else:
             self.replace_node(parent_id, old, new)
@@ -452,7 +431,7 @@ class Diff:
                 assert node.scope_id is not None
 
                 scope_id = node.scope_id
-                root = self.scopes.get_scope(scope_id).fin_frame()
+                root = self.scopes.get_scope(scope_id).fin_frame()[0]
                 self.get_all_real_nodes(root, nodes)
 
     def diff_keyed_ends(self, parent_id: ElementId, old: list[VNode], new: list[VNode]) -> tuple[int, int] | None:
@@ -534,7 +513,7 @@ class Diff:
                 assert scope_id is not None
 
                 scope = self.scopes.get_scope(scope_id)
-                inner_node = scope.fin_frame()
+                inner_node = scope.fin_frame()[0]
 
                 with self.scope(scope_id):
                     self.replace_inner(inner_node, nodes)
@@ -579,7 +558,7 @@ class Diff:
                     scope = self.scopes.get_scope(scope_id)
 
                     with self.scope(scope_id):
-                        root = scope.fin_frame()
+                        root = scope.fin_frame()[0]
                         self.remove_nodes([root], gen_muts)
                         node.scope_id = None
 
@@ -623,13 +602,13 @@ class Diff:
         if (scope_id := node.scope_id) is None:
             scope_id = self.scopes.new_scope(parent_scope, parent_id)
             scope = self.scopes.get_scope(scope_id)
-            scope.component = node.comp_func
+            scope.component = node.func
             node.scope_id = scope_id
 
         with self.scope(scope_id):
             self.scopes.run_scope(scope_id)
             self.mutations.mark_dirty(scope_id)
-            next_node = self.scopes.get_scope(scope_id).fin_frame()
+            next_node = self.scopes.get_scope(scope_id).fin_frame()[0]
             self.create_node(parent_id, next_node, nodes)
 
     def create_and_append_children(self, parent_id: ElementId, nodes: list[VNode]):
@@ -672,7 +651,7 @@ class Diff:
                     return node.id
                 case VComponent() as node:
                     assert node.scope_id is not None
-                    search_node = self.scopes.get_scope(node.scope_id).fin_frame()
+                    search_node = self.scopes.get_scope(node.scope_id).fin_frame()[0]
 
     def current_scope(self) -> ScopeId:
         return self.scope_stack[-1]

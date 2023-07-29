@@ -56,6 +56,8 @@ class UseState(Generic[T]):
         func(value)
         self.set(value)
 
+    def __repr__(self) -> str:
+        return f"<UseState value={self.value!r}>"
 
 class UseFuture(Generic[T]):
     def __init__(self, scope: Scope, idx: int, func: Callable[[], Coroutine[Any, Any, T]]):
