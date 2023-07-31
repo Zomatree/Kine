@@ -293,7 +293,7 @@ class Diff:
             return
 
         old_middle = old[left_offset : len(old) - right_offset]
-        new_middle = old[left_offset : len(new) - right_offset]
+        new_middle = new[left_offset : len(new) - right_offset]
 
         if not new_middle:
             self.remove_nodes(old_middle, True)
@@ -333,13 +333,11 @@ class Diff:
 
         if not shared_keys:
             if old:
-                first_old = old[0]
-
                 self.remove_nodes(old[1:], True)
 
                 created: list[ElementId] = []
                 self.create_children(parent_id, new, created)
-                self.replace_inner(first_old, created)
+                self.replace_inner(old[0], created)
             else:
                 self.create_and_append_children(parent_id, new)
 

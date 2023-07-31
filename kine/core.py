@@ -48,7 +48,7 @@ class VElement:
         self.key = key
 
     def __repr__(self) -> str:
-        return f"<VString id={self.id!r} tag={self.tag!r} children={self.children!r}>"
+        return f"<VElement id={self.id!r} tag={self.tag!r} children={self.children!r}>"
 
 class VPlaceholder:
     def __init__(self):

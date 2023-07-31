@@ -213,6 +213,9 @@ class Scopes:
                     if listener.name == event.name:
                         listener.func(event.data)
 
+                        if not event.bubbles:
+                            break
+
             element_id = node.parent_id
 
     def run_scope(self, scope_id: ScopeId):

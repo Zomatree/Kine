@@ -101,7 +101,7 @@ class App(Generic[P]):
 
                 case diff.NewEventListener():
 
-                    def callback(event: Any, mod: diff.NewEventListener = mod):
+                    def callback(event: Any):
                         target = event.target
                         if not target:
                             return
@@ -144,7 +144,7 @@ class App(Generic[P]):
                         self.event_queue.put_nowait(
                             {
                                 "method": "user_event",
-                                "params": {"event": mod.event_name, "mounted_dom_id": mod.root, "contents": contents},
+                                "params": {"event": event.type, "mounted_dom_id": int(real_id), "contents": contents},
                             }
                         )
 
