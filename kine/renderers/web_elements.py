@@ -171,6 +171,7 @@ class ElementArgs(TypedDict, total=False):
     size: str
     step: str
     key: str
+    name: str
 
     type: str
     href: str

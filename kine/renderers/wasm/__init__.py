@@ -7,7 +7,6 @@ from ... import ComponentFunction, messages, diff
 from ...dom import VirtualDom, ElementId
 
 from ..web_elements import *
-from ...ext.wasm import *
 
 P = ParamSpec("P")
 

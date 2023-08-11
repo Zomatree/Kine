@@ -10,7 +10,6 @@ import shutil
 import tarfile
 import os.path
 import kine
-import typing_extensions
 import types
 import importlib
 import os
@@ -36,11 +35,10 @@ def get_library_root(library: types.ModuleType):
 
 
 kine_path = get_library_root(kine)
-typing_extensions_path = get_library_root(typing_extensions)
 
 
 def get_all_dependancies(deps: list[str]) -> list[str]:
-    libs = pipdeptree.get_installed_distributions(True, True)
+    libs = pipdeptree.get_installed_distributions()
 
     tree = pipdeptree.PackageDAG.from_pkgs(libs)
     dep_tree = tree.filter(deps, [])
@@ -139,7 +137,7 @@ def app(cx: Scope):
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
     <title>{{name}}</title>
 </head>
 <body>
@@ -179,10 +177,11 @@ def build(ctx: click.Context):
     modules = [
         (src_dir, build_dir / "src.tar.gz"),
         (kine_path, build_dir / "kine.tar.gz"),
-        (typing_extensions_path, build_dir / "typing_extensions.tar.gz"),
     ]
 
-    deps = config["project"]["dependancies"]
+    deps: list[str] = config["project"]["dependancies"]
+
+    deps.extend(["werkzeug", "kine", "typing_extensions"])
 
     for lib_name in get_all_dependancies(deps):
         modules.append((get_library_root(importlib.import_module(lib_name)), build_dir / f"{lib_name}.tar.gz"))
