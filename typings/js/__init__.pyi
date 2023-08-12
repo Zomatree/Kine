@@ -284,6 +284,8 @@ PresentationConnectionState = Literal["connecting", "connected", "closed", "term
 
 PresentationConnectionCloseReason = Literal["error", "closed", "wentaway"]
 
+RequestTargetAddressSpace = Literal["private", "local"]
+
 PushEncryptionKeyName = Literal["p256dh", "auth"]
 
 ReferrerPolicy = Literal["", "no-referrer", "no-referrer-when-downgrade", "same-origin", "origin", "strict-origin", "origin-when-cross-origin", "strict-origin-when-cross-origin", "unsafe-url"]
@@ -458,7 +460,7 @@ GPUTextureViewDimension = Literal["1d", "2d", "2d-array", "cube", "cube-array", 
 
 GPUTextureAspect = Literal["all", "stencil-only", "depth-only"]
 
-GPUTextureFormat = Literal["r8unorm", "r8snorm", "r8uint", "r8sint", "r16uint", "r16sint", "r16float", "rg8unorm", "rg8snorm", "rg8uint", "rg8sint", "r32uint", "r32sint", "r32float", "rg16uint", "rg16sint", "rg16float", "rgba8unorm", "rgba8unorm-srgb", "rgba8snorm", "rgba8uint", "rgba8sint", "bgra8unorm", "bgra8unorm-srgb", "rgb9e5ufloat", "rgb10a2unorm", "rg11b10ufloat", "rg32uint", "rg32sint", "rg32float", "rgba16uint", "rgba16sint", "rgba16float", "rgba32uint", "rgba32sint", "rgba32float", "stencil8", "depth16unorm", "depth24plus", "depth24plus-stencil8", "depth32float", "depth32float-stencil8", "bc1-rgba-unorm", "bc1-rgba-unorm-srgb", "bc2-rgba-unorm", "bc2-rgba-unorm-srgb", "bc3-rgba-unorm", "bc3-rgba-unorm-srgb", "bc4-r-unorm", "bc4-r-snorm", "bc5-rg-unorm", "bc5-rg-snorm", "bc6h-rgb-ufloat", "bc6h-rgb-float", "bc7-rgba-unorm", "bc7-rgba-unorm-srgb", "etc2-rgb8unorm", "etc2-rgb8unorm-srgb", "etc2-rgb8a1unorm", "etc2-rgb8a1unorm-srgb", "etc2-rgba8unorm", "etc2-rgba8unorm-srgb", "eac-r11unorm", "eac-r11snorm", "eac-rg11unorm", "eac-rg11snorm", "astc-4x4-unorm", "astc-4x4-unorm-srgb", "astc-5x4-unorm", "astc-5x4-unorm-srgb", "astc-5x5-unorm", "astc-5x5-unorm-srgb", "astc-6x5-unorm", "astc-6x5-unorm-srgb", "astc-6x6-unorm", "astc-6x6-unorm-srgb", "astc-8x5-unorm", "astc-8x5-unorm-srgb", "astc-8x6-unorm", "astc-8x6-unorm-srgb", "astc-8x8-unorm", "astc-8x8-unorm-srgb", "astc-10x5-unorm", "astc-10x5-unorm-srgb", "astc-10x6-unorm", "astc-10x6-unorm-srgb", "astc-10x8-unorm", "astc-10x8-unorm-srgb", "astc-10x10-unorm", "astc-10x10-unorm-srgb", "astc-12x10-unorm", "astc-12x10-unorm-srgb", "astc-12x12-unorm", "astc-12x12-unorm-srgb"]
+GPUTextureFormat = Literal["r8unorm", "r8snorm", "r8uint", "r8sint", "r16uint", "r16sint", "r16float", "rg8unorm", "rg8snorm", "rg8uint", "rg8sint", "r32uint", "r32sint", "r32float", "rg16uint", "rg16sint", "rg16float", "rgba8unorm", "rgba8unorm-srgb", "rgba8snorm", "rgba8uint", "rgba8sint", "bgra8unorm", "bgra8unorm-srgb", "rgb9e5ufloat", "rgb10a2uint", "rgb10a2unorm", "rg11b10ufloat", "rg32uint", "rg32sint", "rg32float", "rgba16uint", "rgba16sint", "rgba16float", "rgba32uint", "rgba32sint", "rgba32float", "stencil8", "depth16unorm", "depth24plus", "depth24plus-stencil8", "depth32float", "depth32float-stencil8", "bc1-rgba-unorm", "bc1-rgba-unorm-srgb", "bc2-rgba-unorm", "bc2-rgba-unorm-srgb", "bc3-rgba-unorm", "bc3-rgba-unorm-srgb", "bc4-r-unorm", "bc4-r-snorm", "bc5-rg-unorm", "bc5-rg-snorm", "bc6h-rgb-ufloat", "bc6h-rgb-float", "bc7-rgba-unorm", "bc7-rgba-unorm-srgb", "etc2-rgb8unorm", "etc2-rgb8unorm-srgb", "etc2-rgb8a1unorm", "etc2-rgb8a1unorm-srgb", "etc2-rgba8unorm", "etc2-rgba8unorm-srgb", "eac-r11unorm", "eac-r11snorm", "eac-rg11unorm", "eac-rg11snorm", "astc-4x4-unorm", "astc-4x4-unorm-srgb", "astc-5x4-unorm", "astc-5x4-unorm-srgb", "astc-5x5-unorm", "astc-5x5-unorm-srgb", "astc-6x5-unorm", "astc-6x5-unorm-srgb", "astc-6x6-unorm", "astc-6x6-unorm-srgb", "astc-8x5-unorm", "astc-8x5-unorm-srgb", "astc-8x6-unorm", "astc-8x6-unorm-srgb", "astc-8x8-unorm", "astc-8x8-unorm-srgb", "astc-10x5-unorm", "astc-10x5-unorm-srgb", "astc-10x6-unorm", "astc-10x6-unorm-srgb", "astc-10x8-unorm", "astc-10x8-unorm-srgb", "astc-10x10-unorm", "astc-10x10-unorm-srgb", "astc-12x10-unorm", "astc-12x10-unorm-srgb", "astc-12x12-unorm", "astc-12x12-unorm-srgb"]
 
 GPUAddressMode = Literal["clamp-to-edge", "repeat", "mirror-repeat"]
 
@@ -669,10 +671,6 @@ XRLayerLayout = Literal["default", "mono", "stereo", "stereo-left-right", "stere
 XRLayerQuality = Literal["default", "text-optimized", "graphics-optimized"]
 
 XRTextureType = Literal["texture", "texture-array"]
-
-TextDirection = Literal["ltr", "rtl", "auto"]
-
-ProgressionDirection = Literal["ltr", "rtl"]
 
 XMLHttpRequestResponseType = Literal["", "arraybuffer", "blob", "document", "json", "text"]
 
@@ -1016,7 +1014,7 @@ GPUPipelineConstantValue = float
 
 GPUColorWriteFlags = int
 
-GPUImageCopyExternalImageSource = Union['ImageBitmap', 'HTMLVideoElement', 'VideoFrame', 'HTMLCanvasElement', 'OffscreenCanvas']
+GPUImageCopyExternalImageSource = Union['ImageBitmap', 'ImageData', 'HTMLImageElement', 'HTMLVideoElement', 'VideoFrame', 'HTMLCanvasElement', 'OffscreenCanvas']
 
 GPUBufferDynamicOffset = int
 
@@ -1349,14 +1347,18 @@ class StyleSheet:
 
 class StyleSheetList:
     length: int
-
+    @overload
     def item(self, index: int) -> StyleSheet: ...
+    @overload
+    def item(self, index: int) -> Union['CSSStyleSheet', 'None']: ...
 
 class MediaList:
     mediaText: Union['str', 'str']
     length: int
-
+    @overload
     def item(self, index: int) -> str: ...
+    @overload
+    def item(self, index: int) -> Union['str', 'None']: ...
     @overload
     def deleteMedium(self, oldMedium: str) -> None: ...
     @overload
@@ -1371,11 +1373,6 @@ class LinkStyle:
 
 class DocumentStyle:
     styleSheets: StyleSheetList
-
-class CSSRuleList:
-    length: int
-
-    def item(self, index: int) -> CSSRule: ...
 
 class CSSRule:
     UNKNOWN_RULE = 0
@@ -1400,11 +1397,6 @@ class CSSRule:
 class CSSStyleRule(CSSRule, CSSGroupingRule):
     selectorText: Union['str', 'str']
     style: CSSStyleDeclaration
-    cssRules: CSSRuleList
-
-    def insertRule(self, rule: str, index: Union['int', 'None'] = 0) -> int: ...
-
-    def deleteRule(self, index: int) -> None: ...
     styleMap: StylePropertyMap
 
 class CSSFontFaceRule(CSSRule):
@@ -1440,7 +1432,9 @@ class CSSStyleDeclaration:
     @overload
     def setProperty(self, property: str, value: str, priority: Union['str', 'None'] = "") -> None: ...
     length: int
-
+    @overload
+    def item(self, index: int) -> str: ...
+    @overload
     def item(self, index: int) -> str: ...
     parentRule: Union['CSSRule', 'Union["CSSRule", "None"]']
     cssFloat: str
@@ -2267,6 +2261,8 @@ class FilePropertyBag(TypedDict, BlobPropertyBag):
     lastModified: NotRequired[int]
 
 class FileList:
+
+    def item(self, index: int) -> Union['File', 'None']: ...
     length: int
 
 class FileReader(EventTarget):
@@ -2659,6 +2655,8 @@ class SVGNumberList:
 
     def initialize(self, newItem: SVGNumber) -> SVGNumber: ...
 
+    def getItem(self, index: int) -> SVGNumber: ...
+
     def insertItemBefore(self, newItem: SVGNumber, index: int) -> SVGNumber: ...
 
     def replaceItem(self, newItem: SVGNumber, index: int) -> SVGNumber: ...
@@ -2666,6 +2664,8 @@ class SVGNumberList:
     def removeItem(self, index: int) -> SVGNumber: ...
 
     def appendItem(self, newItem: SVGNumber) -> SVGNumber: ...
+
+    def __setter__(self, index: int, newItem: SVGNumber) -> None: ...
 
 class SVGLengthList:
     length: int
@@ -2675,6 +2675,8 @@ class SVGLengthList:
 
     def initialize(self, newItem: SVGLength) -> SVGLength: ...
 
+    def getItem(self, index: int) -> SVGLength: ...
+
     def insertItemBefore(self, newItem: SVGLength, index: int) -> SVGLength: ...
 
     def replaceItem(self, newItem: SVGLength, index: int) -> SVGLength: ...
@@ -2682,6 +2684,8 @@ class SVGLengthList:
     def removeItem(self, index: int) -> SVGLength: ...
 
     def appendItem(self, newItem: SVGLength) -> SVGLength: ...
+
+    def __setter__(self, index: int, newItem: SVGLength) -> None: ...
 
 class SVGStringList:
     length: int
@@ -2691,6 +2695,8 @@ class SVGStringList:
 
     def initialize(self, newItem: str) -> str: ...
 
+    def getItem(self, index: int) -> str: ...
+
     def insertItemBefore(self, newItem: str, index: int) -> str: ...
 
     def replaceItem(self, newItem: str, index: int) -> str: ...
@@ -2698,6 +2704,8 @@ class SVGStringList:
     def removeItem(self, index: int) -> str: ...
 
     def appendItem(self, newItem: str) -> str: ...
+
+    def __setter__(self, index: int, newItem: str) -> None: ...
 
 class SVGAnimatedBoolean:
     baseVal: bool
@@ -2831,6 +2839,8 @@ class Document(Node, FontFaceSource, GeometryUtils, NonElementParentNode, Docume
     cookie: str
     lastModified: str
     readyState: DocumentReadyState
+
+    def __getter__(self, name: str) -> object: ...
     title: str
     dir: str
     body: Union['HTMLElement', 'None']
@@ -2910,6 +2920,8 @@ class Document(Node, FontFaceSource, GeometryUtils, NonElementParentNode, Docume
     def hasStorageAccess(self) -> Awaitable[bool]: ...
 
     def requestStorageAccess(self) -> Awaitable[None]: ...
+
+    def browsingTopics(self, options: Union['BrowsingTopicsOptions', 'None'] = {}) -> Awaitable[Sequence[BrowsingTopic]]: ...
 
     def hasPrivateTokens(self, issuer: str) -> Awaitable[bool]: ...
 
@@ -3044,6 +3056,8 @@ class SVGTransformList:
 
     def initialize(self, newItem: SVGTransform) -> SVGTransform: ...
 
+    def getItem(self, index: int) -> SVGTransform: ...
+
     def insertItemBefore(self, newItem: SVGTransform, index: int) -> SVGTransform: ...
 
     def replaceItem(self, newItem: SVGTransform, index: int) -> SVGTransform: ...
@@ -3051,6 +3065,8 @@ class SVGTransformList:
     def removeItem(self, index: int) -> SVGTransform: ...
 
     def appendItem(self, newItem: SVGTransform) -> SVGTransform: ...
+
+    def __setter__(self, index: int, newItem: SVGTransform) -> None: ...
 
     def createSVGTransformFromMatrix(self, matrix: Union['DOMMatrix2DInit', 'None'] = {}) -> SVGTransform: ...
 
@@ -3121,6 +3137,8 @@ class SVGPointList:
 
     def initialize(self, newItem: DOMPoint) -> DOMPoint: ...
 
+    def getItem(self, index: int) -> DOMPoint: ...
+
     def insertItemBefore(self, newItem: DOMPoint, index: int) -> DOMPoint: ...
 
     def replaceItem(self, newItem: DOMPoint, index: int) -> DOMPoint: ...
@@ -3128,6 +3146,8 @@ class SVGPointList:
     def removeItem(self, index: int) -> DOMPoint: ...
 
     def appendItem(self, newItem: DOMPoint) -> DOMPoint: ...
+
+    def __setter__(self, index: int, newItem: DOMPoint) -> None: ...
 
 class SVGPolylineElement(SVGGeometryElement, SVGAnimatedPoints): ...
 
@@ -3651,7 +3671,7 @@ class XRFrame:
 
     def createAnchor(self, pose: XRRigidTransform, space: XRSpace) -> Awaitable[XRAnchor]: ...
     trackedAnchors: XRAnchorSet
-    detectedMeshs: XRMeshSet
+    detectedMeshes: XRMeshSet
 
     def getDepthInformation(self, view: XRView) -> Union['XRCPUDepthInformation', 'None']: ...
 
@@ -3826,6 +3846,8 @@ class RequestInit(TypedDict):
     duplex: NotRequired[RequestDuplex]
     priority: NotRequired[RequestPriority]
     window: NotRequired[Any]
+    targetAddressSpace: NotRequired[RequestTargetAddressSpace]
+    browsingTopics: NotRequired[bool]
     privateToken: NotRequired[PrivateToken]
 
 class XMLHttpRequest(XMLHttpRequestEventTarget):
@@ -4250,19 +4272,6 @@ class Clipboard(EventTarget):
 class ClipboardPermissionDescriptor(TypedDict, PermissionDescriptor):
     allowWithoutGesture: NotRequired[bool]
 
-class CloseWatcher(EventTarget):
-    @classmethod
-    def new(cls, options: Union['CloseWatcherOptions', 'None'] = {}) -> CloseWatcher: ...
-
-    def destroy(self) -> None: ...
-
-    def close(self) -> None: ...
-    oncancel: EventHandler
-    onclose: EventHandler
-
-class CloseWatcherOptions(TypedDict):
-    signal: NotRequired[AbortSignal]
-
 class Window(EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, AnimationFrameProvider, WindowSessionStorage, WindowLocalStorage):
     orientation: int
     onorientationchange: EventHandler
@@ -4351,6 +4360,8 @@ class Window(EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWork
     frameElement: Union['Element', 'None']
 
     def open(self, url: Union['str', 'None'] = "", target: Union['str', 'None'] = "_blank", features: Union['str', 'None'] = "") -> Union['WindowProxy', 'None']: ...
+
+    def __getter__(self, name: str) -> object: ...
     navigator: Navigator
     clientInformation: Navigator
     originAgentCluster: bool
@@ -4557,11 +4568,13 @@ class CookieInit(TypedDict):
     domain: NotRequired[Union['str', 'None']]
     path: NotRequired[str]
     sameSite: NotRequired[CookieSameSite]
+    partitioned: NotRequired[bool]
 
 class CookieStoreDeleteOptions(TypedDict):
     name: str
     domain: NotRequired[Union['str', 'None']]
     path: NotRequired[str]
+    partitioned: NotRequired[bool]
 
 class CookieListItem(TypedDict):
     name: NotRequired[str]
@@ -4571,6 +4584,7 @@ class CookieListItem(TypedDict):
     expires: NotRequired[Union['DOMHighResTimeStamp', 'None']]
     secure: NotRequired[bool]
     sameSite: NotRequired[CookieSameSite]
+    partitioned: NotRequired[bool]
 
 class CookieStoreManager:
 
@@ -4689,6 +4703,7 @@ class HTMLIFrameElement(HTMLElement):
     marginHeight: str
     marginWidth: str
     permissionsPolicy: PermissionsPolicy
+    browsingTopics: bool
     privateToken: str
 
 class ScriptingPolicyReportBody(ReportBody):
@@ -4749,6 +4764,8 @@ class CSSKeyframesRule(CSSRule):
     name: str
     cssRules: CSSRuleList
     length: int
+
+    def __getter__(self, index: int) -> CSSKeyframeRule: ...
 
     def appendRule(self, rule: str) -> None: ...
 
@@ -5099,11 +5116,15 @@ class FontFaceVariations: ...
 
 class FontFacePalette:
     length: int
+
+    def __getter__(self, index: int) -> str: ...
     usableWithLightBackground: bool
     usableWithDarkBackground: bool
 
 class FontFacePalettes:
     length: int
+
+    def __getter__(self, index: int) -> FontFacePalette: ...
 
 class FontFaceSetLoadEventInit(TypedDict, EventInit):
     fontfaces: NotRequired[Sequence[FontFace]]
@@ -5423,6 +5444,10 @@ class CSSUnparsedValue(CSSStyleValue):
     def new(cls, members: Sequence[CSSUnparsedSegment]) -> CSSUnparsedValue: ...
     length: int
 
+    def __getter__(self, index: int) -> CSSUnparsedSegment: ...
+
+    def __setter__(self, index: int, val: CSSUnparsedSegment) -> CSSUnparsedSegment: ...
+
 class CSSVariableReferenceValue:
     @classmethod
     def new(cls, variable: str, fallback: Union['CSSUnparsedValue', 'None'] = None) -> CSSVariableReferenceValue: ...
@@ -5515,10 +5540,16 @@ class CSSMathClamp(CSSMathValue):
 class CSSNumericArray:
     length: int
 
+    def __getter__(self, index: int) -> CSSNumericValue: ...
+
 class CSSTransformValue(CSSStyleValue):
     @classmethod
     def new(cls, transforms: Sequence[CSSTransformComponent]) -> CSSTransformValue: ...
     length: int
+
+    def __getter__(self, index: int) -> CSSTransformComponent: ...
+
+    def __setter__(self, index: int, val: CSSTransformComponent) -> CSSTransformComponent: ...
     is2D: bool
 
     def toMatrix(self) -> DOMMatrix: ...
@@ -6179,10 +6210,16 @@ class Slottable:
     assignedSlot: Union['HTMLSlotElement', 'None']
 
 class NodeList:
+
+    def item(self, index: int) -> Union['Node', 'None']: ...
     length: int
 
 class HTMLCollection:
     length: int
+
+    def item(self, index: int) -> Union['Element', 'None']: ...
+
+    def namedItem(self, name: str) -> Union['Element', 'None']: ...
 
 class MutationObserver:
     @classmethod
@@ -6303,6 +6340,10 @@ class ShadowRootInit(TypedDict):
 class NamedNodeMap:
     length: int
 
+    def item(self, index: int) -> Union['Attr', 'None']: ...
+
+    def getNamedItem(self, qualifiedName: str) -> Union['Attr', 'None']: ...
+
     def getNamedItemNS(self, namespace: Union['str', 'None'], localName: str) -> Union['Attr', 'None']: ...
 
     def setNamedItem(self, attr: Attr) -> Union['Attr', 'None']: ...
@@ -6380,6 +6421,8 @@ class TreeWalker:
 
 class DOMTokenList:
     length: int
+
+    def item(self, index: int) -> Union['str', 'None']: ...
 
     def contains(self, token: str) -> bool: ...
 
@@ -7595,6 +7638,8 @@ class DOMRectInit(TypedDict):
 class DOMRectList:
     length: int
 
+    def item(self, index: int) -> Union['DOMRect', 'None']: ...
+
 class DOMQuad:
     @classmethod
     def new(cls, p1: Union['DOMPointInit', 'None'] = {}, p2: Union['DOMPointInit', 'None'] = {}, p3: Union['DOMPointInit', 'None'] = {}, p4: Union['DOMPointInit', 'None'] = {}) -> DOMQuad: ...
@@ -7779,15 +7824,23 @@ class GyroscopeReadingValues(TypedDict):
 class HTMLAllCollection:
     length: int
 
+    def __getter__(self, index: int) -> Element: ...
+
+    def namedItem(self, name: str) -> Union['HTMLCollection', 'Element', 'None']: ...
+
     def item(self, nameOrIndex: Union['str', 'None'] = None) -> Union['HTMLCollection', 'Element', 'None']: ...
 
-class HTMLFormControlsCollection(HTMLCollection): ...
+class HTMLFormControlsCollection(HTMLCollection):
+
+    def namedItem(self, name: str) -> Union['RadioNodeList', 'Element', 'None']: ...
 
 class RadioNodeList(NodeList):
     value: str
 
 class HTMLOptionsCollection(HTMLCollection):
     length: int
+
+    def __setter__(self, index: int, option: Union['HTMLOptionElement', 'None']) -> None: ...
 
     def add(self, element: Union['HTMLOptionElement', 'HTMLOptGroupElement'], before: Union['HTMLElement', 'int', 'None'] = None) -> None: ...
 
@@ -7796,6 +7849,8 @@ class HTMLOptionsCollection(HTMLCollection):
 
 class DOMStringList:
     length: int
+
+    def item(self, index: int) -> Union['str', 'None']: ...
 
     def contains(self, string: str) -> bool: ...
 
@@ -7811,7 +7866,13 @@ class HTMLOrSVGElement:
 
     def blur(self) -> None: ...
 
-class DOMStringMap: ...
+class DOMStringMap:
+
+    def __getter__(self, name: str) -> str: ...
+
+    def __setter__(self, name: str, value: str) -> None: ...
+
+    def __deleter__(self, name: str) -> None: ...
 
 class HTMLHtmlElement(HTMLElement):
     @classmethod
@@ -8089,6 +8150,8 @@ class MediaError:
 class AudioTrackList(EventTarget):
     length: int
 
+    def __getter__(self, index: int) -> AudioTrack: ...
+
     def getTrackById(self, id: str) -> Union['AudioTrack', 'None']: ...
     onchange: EventHandler
     onaddtrack: EventHandler
@@ -8104,6 +8167,8 @@ class AudioTrack:
 
 class VideoTrackList(EventTarget):
     length: int
+
+    def __getter__(self, index: int) -> VideoTrack: ...
 
     def getTrackById(self, id: str) -> Union['VideoTrack', 'None']: ...
     selectedIndex: int
@@ -8121,6 +8186,8 @@ class VideoTrack:
 
 class TextTrackList(EventTarget):
     length: int
+
+    def __getter__(self, index: int) -> TextTrack: ...
 
     def getTrackById(self, id: str) -> Union['TextTrack', 'None']: ...
     onchange: EventHandler
@@ -8145,6 +8212,8 @@ class TextTrack(EventTarget):
 
 class TextTrackCueList:
     length: int
+
+    def __getter__(self, index: int) -> TextTrackCue: ...
 
     def getCueById(self, id: str) -> Union['TextTrackCue', 'None']: ...
 
@@ -8307,6 +8376,10 @@ class HTMLFormElement(HTMLElement):
     relList: DOMTokenList
     elements: HTMLFormControlsCollection
     length: int
+    @overload
+    def __getter__(self, index: int) -> Element: ...
+    @overload
+    def __getter__(self, name: str) -> Union['RadioNodeList', 'Element']: ...
 
     def submit(self) -> None: ...
 
@@ -8363,6 +8436,8 @@ class HTMLSelectElement(HTMLElement):
     options: HTMLOptionsCollection
     length: int
 
+    def item(self, index: int) -> Union['HTMLOptionElement', 'None']: ...
+
     def namedItem(self, name: str) -> Union['HTMLOptionElement', 'None']: ...
 
     def add(self, element: Union['HTMLOptionElement', 'HTMLOptGroupElement'], before: Union['HTMLElement', 'int', 'None'] = None) -> None: ...
@@ -8370,6 +8445,8 @@ class HTMLSelectElement(HTMLElement):
     def remove(self) -> None: ...
     @overload
     def remove(self, index: int) -> None: ...
+
+    def __setter__(self, index: int, option: Union['HTMLOptionElement', 'None']) -> None: ...
     selectedOptions: HTMLCollection
     selectedIndex: int
     value: str
@@ -8920,6 +8997,8 @@ class DataTransfer:
 
 class DataTransferItemList:
     length: int
+
+    def __getter__(self, index: int) -> DataTransferItem: ...
     @overload
     def add(self, data: str, type: str) -> Union['DataTransferItem', 'None']: ...
     @overload
@@ -9200,14 +9279,26 @@ class PluginArray:
     def refresh(self) -> None: ...
     length: int
 
+    def item(self, index: int) -> Union['Plugin', 'None']: ...
+
+    def namedItem(self, name: str) -> Union['Plugin', 'None']: ...
+
 class MimeTypeArray:
     length: int
+
+    def item(self, index: int) -> Union['MimeType', 'None']: ...
+
+    def namedItem(self, name: str) -> Union['MimeType', 'None']: ...
 
 class Plugin:
     name: str
     description: str
     filename: str
     length: int
+
+    def item(self, index: int) -> Union['MimeType', 'None']: ...
+
+    def namedItem(self, name: str) -> Union['MimeType', 'None']: ...
 
 class MimeType:
     type: str
@@ -9373,6 +9464,12 @@ class Storage:
     length: int
 
     def key(self, index: int) -> Union['str', 'None']: ...
+
+    def getItem(self, key: str) -> Union['str', 'None']: ...
+
+    def setItem(self, key: str, value: str) -> None: ...
+
+    def removeItem(self, key: str) -> None: ...
 
     def clear(self) -> None: ...
 
@@ -10119,6 +10216,8 @@ class SourceBufferList(EventTarget):
     length: int
     onaddsourcebuffer: EventHandler
     onremovesourcebuffer: EventHandler
+
+    def __getter__(self, index: int) -> SourceBuffer: ...
 
 class MockCapturePromptResultConfiguration(TypedDict):
     getUserMedia: NotRequired[MockCapturePromptResult]
@@ -10949,6 +11048,9 @@ class PresentationConnectionList(EventTarget):
     connections: Sequence[PresentationConnection]
     onconnectionavailable: EventHandler
 
+class PrivateNetworkAccessPermissionDescriptor(TypedDict, PermissionDescriptor):
+    id: NotRequired[str]
+
 class ProximitySensor(Sensor):
     @classmethod
     def new(cls, sensorOptions: Union['SensorOptions', 'None'] = {}) -> ProximitySensor: ...
@@ -11376,10 +11478,12 @@ class Serial(EventTarget):
 
 class SerialPortRequestOptions(TypedDict):
     filters: NotRequired[Sequence[SerialPortFilter]]
+    allowedBluetoothServiceClassIds: NotRequired[Sequence[BluetoothServiceUUID]]
 
 class SerialPortFilter(TypedDict):
     usbVendorId: NotRequired[int]
     usbProductId: NotRequired[int]
+    bluetoothServiceClassId: NotRequired[BluetoothServiceUUID]
 
 class SerialPort(EventTarget):
     onconnect: EventHandler
@@ -11402,6 +11506,7 @@ class SerialPort(EventTarget):
 class SerialPortInfo(TypedDict):
     usbVendorId: NotRequired[int]
     usbProductId: NotRequired[int]
+    bluetoothServiceClassId: NotRequired[BluetoothServiceUUID]
 
 class SerialOptions(TypedDict):
     baudRate: int
@@ -11702,10 +11807,14 @@ class SpeechRecognitionAlternative:
 
 class SpeechRecognitionResult:
     length: int
+
+    def item(self, index: int) -> SpeechRecognitionAlternative: ...
     isFinal: bool
 
 class SpeechRecognitionResultList:
     length: int
+
+    def item(self, index: int) -> SpeechRecognitionResult: ...
 
 class SpeechRecognitionEvent(Event):
     @classmethod
@@ -11725,6 +11834,8 @@ class SpeechGrammarList:
     @classmethod
     def new(cls) -> SpeechGrammarList: ...
     length: int
+
+    def item(self, index: int) -> SpeechGrammar: ...
 
     def addFromURI(self, src: str, weight: Union['float', 'None'] = 1.0) -> None: ...
 
@@ -12062,6 +12173,16 @@ class DetectedText(TypedDict):
     rawValue: str
     cornerPoints: Sequence[Point2D]
 
+class BrowsingTopic(TypedDict):
+    topic: NotRequired[int]
+    version: NotRequired[str]
+    configVersion: NotRequired[str]
+    modelVersion: NotRequired[str]
+    taxonomyVersion: NotRequired[str]
+
+class BrowsingTopicsOptions(TypedDict):
+    skipObservation: NotRequired[bool]
+
 class TouchInit(TypedDict):
     identifier: int
     target: EventTarget
@@ -12101,6 +12222,8 @@ class Touch:
 class TouchList:
     length: int
 
+    def item(self, index: int) -> Union['Touch', 'None']: ...
+
 class TouchEventInit(TypedDict, EventModifierInit):
     touches: NotRequired[Sequence[Touch]]
     targetTouches: NotRequired[Sequence[Touch]]
@@ -12116,6 +12239,8 @@ class TouchEvent(UIEvent):
     metaKey: bool
     ctrlKey: bool
     shiftKey: bool
+
+    def getModifierState(self, keyArg: str) -> bool: ...
 
 class PrivateToken(TypedDict):
     version: TokenVersion
@@ -12225,7 +12350,7 @@ class InterestGroupBiddingScriptRunnerGlobalScope(InterestGroupScriptRunnerGloba
 
     def setPriority(self, priority: float) -> None: ...
 
-    def setPrioritySignalsOverride(self, key: str, priority: float) -> None: ...
+    def setPrioritySignalsOverride(self, key: str, priority: Union['float', 'None'] = None) -> None: ...
 
 class AdRender(TypedDict):
     url: str
@@ -12259,6 +12384,7 @@ class BiddingBrowserSignals(TypedDict):
     seller: str
     joinCount: int
     bidCount: int
+    recency: int
     topLevelSeller: NotRequired[str]
     prevWinsMs: NotRequired[Sequence[PreviousWin]]
     wasmHelper: NotRequired[object]
@@ -12772,6 +12898,8 @@ class GroupEffect:
 
 class AnimationNodeList:
     length: int
+
+    def item(self, index: int) -> Union['AnimationEffect', 'None']: ...
 
 class SequenceEffect(GroupEffect):
     @classmethod
@@ -13901,6 +14029,7 @@ class AV1EncoderConfig(TypedDict):
 class VideoEncoderEncodeOptions(TypedDict):
     av1: NotRequired[VideoEncoderEncodeOptionsForAv1]
     avc: NotRequired[VideoEncoderEncodeOptionsForAvc]
+    hevc: NotRequired[VideoEncoderEncodeOptionsForHevc]
     vp9: NotRequired[VideoEncoderEncodeOptionsForVp9]
     keyFrame: NotRequired[bool]
 
@@ -13919,6 +14048,9 @@ class FlacEncoderConfig(TypedDict):
 
 class HevcEncoderConfig(TypedDict):
     format: NotRequired[HevcBitstreamFormat]
+
+class VideoEncoderEncodeOptionsForHevc(TypedDict):
+    quantizer: NotRequired[Union['int', 'None']]
 
 class OpusEncoderConfig(TypedDict):
     format: NotRequired[OpusBitstreamFormat]
@@ -14232,6 +14364,8 @@ class ImageDecodeResult(TypedDict):
     complete: bool
 
 class ImageTrackList:
+
+    def __getter__(self, index: int) -> ImageTrack: ...
     ready: Awaitable[None]
     length: int
     selectedIndex: int
@@ -16913,7 +17047,6 @@ class RTCReceivedRtpStreamStats(TypedDict, RTCRtpStreamStats):
 
 class RTCInboundRtpStreamStats(TypedDict, RTCReceivedRtpStreamStats):
     trackIdentifier: str
-    kind: str
     mid: NotRequired[str]
     remoteId: NotRequired[str]
     framesDecoded: NotRequired[int]
@@ -16964,6 +17097,8 @@ class RTCInboundRtpStreamStats(TypedDict, RTCReceivedRtpStreamStats):
     totalAssemblyTime: NotRequired[float]
     retransmittedPacketsReceived: NotRequired[int]
     retransmittedBytesReceived: NotRequired[int]
+    rtxSsrc: NotRequired[int]
+    fecSsrc: NotRequired[int]
 
 class RTCRemoteInboundRtpStreamStats(TypedDict, RTCReceivedRtpStreamStats):
     localId: NotRequired[str]
@@ -16984,6 +17119,7 @@ class RTCOutboundRtpStreamStats(TypedDict, RTCSentRtpStreamStats):
     headerBytesSent: NotRequired[int]
     retransmittedPacketsSent: NotRequired[int]
     retransmittedBytesSent: NotRequired[int]
+    rtxSsrc: NotRequired[int]
     targetBitrate: NotRequired[float]
     totalEncodedBytesTarget: NotRequired[int]
     frameWidth: NotRequired[int]
@@ -17839,6 +17975,8 @@ class XRViewerPose(XRPose):
 class XRInputSourceArray:
     length: int
 
+    def __getter__(self, index: int) -> XRInputSource: ...
+
 class XRLayer(EventTarget): ...
 
 class XRWebGLLayerInit(TypedDict):
@@ -18089,25 +18227,6 @@ class ScreenDetailed(Screen):
     isInternal: bool
     devicePixelRatio: float
     label: str
-
-class CreatorInfo(TypedDict):
-    type: NotRequired[Sequence[str]]
-    name: Sequence[LocalizableString]
-    id: NotRequired[str]
-    url: NotRequired[str]
-
-class LocalizableString(TypedDict):
-    value: str
-    language: NotRequired[str]
-
-class LinkedResource(TypedDict):
-    url: str
-    encodingFormat: NotRequired[str]
-    name: NotRequired[Sequence[LocalizableString]]
-    description: NotRequired[LocalizableString]
-    rel: NotRequired[Sequence[str]]
-    integrity: NotRequired[str]
-    length: NotRequired[float]
 
 class XMLHttpRequestEventTarget(EventTarget):
     onloadstart: EventHandler
