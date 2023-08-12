@@ -332,7 +332,7 @@ class App(Generic[P]):
     def transform_event(self, event: Any) -> dict[str, Any]:
         match event.type:
             case "compositionend" | "compositionstart" | "compositionupdate":
-                return event.data
+                return {"data": event.data}
             case "keyup" | "keydown" | "keypress":
                 return {
                     "char_code": event.charCode,

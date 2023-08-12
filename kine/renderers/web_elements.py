@@ -1,4 +1,4 @@
-from typing import TypedDict, Callable, Any, cast
+from typing import TypeVar, TypedDict, Callable, Any, cast
 from typing_extensions import Unpack
 
 from ..elements import Element as BaseElement, CGI
@@ -118,11 +118,113 @@ __all__: tuple[str, ...] = (
     "div",
 )
 
+T = TypeVar("T")
+
+class CopyEvent(TypedDict):
+    pass
 
 class InputEvent(TypedDict):
     value: str
     values: dict[str, str]
 
+class CompositionEvent(TypedDict):
+    data: str
+
+class KeyEvent(TypedDict):
+    char_code: int
+    key: str
+    alt_key: bool
+    ctrl_key: bool
+    meta_key: bool
+    shift_key: bool
+    location: int
+    repeat: bool
+    which: int
+    code: str
+
+class FocusEvent(TypedDict):
+    pass
+
+class ChangeEvent(TypedDict):
+    value: str
+    values: dict[str, str]
+
+class MouseEvent(TypedDict):
+    alt_key: bool
+    button: int
+    buttons: int
+    client_x: int
+    client_y: int
+    ctrl_key: bool
+    meta_key: bool
+    offset_x: int
+    offset_y: int
+    page_x: int
+    page_y: int
+    screen_x: int
+    screen_y: int
+    shift_key: int
+
+class PointerEvent(TypedDict):
+    alt_key: bool
+    button: int
+    buttons: int
+    client_x: int
+    client_y: int
+    ctrl_key: bool
+    meta_key: bool
+    offset_x: int
+    offset_y: int
+    page_x: int
+    page_y: int
+    screen_x: int
+    screen_y: int
+    shift_key: int
+    pointer_id: int
+    width: int
+    height: int
+    pressure: int
+    tangential_pressure: int
+    tilt_x: int
+    tilt_y: int
+    twist: int
+    pointer_type: str
+    is_primary: bool
+
+class SelectEvent(TypedDict):
+    pass
+
+class TouchEvent(TypedDict):
+    alt_key: bool
+    ctrl_key: bool
+    meta_key: bool
+    shift_key: bool
+
+class ScrollEvent(TypedDict):
+    pass
+
+class WheelEvent(TypedDict):
+    delta_x: int
+    delta_y: int
+    delta_z: int
+    delta_move: int
+class AnimationEvent(TypedDict):
+    animation_name: str
+    elapsed_time: int
+    pseudo_element: str
+
+class TransitionEvent(TypedDict):
+    property_name: str
+    elapsed_time: int
+    pseudo_element: str
+
+class VideoEvent(TypedDict):
+    pass
+
+class ToggleEvent(TypedDict):
+    pass
+
+EventCallback = Callable[[T], Any]
 
 class ElementArgs(TypedDict, total=False):
     accesskey: str
@@ -177,8 +279,52 @@ class ElementArgs(TypedDict, total=False):
     href: str
     prevent_default: str
 
-    onclick: Callable[[Any], Any]
-    oninput: Callable[[InputEvent], Any]
+    oncompositionend: EventCallback[CompositionEvent]
+    oncompositionstart: EventCallback[CompositionEvent]
+    oncompositionupdate: EventCallback[CompositionEvent]
+    onkeyup: EventCallback[KeyEvent]
+    onkeydown: EventCallback[KeyEvent]
+    onkeypress: EventCallback[KeyEvent]
+    onchange: EventCallback[ChangeEvent]
+    oninput: EventCallback[InputEvent]
+    oninvalid: EventCallback[InputEvent]
+    onreset: EventCallback[InputEvent]
+    onsubmit: EventCallback[InputEvent]
+    onclick: EventCallback[MouseEvent]
+    oncontextmenu: EventCallback[MouseEvent]
+    ondoubleclick: EventCallback[MouseEvent]
+    ondblclick: EventCallback[MouseEvent]
+    ondrag: EventCallback[MouseEvent]
+    ondragend: EventCallback[MouseEvent]
+    ondragenter: EventCallback[MouseEvent]
+    ondragexit: EventCallback[MouseEvent]
+    ondragleave: EventCallback[MouseEvent]
+    ondragover: EventCallback[MouseEvent]
+    ondragstart: EventCallback[MouseEvent]
+    ondrop: EventCallback[MouseEvent]
+    onmousedown: EventCallback[MouseEvent]
+    onmouseenter: EventCallback[MouseEvent]
+    onmouseleave: EventCallback[MouseEvent]
+    onmousemove: EventCallback[MouseEvent]
+    onmouseout: EventCallback[MouseEvent]
+    onmouseover: EventCallback[MouseEvent]
+    onmouseup: EventCallback[MouseEvent]
+    onpointerdown: EventCallback[PointerEvent]
+    onpointermove: EventCallback[PointerEvent]
+    onpointerup: EventCallback[PointerEvent]
+    onpointercancel: EventCallback[PointerEvent]
+    ongotpointercapture: EventCallback[PointerEvent]
+    onlostpointercapture: EventCallback[PointerEvent]
+    onpointerenter: EventCallback[PointerEvent]
+    onpointerleave: EventCallback[PointerEvent]
+    onpointerover: EventCallback[PointerEvent]
+    onpointerout: EventCallback[PointerEvent]
+    ontouchcancel: EventCallback[TouchEvent]
+    ontouchend: EventCallback[TouchEvent]
+    ontouchmove: EventCallback[TouchEvent]
+    ontouchstart: EventCallback[TouchEvent]
+    onwheel: EventCallback[WheelEvent]
+    ontransitionend: EventCallback[TransitionEvent]
 
     extras: dict[
         str, Any
