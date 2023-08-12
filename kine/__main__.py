@@ -14,6 +14,7 @@ import types
 import importlib
 import os
 import pipdeptree
+import typing_extensions
 import importlib.metadata as import_meta
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
@@ -35,7 +36,7 @@ def get_library_root(library: types.ModuleType):
 
 
 kine_path = get_library_root(kine)
-
+typing_extensions_path = get_library_root(typing_extensions)
 
 def get_all_dependancies(deps: list[str]) -> list[str]:
     libs = pipdeptree.get_installed_distributions()
@@ -177,11 +178,10 @@ def build(ctx: click.Context):
     modules = [
         (src_dir, build_dir / "src.tar.gz"),
         (kine_path, build_dir / "kine.tar.gz"),
+        (typing_extensions_path, build_dir / "typing_extensions.tar.gz")
     ]
 
     deps: list[str] = config["project"]["dependancies"]
-
-    deps.extend(["werkzeug", "kine", "typing_extensions"])
 
     for lib_name in get_all_dependancies(deps):
         modules.append((get_library_root(importlib.import_module(lib_name)), build_dir / f"{lib_name}.tar.gz"))

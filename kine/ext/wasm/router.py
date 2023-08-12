@@ -1,28 +1,25 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generator, Mapping, ParamSpec
+from typing import TYPE_CHECKING, Any, Mapping, ParamSpec
 
 from dataclasses import dataclass
 from kine import Node, no_memo
 
-
 from ...fullstack import IS_WEB_PLATFORM
-from ...renderers.web_elements import a, div
+from ...renderers.web_elements import a
 from ... import Scope, component
 
-from werkzeug.routing import Map, Rule
+from .router_impl import Map, Rule
 
 if IS_WEB_PLATFORM or TYPE_CHECKING:
     import js
 
 P = ParamSpec("P")
-
-
 class UseRouter:
     def __init__(self, cx: Scope, routes: tuple[Route]):
         import js
         self.scope = cx
-        self.map = Map([Rule(route.route, endpoint=route.children) for route in routes if not route.is_404]).bind("0:0")
+        self.map: Map[Node] = Map([Rule(route.route, route.child) for route in routes])
 
         location = js.document.location
         assert location
@@ -64,25 +61,11 @@ def link(cx: Scope, route: str):
 @dataclass
 class Route:
     route: str
-    children: tuple[Node, ...] = ()
-    is_404: bool = False
-
-    def __getitem__(self, children: Node | tuple[Node, ...] | Generator[Node, Any, Any]):
-        if isinstance(children, Generator):
-            children = tuple(children)
-
-        elif isinstance(children, tuple):
-            pass
-
-        else:
-            children = (children,)
-
-        self.children = children
-        return self
+    child: Node
 
 @no_memo
 @component
-def router(cx: Scope, *routes: Route):
+def router(cx: Scope, *routes: Route, not_found: Node | None = "404: Not Found"):
     router = cx.use_hook(lambda: cx.provide_context(UseRouter(cx, routes)))
 
     location = js.document.location
@@ -90,7 +73,15 @@ def router(cx: Scope, *routes: Route):
 
     router.current_route = location.pathname
 
-    elements, route_parameters = router.map.match(location.pathname, "GET")
-    router.route_parameters = route_parameters
+    match = router.map.match(location.pathname)
 
-    return cx.render(div[*elements])
+    if match:
+        rule, dynamic_parts = match
+        router.route_parameters = dynamic_parts
+
+        return cx.render(rule.data)
+
+    else:
+        router.route_parameters = {}
+
+        return cx.render(not_found)
