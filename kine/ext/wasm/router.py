@@ -15,9 +15,9 @@ if IS_WEB_PLATFORM or TYPE_CHECKING:
     import js
 
 P = ParamSpec("P")
+
 class UseRouter:
     def __init__(self, cx: Scope, routes: tuple[Route]):
-        import js
         self.scope = cx
         self.map: Map[Node] = Map([Rule(route.route, route.child) for route in routes])
 

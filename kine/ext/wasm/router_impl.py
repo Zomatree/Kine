@@ -9,12 +9,7 @@ class Rule(Generic[T]):
         self.route = route
         self.data = data
 
-        if route == "/":
-            parts = []
-        else:
-            parts = route.removeprefix("/").removesuffix("/").split("/")
-
-        self.parts = [RoutePart(part) for part in parts]
+        self.parts = list(map(RoutePart, filter(None, route.split("/"))))
 
     def __repr__(self) -> str:
         return f"<Rule route={self.route!r} parts={self.parts!r}>"
@@ -40,10 +35,7 @@ class Map(Generic[T]):
         self.rules.append(rule)
 
     def match(self, path: str) -> tuple[Rule[T], Mapping[str, Any]] | None:
-        if path == "/":
-            parts = []
-        else:
-            parts = path.removeprefix("/").removesuffix("/").split("/")
+        parts = list(filter(None, path.split("/")))
 
         matching_rules: list[tuple[Rule[T], dict[str, str]]] = [(rule, {}) for rule in self.rules]
 
