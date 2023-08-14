@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Mapping, ParamSpec
+from typing import TYPE_CHECKING, Any, Iterable, Mapping, ParamSpec
 
 from dataclasses import dataclass
 from kine import Node, no_memo
 
 from ...fullstack import IS_WEB_PLATFORM
-from ...renderers.web_elements import a
+from ...renderers.web_elements import a, div
 from ... import Scope, component
 
 from .router_impl import Map, Rule
@@ -17,7 +17,7 @@ if IS_WEB_PLATFORM or TYPE_CHECKING:
 P = ParamSpec("P")
 
 class UseRouter:
-    def __init__(self, cx: Scope, routes: tuple[Route]):
+    def __init__(self, cx: Scope, routes: Iterable[Route]):
         self.scope = cx
         self.map: Map[Node] = Map([Rule(route.route, route.child) for route in routes])
 
@@ -65,7 +65,20 @@ class Route:
 
 @no_memo
 @component
-def router(cx: Scope, *routes: Route, not_found: Node | None = "404: Not Found"):
+def router(cx: Scope, *elements: Route | Node, not_found: Node | None = "404: Not Found"):
+    routes: list[Route] = []
+    before: list[Node] = []
+    after: list[Node] = []
+
+    for el in elements:
+        if isinstance(el, Route):
+            routes.append(el)
+        else:
+            if not routes:
+                before.append(el)
+            else:
+                after.append(el)
+
     router = cx.use_hook(lambda: cx.provide_context(UseRouter(cx, routes)))
 
     location = js.document.location
@@ -79,9 +92,9 @@ def router(cx: Scope, *routes: Route, not_found: Node | None = "404: Not Found")
         rule, dynamic_parts = match
         router.route_parameters = dynamic_parts
 
-        return cx.render(rule.data)
+        return cx.render(div[*before, rule.data, *after])
 
     else:
         router.route_parameters = {}
 
-        return cx.render(not_found)
+        return cx.render(div[*before, not_found, *after])
