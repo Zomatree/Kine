@@ -228,7 +228,7 @@ def serve(port: int, host: str):
     os.chdir("build")
     httpd = ThreadingHTTPServer((host, port), Handler)
 
-    print(f"Running server on http://{host}:{port}")
+    print(f"Running web server on http://{host}:{port}")
 
     try:
         httpd.serve_forever()
