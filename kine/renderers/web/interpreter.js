@@ -217,7 +217,6 @@ var Interpreter = /** @class */ (function () {
             }
             finally { if (e_2) throw e_2.error; }
         }
-        ;
         console.log(node, els);
         node.replaceWith.apply(node, __spreadArray([], __read(els), false));
     };
@@ -348,57 +347,24 @@ var Interpreter = /** @class */ (function () {
             node.removeAttribute(name);
         }
     };
-    Interpreter.prototype.CloneNode = function (old, new_id) {
-        var node = old ? this.nodes[old] : this.lastNode;
-        this.nodes[new_id] = node.cloneNode(true);
-    };
-    Interpreter.prototype.CloneNodeChildren = function (old, new_ids) {
-        var e_5, _a;
-        var node = old ? this.nodes[old] : this.lastNode;
-        var old_node = node.cloneNode(true);
-        try {
-            for (var _b = __values(Array.from(node.childNodes).entries()), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var _d = __read(_c.value, 2), i = _d[0], child = _d[1];
-                this.nodes[new_ids[i]] = child;
-            }
-        }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b["return"])) _a.call(_b);
-            }
-            finally { if (e_5) throw e_5.error; }
-        }
-    };
-    Interpreter.prototype.FirstChild = function () {
-        this.lastNode = this.lastNode.firstChild;
-    };
-    Interpreter.prototype.NextSibling = function () {
-        this.lastNode = this.lastNode.nextSibling;
-    };
-    Interpreter.prototype.ParentNode = function () {
-        this.lastNode = this.lastNode.parentNode;
-    };
-    Interpreter.prototype.StoreWithId = function (id) {
-        this.nodes[id] = this.lastNode;
-    };
-    Interpreter.prototype.SetLastNode = function (root) {
-        this.lastNode = this.nodes[root];
+    Interpreter.prototype.removeAllChildren = function (root) {
+        var node = this.nodes[root];
+        node.replaceChildren();
     };
     Interpreter.prototype.handleEdits = function (edits) {
-        var e_6, _a;
+        var e_5, _a;
         try {
             for (var edits_1 = __values(edits), edits_1_1 = edits_1.next(); !edits_1_1.done; edits_1_1 = edits_1.next()) {
                 var edit = edits_1_1.value;
                 this.handleEdit(edit);
             }
         }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
         finally {
             try {
                 if (edits_1_1 && !edits_1_1.done && (_a = edits_1["return"])) _a.call(edits_1);
             }
-            finally { if (e_6) throw e_6.error; }
+            finally { if (e_5) throw e_5.error; }
         }
     };
     Interpreter.prototype.handleEdit = function (edit) {
@@ -437,75 +403,75 @@ var Interpreter = /** @class */ (function () {
                 var handler = function (event) {
                     var _a;
                     var target = event.target;
-                    if (target != null) {
-                        var realId = target.getAttribute("data-kine-id");
-                        var shouldPreventDefault = target.getAttribute("kine-prevent-default");
-                        if (event.type === "click") {
-                            // todo call prevent default if it's the right type of event
-                            if (shouldPreventDefault !== "onclick") {
-                                if (target.tagName === "A") {
-                                    event.preventDefault();
-                                    var href = target.getAttribute("href");
-                                    if (href !== "" && href !== null && href !== undefined) {
-                                        _this.ipc.send(serializeIpcMessage("browser_open", { href: href }));
-                                    }
-                                }
-                            }
-                            // also prevent buttons from submitting
-                            if (target.tagName === "BUTTON" && event.type == "submit") {
+                    if (target == null)
+                        return;
+                    var realId = target.getAttribute("data-kine-id");
+                    var shouldPreventDefault = target.getAttribute("kine-prevent-default");
+                    if (event.type === "click") {
+                        // todo call prevent default if it's the right type of event
+                        if (shouldPreventDefault !== "onclick") {
+                            if (target.tagName === "A") {
                                 event.preventDefault();
-                            }
-                        }
-                        // walk the tree to find the real element
-                        while (realId == null) {
-                            // we've reached the root we don't want to send an event
-                            if (target.parentElement === null) {
-                                return;
-                            }
-                            target = target.parentElement;
-                            realId = target.getAttribute("data-kine-id");
-                        }
-                        shouldPreventDefault = target.getAttribute("kine-prevent-default");
-                        var contents = serialize_event(event);
-                        if (shouldPreventDefault === "on".concat(event.type)) {
-                            event.preventDefault();
-                        }
-                        if (event.type === "submit") {
-                            event.preventDefault();
-                        }
-                        if (target.tagName === "FORM" &&
-                            (event.type === "submit" || event.type === "input")) {
-                            for (var x = 0; x < target.elements.length; x++) {
-                                var element = target.elements[x];
-                                var name_1 = element.getAttribute("name");
-                                if (name_1 != null) {
-                                    if (element.getAttribute("type") === "checkbox") {
-                                        // @ts-ignore
-                                        contents.values[name_1] = element.checked ? "true" : "false";
-                                    }
-                                    else if (element.getAttribute("type") === "radio") {
-                                        if (element.checked) {
-                                            contents.values[name_1] = element.value;
-                                        }
-                                    }
-                                    else {
-                                        // @ts-ignore
-                                        contents.values[name_1] =
-                                            (_a = element.value) !== null && _a !== void 0 ? _a : element.textContent;
-                                    }
+                                var href = target.getAttribute("href");
+                                if (href !== "" && href !== null && href !== undefined) {
+                                    _this.ipc.send(serializeIpcMessage("browser_open", { href: href }));
                                 }
                             }
                         }
-                        if (realId === null) {
+                        // also prevent buttons from submitting
+                        if (target.tagName === "BUTTON" && event.type == "submit") {
+                            event.preventDefault();
+                        }
+                    }
+                    // walk the tree to find the real element
+                    while (realId == null) {
+                        // we've reached the root we don't want to send an event
+                        if (target.parentElement === null) {
                             return;
                         }
-                        realId = parseInt(realId);
-                        _this.ipc.send(serializeIpcMessage("user_event", {
-                            event: edit.event_name,
-                            mounted_dom_id: realId,
-                            contents: contents
-                        }));
+                        target = target.parentElement;
+                        realId = target.getAttribute("data-kine-id");
                     }
+                    shouldPreventDefault = target.getAttribute("kine-prevent-default");
+                    var contents = serialize_event(event);
+                    if (shouldPreventDefault === "on".concat(event.type)) {
+                        event.preventDefault();
+                    }
+                    if (event.type === "submit") {
+                        event.preventDefault();
+                    }
+                    if (target.tagName === "FORM" &&
+                        (event.type === "submit" || event.type === "input")) {
+                        for (var x = 0; x < target.elements.length; x++) {
+                            var element = target.elements[x];
+                            var name_1 = element.getAttribute("name");
+                            if (name_1 != null) {
+                                if (element.getAttribute("type") === "checkbox") {
+                                    // @ts-ignore
+                                    contents.values[name_1] = element.checked ? "true" : "false";
+                                }
+                                else if (element.getAttribute("type") === "radio") {
+                                    if (element.checked) {
+                                        contents.values[name_1] = element.value;
+                                    }
+                                }
+                                else {
+                                    // @ts-ignore
+                                    contents.values[name_1] =
+                                        (_a = element.value) !== null && _a !== void 0 ? _a : element.textContent;
+                                }
+                            }
+                        }
+                    }
+                    if (realId === null) {
+                        return;
+                    }
+                    realId = parseInt(realId);
+                    _this.ipc.send(serializeIpcMessage("user_event", {
+                        event: edit.event_name,
+                        mounted_dom_id: realId,
+                        contents: contents
+                    }));
                 };
                 this.NewEventListener(edit.event_name, edit.root, handler, event_bubbles(edit.event_name));
                 break;
@@ -518,29 +484,11 @@ var Interpreter = /** @class */ (function () {
             case "RemoveAttribute":
                 this.RemoveAttribute(edit.root, edit.name);
                 break;
-            case "CloneNode":
-                this.CloneNode(edit.id, edit.new_id);
-                break;
-            case "CloneNodeChildren":
-                this.CloneNodeChildren(edit.id, edit.new_ids);
-                break;
-            case "FirstChild":
-                this.FirstChild();
-                break;
-            case "NextSibling":
-                this.NextSibling();
-                break;
-            case "ParentNode":
-                this.ParentNode();
-                break;
-            case "StoreWithId":
-                this.StoreWithId(edit.id);
-                break;
-            case "SetLastNode":
-                this.SetLastNode(edit.id);
-                break;
             case "EvalMessage":
                 eval(edit.code);
+                break;
+            case "RemoveAllChildren":
+                this.removeAllChildren(edit.root);
                 break;
         }
     };
@@ -770,7 +718,6 @@ function serializeIpcMessage(method, params) {
     if (params === void 0) { params = {}; }
     return msgpack.encode({ method: method, params: params });
 }
-;
 var bool_attrs = {
     allowfullscreen: true,
     allowpaymentrequest: true,
@@ -803,5 +750,58 @@ function is_element_node(node) {
     return node.nodeType == 1;
 }
 function event_bubbles(event) {
-    return event in ["copy", "cut", "paste", "compositionend", "compositionstart", "compositionupdate", "keydown", "keypress", "keyup", "focusout", "focusin", "change", "input", "invalid", "reset", "submit", "click", "contextmenu", "doubleclick", "dblclick", "drag", "dragend", "dragleave", "dragover", "dragstart", "drop", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointermove", "pointerup", "pointercancel", "gotpointercapture", "lostpointercapture", "pointerover", "pointerout", "select", "touchcancel", "touchend", "touchmove", "touchstart", "wheel", "encrypted", "animationstart", "animationend", "animationiteration", "transitionend", "toggle"];
+    return (event in
+        [
+            "copy",
+            "cut",
+            "paste",
+            "compositionend",
+            "compositionstart",
+            "compositionupdate",
+            "keydown",
+            "keypress",
+            "keyup",
+            "focusout",
+            "focusin",
+            "change",
+            "input",
+            "invalid",
+            "reset",
+            "submit",
+            "click",
+            "contextmenu",
+            "doubleclick",
+            "dblclick",
+            "drag",
+            "dragend",
+            "dragleave",
+            "dragover",
+            "dragstart",
+            "drop",
+            "mousedown",
+            "mousemove",
+            "mouseout",
+            "mouseover",
+            "mouseup",
+            "pointerdown",
+            "pointermove",
+            "pointerup",
+            "pointercancel",
+            "gotpointercapture",
+            "lostpointercapture",
+            "pointerover",
+            "pointerout",
+            "select",
+            "touchcancel",
+            "touchend",
+            "touchmove",
+            "touchstart",
+            "wheel",
+            "encrypted",
+            "animationstart",
+            "animationend",
+            "animationiteration",
+            "transitionend",
+            "toggle",
+        ]);
 }

@@ -5,46 +5,109 @@ declare module msgpack {
     export function decode(Uint8Array): any;
 }
 
-type TypedEvent<Name, Evt> = {type: Name} & Evt;
-type TypedEditEvent<Name, Evt> = TypedEvent<Name, Evt> & {root: number};
+type TypedEvent<Name, Evt> = { type: Name } & Evt;
+type TypedEditEvent<Name, Evt> = TypedEvent<Name, Evt> & { root: number };
 
-type EditEvent = TypedEditEvent<"AppendChildren", {children: number[]}>
-    | TypedEditEvent<"ReplaceWith", {nodes: number[]}>
-    | TypedEditEvent<"InsertAfter", {nodes: number[]}>
-    | TypedEditEvent<"InsertBefore", {nodes: number[]}>
-    | TypedEditEvent<"Remove", {nodes: number[]}>
-    | TypedEditEvent<"CreateTextNode", {text: string}>
-    | TypedEditEvent<"CreateElement", {tag: string}>
+type EditEvent =
+    | TypedEditEvent<"AppendChildren", { children: number[] }>
+    | TypedEditEvent<"ReplaceWith", { nodes: number[] }>
+    | TypedEditEvent<"InsertAfter", { nodes: number[] }>
+    | TypedEditEvent<"InsertBefore", { nodes: number[] }>
+    | TypedEditEvent<"Remove", { nodes: number[] }>
+    | TypedEditEvent<"CreateTextNode", { text: string }>
+    | TypedEditEvent<"CreateElement", { tag: string }>
     | TypedEditEvent<"CreatePlaceholder", {}>
-    | TypedEditEvent<"RemoveEventListener", {event_name: string}>
-    | TypedEditEvent<"NewEventListener", {event_name: string}>
-    | TypedEditEvent<"SetText", {text: string}>
-    | TypedEditEvent<"SetAttribute", {field: string, value: string}>
-    | TypedEditEvent<"RemoveAttribute", {name: string}>
-    | TypedEditEvent<"CloneNode", {id: number, new_id: number}>
-    | TypedEditEvent<"CloneNodeChildren", {id: number, new_ids: number[]}>
-    | TypedEditEvent<"FirstChild", {}>
-    | TypedEditEvent<"NextSibling", {}>
-    | TypedEditEvent<"ParentNode", {}>
-    | TypedEditEvent<"StoreWithId", {id: number}>
-    | TypedEditEvent<"SetLastNode", {id: number}>
-    | TypedEditEvent<"EvalMessage", {code: string}>;
+    | TypedEditEvent<"RemoveEventListener", { event_name: string }>
+    | TypedEditEvent<"NewEventListener", { event_name: string }>
+    | TypedEditEvent<"SetText", { text: string }>
+    | TypedEditEvent<"SetAttribute", { field: string; value: string }>
+    | TypedEditEvent<"RemoveAttribute", { name: string }>
+    | TypedEditEvent<"EvalMessage", { code: string }>
+    | TypedEditEvent<"RemoveAllChildren", {}>;
 
-type DomEvent = TypedEvent<"copy" | "cut" | "paste", ClipboardEvent>
-    | TypedEvent<"compositionend" | "compositionstart" | "compositionupdate", CompositionEvent>
+type DomEvent =
+    | TypedEvent<"copy" | "cut" | "paste", ClipboardEvent>
+    | TypedEvent<
+            "compositionend" | "compositionstart" | "compositionupdate",
+            CompositionEvent
+        >
     | TypedEvent<"keydown" | "keypress" | "keyup", KeyboardEvent>
     | TypedEvent<"focus" | "blur", FocusEvent>
     | TypedEvent<"change", Event>
     | TypedEvent<"input" | "invalid" | "reset" | "submit", Event>
-    | TypedEvent<"click" | "contextmenu" | "doubleclick" | "dblclick" | "drag" | "dragend" | "dragenter" | "dragexit" | "dragleave" | "dragover" | "dragstart" | "drop" | "mousedown" | "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover" | "mouseup", MouseEvent>
-    | TypedEvent<"pointerdown" | "pointermove" | "pointerup" | "pointercancel" | "gotpointercapture" | "lostpointercapture" | "pointerenter" | "pointerleave" | "pointerover" | "pointerout", PointerEvent>
+    | TypedEvent<
+            | "click"
+            | "contextmenu"
+            | "doubleclick"
+            | "dblclick"
+            | "drag"
+            | "dragend"
+            | "dragenter"
+            | "dragexit"
+            | "dragleave"
+            | "dragover"
+            | "dragstart"
+            | "drop"
+            | "mousedown"
+            | "mouseenter"
+            | "mouseleave"
+            | "mousemove"
+            | "mouseout"
+            | "mouseover"
+            | "mouseup",
+            MouseEvent
+        >
+    | TypedEvent<
+            | "pointerdown"
+            | "pointermove"
+            | "pointerup"
+            | "pointercancel"
+            | "gotpointercapture"
+            | "lostpointercapture"
+            | "pointerenter"
+            | "pointerleave"
+            | "pointerover"
+            | "pointerout",
+            PointerEvent
+        >
     | TypedEvent<"select", Event>
-    | TypedEvent<"touchcancel" | "touchend" | "touchmove" | "touchstart", TouchEvent>
+    | TypedEvent<
+            "touchcancel" | "touchend" | "touchmove" | "touchstart",
+            TouchEvent
+        >
     | TypedEvent<"scroll", Event>
     | TypedEvent<"wheel", WheelEvent>
-    | TypedEvent<"animationstart" | "animationend" | "animationiteration", AnimationEvent>
+    | TypedEvent<
+            "animationstart" | "animationend" | "animationiteration",
+            AnimationEvent
+        >
     | TypedEvent<"transitionend", TransitionEvent>
-    | TypedEvent<"abort" | "canplay" | "canplaythrough" | "durationchange" | "emptied" | "encrypted" | "ended" | "error" | "loadeddata" | "loadedmetadata" | "loadstart" | "pause" | "play" | "playing" | "progress" | "ratechange" | "seeked" | "seeking" | "stalled" | "suspend" | "timeupdate" | "volumechange" | "waiting", Event>
+    | TypedEvent<
+            | "abort"
+            | "canplay"
+            | "canplaythrough"
+            | "durationchange"
+            | "emptied"
+            | "encrypted"
+            | "ended"
+            | "error"
+            | "loadeddata"
+            | "loadedmetadata"
+            | "loadstart"
+            | "pause"
+            | "play"
+            | "playing"
+            | "progress"
+            | "ratechange"
+            | "seeked"
+            | "seeking"
+            | "stalled"
+            | "suspend"
+            | "timeupdate"
+            | "volumechange"
+            | "waiting",
+            Event
+        >
     | TypedEvent<"toggle", Event>;
 
 let ipc: IPC;
@@ -58,8 +121,8 @@ function main(ws_addr: string) {
 }
 
 class IPC {
-    interpreter: Interpreter
-    ws: WebSocket
+    interpreter: Interpreter;
+    ws: WebSocket;
 
     constructor(root: HTMLElement, ws_addr: string) {
         this.interpreter = new Interpreter(root, this);
@@ -88,9 +151,9 @@ class IPC {
 }
 
 class ListenerMap {
-    global: Map<string, { active: number, callback: {(...args)} }>
-    local: Map<string, Map<string, {(...args)}>>
-    root: HTMLElement
+    global: Map<string, { active: number; callback: { (...args) } }>;
+    local: Map<string, Map<string, { (...args) }>>;
+    root: HTMLElement;
 
     constructor(root) {
         // bubbling events can listen at the root element
@@ -100,14 +163,19 @@ class ListenerMap {
         this.root = root;
     }
 
-    create(event_name: string, element: HTMLElement, handler: {(...args)}, bubbles: boolean) {
+    create(
+        event_name: string,
+        element: HTMLElement,
+        handler: { (...args) },
+        bubbles: boolean
+    ) {
         if (bubbles) {
             let global = this.global.get(event_name);
 
             if (!global) {
                 this.global.set(event_name, {
                     active: 1,
-                    callback: handler
+                    callback: handler,
                 });
 
                 this.root.addEventListener(event_name, handler);
@@ -153,16 +221,16 @@ class ListenerMap {
 }
 
 class Interpreter {
-    root: HTMLElement
-    lastNode: HTMLElement | Text
-    listeners: ListenerMap
-    nodes: (HTMLElement | Text)[]
-    parents: (HTMLElement | Text)[]
-    ipc: IPC
+    root: HTMLElement;
+    lastNode: HTMLElement | Text;
+    listeners: ListenerMap;
+    nodes: (HTMLElement | Text)[];
+    parents: (HTMLElement | Text)[];
+    ipc: IPC;
 
     constructor(root: HTMLElement, ipc: IPC) {
         this.root = root;
-        this.ipc = ipc
+        this.ipc = ipc;
         this.lastNode = root;
         this.listeners = new ListenerMap(root);
         this.nodes = [root];
@@ -197,7 +265,7 @@ class Interpreter {
 
         for (let new_node of nodes) {
             els.push(this.nodes[new_node]);
-        };
+        }
 
         console.log(node, els);
 
@@ -205,7 +273,7 @@ class Interpreter {
     }
 
     InsertAfter(root: number | null, nodes: number[]) {
-        let node = root != null ?this.nodes[root] : this.lastNode;
+        let node = root != null ? this.nodes[root] : this.lastNode;
         let els: (HTMLElement | Text)[] = [];
 
         for (let new_node of nodes) {
@@ -216,7 +284,7 @@ class Interpreter {
     }
 
     InsertBefore(root: number | null, nodes: number[]) {
-        let node = root != null ?this.nodes[root] : this.lastNode;
+        let node = root != null ? this.nodes[root] : this.lastNode;
         let els: (HTMLElement | Text)[] = [];
 
         for (let new_node of nodes) {
@@ -227,7 +295,7 @@ class Interpreter {
     }
 
     Remove(root: number | null) {
-        let node = root != null ?this.nodes[root] : this.lastNode;
+        let node = root != null ? this.nodes[root] : this.lastNode;
 
         if (node !== undefined) {
             node.remove();
@@ -262,29 +330,34 @@ class Interpreter {
         }
     }
 
-    NewEventListener(event_name: string, root: number, handler: {(...args)}, bubbles: boolean) {
-        let node = (root != null ?this.nodes[root] : this.lastNode) as HTMLElement;
+    NewEventListener(
+        event_name: string,
+        root: number,
+        handler: { (...args) },
+        bubbles: boolean
+    ) {
+        let node = (root != null ? this.nodes[root] : this.lastNode) as HTMLElement;
 
         node.setAttribute("data-kine-id", `${root}`);
         this.listeners.create(event_name, node, handler, bubbles);
     }
 
     RemoveEventListener(root: number, event_name: string, bubbles: boolean) {
-        let node = (root != null ?this.nodes[root] : this.lastNode) as HTMLElement;
+        let node = (root != null ? this.nodes[root] : this.lastNode) as HTMLElement;
 
         node.removeAttribute(`data-kine-id`);
         this.listeners.remove(node, event_name, bubbles);
     }
 
     SetText(root: number | null, text: string) {
-        let node = (root != null ?this.nodes[root] : this.lastNode) as Text;
+        let node = (root != null ? this.nodes[root] : this.lastNode) as Text;
 
         node.data = text;
     }
 
     SetAttribute(root: number | null, field: string, value: string) {
         const name = field;
-        let node = (root != null ?this.nodes[root] : this.lastNode) as HTMLElement;
+        let node = (root != null ? this.nodes[root] : this.lastNode) as HTMLElement;
 
         switch (name) {
             case "value":
@@ -313,7 +386,7 @@ class Interpreter {
 
     RemoveAttribute(root: number | null, field: string) {
         const name = field;
-        let node = (root != null ?this.nodes[root] : this.lastNode) as HTMLElement;
+        let node = (root != null ? this.nodes[root] : this.lastNode) as HTMLElement;
 
         if (name === "value") {
             (node as HTMLInputElement).value = "";
@@ -328,39 +401,9 @@ class Interpreter {
         }
     }
 
-    CloneNode(old: number | null, new_id: number) {
-        let node = old ? this.nodes[old] : this.lastNode;
-
-        this.nodes[new_id] = (node.cloneNode(true) as HTMLElement | Text);
-    }
-
-    CloneNodeChildren(old: number | null, new_ids: number[]) {
-        let node = old ? this.nodes[old] : this.lastNode;
-        const old_node = node.cloneNode(true);
-
-        for (let [i, child] of Array.from(node.childNodes).entries()) {
-            this.nodes[new_ids[i]] = child as HTMLElement | Text;
-        }
-    }
-
-    FirstChild() {
-        this.lastNode = this.lastNode.firstChild! as HTMLElement;
-    }
-
-    NextSibling() {
-        this.lastNode = this.lastNode.nextSibling! as HTMLElement;
-    }
-
-    ParentNode() {
-        this.lastNode = this.lastNode.parentNode! as HTMLElement;
-    }
-
-    StoreWithId(id: number) {
-        this.nodes[id] = this.lastNode;
-    }
-
-    SetLastNode(root: number) {
-        this.lastNode = this.nodes[root];
+    removeAllChildren(root: number) {
+        let node = this.nodes[root] as HTMLElement;
+        node.replaceChildren();
     }
 
     handleEdits(edits: any[]) {
@@ -396,99 +439,101 @@ class Interpreter {
                 this.CreatePlaceholder(edit.root);
                 break;
             case "RemoveEventListener":
-                this.RemoveEventListener(edit.root, edit.event_name, event_bubbles(edit.event_name));
+                this.RemoveEventListener(
+                    edit.root,
+                    edit.event_name,
+                    event_bubbles(edit.event_name)
+                );
                 break;
             case "NewEventListener":
                 // this handler is only provided on desktop implementations since this
                 // method is not used by the web implementation
                 let handler = (event) => {
                     let target = event.target;
-                    if (target != null) {
-                        let realId = target.getAttribute(`data-kine-id`);
-                        let shouldPreventDefault = target.getAttribute(
-                            `kine-prevent-default`
-                        );
 
-                        if (event.type === "click") {
-                            // todo call prevent default if it's the right type of event
-                            if (shouldPreventDefault !== `onclick`) {
-                                if (target.tagName === "A") {
-                                    event.preventDefault();
-                                    const href = target.getAttribute("href");
-                                    if (href !== "" && href !== null && href !== undefined) {
-                                        this.ipc.send(
-                                            serializeIpcMessage("browser_open", { href })
-                                        );
-                                    }
-                                }
-                            }
+                    if (target == null) return;
 
-                            // also prevent buttons from submitting
-                            if (target.tagName === "BUTTON" && event.type == "submit") {
+                    let realId = target.getAttribute(`data-kine-id`);
+                    let shouldPreventDefault =
+                        target.getAttribute(`kine-prevent-default`);
+
+                    if (event.type === "click") {
+                        // todo call prevent default if it's the right type of event
+                        if (shouldPreventDefault !== `onclick`) {
+                            if (target.tagName === "A") {
                                 event.preventDefault();
-                            }
-                        }
-                        // walk the tree to find the real element
-                        while (realId == null) {
-                            // we've reached the root we don't want to send an event
-                            if (target.parentElement === null) {
-                                return;
-                            }
-
-                            target = target.parentElement;
-                            realId = target.getAttribute(`data-kine-id`);
-                        }
-
-                        shouldPreventDefault = target.getAttribute(
-                            `kine-prevent-default`
-                        );
-
-                        let contents = serialize_event(event);
-
-                        if (shouldPreventDefault === `on${event.type}`) {
-                            event.preventDefault();
-                        }
-
-                        if (event.type === "submit") {
-                            event.preventDefault();
-                        }
-
-                        if (
-                            target.tagName === "FORM" &&
-                            (event.type === "submit" || event.type === "input")
-                        ) {
-                            for (let x = 0; x < target.elements.length; x++) {
-                                let element = target.elements[x];
-                                let name = element.getAttribute("name");
-                                if (name != null) {
-                                    if (element.getAttribute("type") === "checkbox") {
-                                        // @ts-ignore
-                                        contents.values[name] = element.checked ? "true" : "false";
-                                    } else if (element.getAttribute("type") === "radio") {
-                                        if (element.checked) {
-                                            contents.values![name] = element.value;
-                                        }
-                                    } else {
-                                        // @ts-ignore
-                                        contents.values[name] =
-                                            element.value ?? element.textContent;
-                                    }
+                                const href = target.getAttribute("href");
+                                if (href !== "" && href !== null && href !== undefined) {
+                                    this.ipc.send(
+                                        serializeIpcMessage("browser_open", { href })
+                                    );
                                 }
                             }
                         }
 
-                        if (realId === null) {
+                        // also prevent buttons from submitting
+                        if (target.tagName === "BUTTON" && event.type == "submit") {
+                            event.preventDefault();
+                        }
+                    }
+                    // walk the tree to find the real element
+                    while (realId == null) {
+                        // we've reached the root we don't want to send an event
+                        if (target.parentElement === null) {
                             return;
                         }
-                        realId = parseInt(realId);
-                        this.ipc.send(
-                            serializeIpcMessage("user_event", {
-                                event: edit.event_name,
-                                mounted_dom_id: realId,
-                                contents: contents,
-                            })
-                        );
+
+                        target = target.parentElement;
+                        realId = target.getAttribute(`data-kine-id`);
                     }
+
+                    shouldPreventDefault = target.getAttribute(`kine-prevent-default`);
+
+                    let contents = serialize_event(event);
+
+                    if (shouldPreventDefault === `on${event.type}`) {
+                        event.preventDefault();
+                    }
+
+                    if (event.type === "submit") {
+                        event.preventDefault();
+                    }
+
+                    if (
+                        target.tagName === "FORM" &&
+                        (event.type === "submit" || event.type === "input")
+                    ) {
+                        for (let x = 0; x < target.elements.length; x++) {
+                            let element = target.elements[x];
+                            let name = element.getAttribute("name");
+                            if (name != null) {
+                                if (element.getAttribute("type") === "checkbox") {
+                                    // @ts-ignore
+                                    contents.values[name] = element.checked ? "true" : "false";
+                                } else if (element.getAttribute("type") === "radio") {
+                                    if (element.checked) {
+                                        contents.values![name] = element.value;
+                                    }
+                                } else {
+                                    // @ts-ignore
+                                    contents.values[name] =
+                                        element.value ?? element.textContent;
+                                }
+                            }
+                        }
+                    }
+
+                    if (realId === null) {
+                        return;
+                    }
+                    realId = parseInt(realId);
+                    this.ipc.send(
+                        serializeIpcMessage("user_event", {
+                            event: edit.event_name,
+                            mounted_dom_id: realId,
+                            contents: contents,
+                        })
+                    );
                 };
                 this.NewEventListener(
                     edit.event_name,
@@ -507,29 +552,11 @@ class Interpreter {
             case "RemoveAttribute":
                 this.RemoveAttribute(edit.root, edit.name);
                 break;
-            case "CloneNode":
-                this.CloneNode(edit.id, edit.new_id);
-                break;
-            case "CloneNodeChildren":
-                this.CloneNodeChildren(edit.id, edit.new_ids);
-                break;
-            case "FirstChild":
-                this.FirstChild();
-                break;
-            case "NextSibling":
-                this.NextSibling();
-                break;
-            case "ParentNode":
-                this.ParentNode();
-                break;
-            case "StoreWithId":
-                this.StoreWithId(edit.id);
-                break;
-            case "SetLastNode":
-                this.SetLastNode(edit.id);
-                break;
             case "EvalMessage":
                 eval(edit.code);
+                break;
+            case "RemoveAllChildren":
+                this.removeAllChildren(edit.root);
                 break;
         }
     }
@@ -585,7 +612,7 @@ function serialize_event(event: DomEvent) {
             return {};
         }
         case "change": {
-            let target = (event.target as HTMLInputElement);
+            let target = event.target as HTMLInputElement;
             let value;
             if (target.type === "checkbox" || target.type === "radio") {
                 value = target.checked ? "true" : "false";
@@ -601,7 +628,7 @@ function serialize_event(event: DomEvent) {
         case "invalid":
         case "reset":
         case "submit": {
-            let target = (event.target as HTMLInputElement);
+            let target = event.target as HTMLInputElement;
             let value = target.value ?? target.textContent;
 
             if (target.type === "checkbox") {
@@ -807,7 +834,7 @@ function serialize_event(event: DomEvent) {
 }
 function serializeIpcMessage(method: any, params: any = {}) {
     return msgpack.encode({ method, params });
-};
+}
 
 const bool_attrs = {
     allowfullscreen: true,
@@ -843,5 +870,60 @@ function is_element_node(node: Node) {
 }
 
 function event_bubbles(event: string) {
-    return event in ["copy", "cut", "paste", "compositionend", "compositionstart", "compositionupdate", "keydown", "keypress", "keyup", "focusout", "focusin", "change", "input", "invalid", "reset", "submit", "click", "contextmenu", "doubleclick", "dblclick", "drag", "dragend", "dragleave", "dragover", "dragstart", "drop", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup", "pointerdown", "pointermove", "pointerup", "pointercancel", "gotpointercapture", "lostpointercapture", "pointerover", "pointerout", "select", "touchcancel", "touchend", "touchmove", "touchstart", "wheel", "encrypted", "animationstart", "animationend", "animationiteration", "transitionend", "toggle"]
+    return (
+        event in
+        [
+            "copy",
+            "cut",
+            "paste",
+            "compositionend",
+            "compositionstart",
+            "compositionupdate",
+            "keydown",
+            "keypress",
+            "keyup",
+            "focusout",
+            "focusin",
+            "change",
+            "input",
+            "invalid",
+            "reset",
+            "submit",
+            "click",
+            "contextmenu",
+            "doubleclick",
+            "dblclick",
+            "drag",
+            "dragend",
+            "dragleave",
+            "dragover",
+            "dragstart",
+            "drop",
+            "mousedown",
+            "mousemove",
+            "mouseout",
+            "mouseover",
+            "mouseup",
+            "pointerdown",
+            "pointermove",
+            "pointerup",
+            "pointercancel",
+            "gotpointercapture",
+            "lostpointercapture",
+            "pointerover",
+            "pointerout",
+            "select",
+            "touchcancel",
+            "touchend",
+            "touchmove",
+            "touchstart",
+            "wheel",
+            "encrypted",
+            "animationstart",
+            "animationend",
+            "animationiteration",
+            "transitionend",
+            "toggle",
+        ]
+    );
 }

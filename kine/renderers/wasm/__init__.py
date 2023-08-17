@@ -273,6 +273,14 @@ class App(Generic[P]):
 
                         node.removeEventListener(mod.event_name, handler)
 
+                case diff.RemoveAllChildren():
+                    node = self.nodes[mod.root]
+
+                    if TYPE_CHECKING:
+                        assert isinstance(node, js.Element)
+
+                    node.replaceChildren()
+
     def should_bubble(self, event_name: str) -> bool:
         return event_name in [
             "copy",

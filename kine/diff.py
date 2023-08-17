@@ -44,6 +44,10 @@ class Remove:
     type = "Remove"
     root: ElementId
 
+@dataclass
+class RemoveAllChildren:
+    type = "RemoveAllChildren"
+    root: ElementId
 
 @dataclass
 class CreateTextNode:
@@ -116,6 +120,7 @@ Modification = (
     | SetAttribute
     | RemoveAttribute
     | RemoveEventListener
+    | RemoveAllChildren
 )
 
 MAX_N = (1 << 32) - 1  # 32 bit int max size
@@ -275,7 +280,7 @@ class Diff:
                 self.create_and_append_children(parent_id, new_children)
 
             case old_children, []:
-                self.remove_nodes(old_children, True)
+                self.mutations.append(RemoveAllChildren(parent_id))
 
             case old_children, new_children:
                 old_keyed = old_children[0].key
