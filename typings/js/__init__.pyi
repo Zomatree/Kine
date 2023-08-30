@@ -1,6 +1,6 @@
 # @formatter:off
 
-from typing import overload, Any, Awaitable, Sequence, Literal, TypedDict, NotRequired, ByteString, Union, Callable
+from typing import overload, Any, Awaitable, Sequence, Literal, TypedDict, NotRequired, ByteString, Union, Callable, TypeAlias
 from .ecmascript import *
 SecurityPolicyViolationEventDisposition = Literal["enforce", "report"]
 
@@ -276,6 +276,8 @@ ClientLifecycleState = Literal["active", "frozen"]
 
 PaymentDelegation = Literal["shippingAddress", "payerName", "payerPhone", "payerEmail"]
 
+PaymentShippingType = Literal["shipping", "delivery", "pickup"]
+
 PaymentComplete = Literal["fail", "success", "unknown"]
 
 PermissionState = Literal["granted", "denied", "prompt"]
@@ -358,13 +360,13 @@ TableKind = Literal["externref", "anyfunc"]
 
 ValueType = Literal["i32", "i64", "f32", "f64", "v128", "externref", "anyfunc"]
 
-FillMode = Literal["none", "forwards", "backwards", "both", "auto"]
-
 IterationCompositeOperation = Literal["replace", "accumulate"]
 
 AnimationPlayState = Literal["idle", "running", "paused", "finished"]
 
 AnimationReplaceState = Literal["active", "removed", "persisted"]
+
+FillMode = Literal["none", "forwards", "backwards", "both", "auto"]
 
 PlaybackDirection = Literal["normal", "reverse", "alternate", "alternate-reverse"]
 
@@ -411,6 +413,8 @@ PublicKeyCredentialType = Literal["public-key"]
 AuthenticatorTransport = Literal["usb", "nfc", "ble", "smart-card", "hybrid", "internal"]
 
 UserVerificationRequirement = Literal["required", "preferred", "discouraged"]
+
+PublicKeyCredentialHints = Literal["security-key", "client-device", "hybrid"]
 
 LargeBlobSupport = Literal["required", "preferred"]
 
@@ -674,55 +678,55 @@ XRTextureType = Literal["texture", "texture-array"]
 
 XMLHttpRequestResponseType = Literal["", "arraybuffer", "blob", "document", "json", "text"]
 
-GLuint64EXT = int
+GLuint64EXT: TypeAlias = int
 
-BlobPart = Union['BufferSource', 'Blob', 'str']
+BlobPart: TypeAlias = Union['BufferSource', 'Blob', 'str']
 
-AlgorithmIdentifier = Union['object', 'str']
+AlgorithmIdentifier: TypeAlias = Union['object', 'str']
 
-HashAlgorithmIdentifier = AlgorithmIdentifier
+HashAlgorithmIdentifier: TypeAlias = AlgorithmIdentifier
 
-BigInteger = Uint8Array
+BigInteger: TypeAlias = Uint8Array
 
-NamedCurve = str
+NamedCurve: TypeAlias = str
 
-ClipboardItemData = Awaitable[Union['str', 'Blob']]
+ClipboardItemData: TypeAlias = Awaitable[Union['str', 'Blob']]
 
-ClipboardItems = Sequence[ClipboardItem]
+ClipboardItems: TypeAlias = Sequence[ClipboardItem]
 
 PressureUpdateCallback = Callable[[Sequence[PressureRecord],PressureObserver], None]
 
-CookieList = Sequence[CookieListItem]
+CookieList: TypeAlias = Sequence[CookieListItem]
 
-PasswordCredentialInit = Union['PasswordCredentialData', 'HTMLFormElement']
+PasswordCredentialInit: TypeAlias = Union['PasswordCredentialData', 'HTMLFormElement']
 
 AnimatorInstanceConstructor = Callable[[Any,Any], Any]
 
-BinaryData = Union['ArrayBuffer', 'ArrayBufferView']
+BinaryData: TypeAlias = Union['ArrayBuffer', 'ArrayBufferView']
 
-CSSStringSource = Union['str', 'ReadableStream']
+CSSStringSource: TypeAlias = Union['str', 'ReadableStream']
 
-CSSToken = Union['str', 'CSSStyleValue', 'CSSParserValue']
+CSSToken: TypeAlias = Union['str', 'CSSStyleValue', 'CSSParserValue']
 
-CSSUnparsedSegment = Union['str', 'CSSVariableReferenceValue']
+CSSUnparsedSegment: TypeAlias = Union['str', 'CSSVariableReferenceValue']
 
-CSSKeywordish = Union['str', 'CSSKeywordValue']
+CSSKeywordish: TypeAlias = Union['str', 'CSSKeywordValue']
 
-CSSNumberish = Union['float', 'CSSNumericValue']
+CSSNumberish: TypeAlias = Union['float', 'CSSNumericValue']
 
-CSSPerspectiveValue = Union['CSSNumericValue', 'CSSKeywordish']
+CSSPerspectiveValue: TypeAlias = Union['CSSNumericValue', 'CSSKeywordish']
 
-CSSColorRGBComp = Union['CSSNumberish', 'CSSKeywordish']
+CSSColorRGBComp: TypeAlias = Union['CSSNumberish', 'CSSKeywordish']
 
-CSSColorPercent = Union['CSSNumberish', 'CSSKeywordish']
+CSSColorPercent: TypeAlias = Union['CSSNumberish', 'CSSKeywordish']
 
-CSSColorNumber = Union['CSSNumberish', 'CSSKeywordish']
+CSSColorNumber: TypeAlias = Union['CSSNumberish', 'CSSKeywordish']
 
-CSSColorAngle = Union['CSSNumberish', 'CSSKeywordish']
+CSSColorAngle: TypeAlias = Union['CSSNumberish', 'CSSKeywordish']
 
 UpdateCallback = Callable[[], Awaitable[Any]]
 
-GeometryNode = Union['Text', 'Element', 'CSSPseudoElement', 'Document']
+GeometryNode: TypeAlias = Union['Text', 'Element', 'CSSPseudoElement', 'Document']
 
 EventListener = Callable[[], None]
 
@@ -740,45 +744,45 @@ FileSystemEntriesCallback = Callable[[Sequence[FileSystemEntry]], None]
 
 FileCallback = Callable[[File], None]
 
-FencedFrameConfigSize = Union['int', 'OpaqueProperty']
+FencedFrameConfigSize: TypeAlias = Union['int', 'OpaqueProperty']
 
-FencedFrameConfigURL = str
+FencedFrameConfigURL: TypeAlias = str
 
-ReportEventType = Union['FenceEvent', 'str']
+ReportEventType: TypeAlias = Union['FenceEvent', 'str']
 
-HeadersInit = Union['Sequence[Sequence[ByteString]]', 'ByteString']
+HeadersInit: TypeAlias = Union['Sequence[Sequence[ByteString]]', 'ByteString']
 
-XMLHttpRequestBodyInit = Union['Blob', 'BufferSource', 'FormData', 'URLSearchParams', 'str']
+XMLHttpRequestBodyInit: TypeAlias = Union['Blob', 'BufferSource', 'FormData', 'URLSearchParams', 'str']
 
-BodyInit = Union['ReadableStream', 'XMLHttpRequestBodyInit']
+BodyInit: TypeAlias = Union['ReadableStream', 'XMLHttpRequestBodyInit']
 
-RequestInfo = Union['Request', 'str']
+RequestInfo: TypeAlias = Union['Request', 'str']
 
-StartInDirectory = Union['WellKnownDirectory', 'FileSystemHandle']
+StartInDirectory: TypeAlias = Union['WellKnownDirectory', 'FileSystemHandle']
 
-FileSystemWriteChunkType = Union['BufferSource', 'Blob', 'str', 'WriteParams']
+FileSystemWriteChunkType: TypeAlias = Union['BufferSource', 'Blob', 'str', 'WriteParams']
 
 PositionCallback = Callable[[GeolocationPosition], None]
 
 PositionErrorCallback = Callable[[GeolocationPositionError], None]
 
-DOMHighResTimeStamp = float
+DOMHighResTimeStamp: TypeAlias = float
 
-EpochTimeStamp = int
+EpochTimeStamp: TypeAlias = int
 
-HTMLOrSVGScriptElement = Union['HTMLScriptElement', 'SVGScriptElement']
+HTMLOrSVGScriptElement: TypeAlias = Union['HTMLScriptElement', 'SVGScriptElement']
 
-MediaProvider = Union['MediaStream', 'MediaSource', 'Blob']
+MediaProvider: TypeAlias = Union['MediaStream', 'MediaSource', 'Blob']
 
-RenderingContext = Union['CanvasRenderingContext2D', 'ImageBitmapRenderingContext', 'WebGLRenderingContext', 'WebGL2RenderingContext', 'GPUCanvasContext']
+RenderingContext: TypeAlias = Union['CanvasRenderingContext2D', 'ImageBitmapRenderingContext', 'WebGLRenderingContext', 'WebGL2RenderingContext', 'GPUCanvasContext']
 
 BlobCallback = Callable[[Union['Blob', 'None']], None]
 
-HTMLOrSVGImageElement = Union['HTMLImageElement', 'SVGImageElement']
+HTMLOrSVGImageElement: TypeAlias = Union['HTMLImageElement', 'SVGImageElement']
 
-CanvasImageSource = Union['HTMLOrSVGImageElement', 'HTMLVideoElement', 'HTMLCanvasElement', 'ImageBitmap', 'OffscreenCanvas', 'VideoFrame']
+CanvasImageSource: TypeAlias = Union['HTMLOrSVGImageElement', 'HTMLVideoElement', 'HTMLCanvasElement', 'ImageBitmap', 'OffscreenCanvas', 'VideoFrame']
 
-OffscreenRenderingContext = Union['OffscreenCanvasRenderingContext2D', 'ImageBitmapRenderingContext', 'WebGLRenderingContext', 'WebGL2RenderingContext', 'GPUCanvasContext']
+OffscreenRenderingContext: TypeAlias = Union['OffscreenCanvasRenderingContext2D', 'ImageBitmapRenderingContext', 'WebGLRenderingContext', 'WebGL2RenderingContext', 'GPUCanvasContext']
 
 CustomElementConstructor = Callable[[], HTMLElement]
 
@@ -788,37 +792,35 @@ NavigationInterceptHandler = Callable[[], Awaitable[None]]
 
 EventHandlerNonNull = Callable[[Event], Any]
 
-EventHandler = Union['EventHandlerNonNull', 'None']
+EventHandler: TypeAlias = Union['EventHandlerNonNull', 'None']
 
 OnErrorEventHandlerNonNull = Callable[[Union['Event', 'str'],str,int,int,Any], Any]
 
-OnErrorEventHandler = Union['OnErrorEventHandlerNonNull', 'None']
+OnErrorEventHandler: TypeAlias = Union['OnErrorEventHandlerNonNull', 'None']
 
 OnBeforeUnloadEventHandlerNonNull = Callable[[Event], Union['str', 'None']]
 
-OnBeforeUnloadEventHandler = Union['OnBeforeUnloadEventHandlerNonNull', 'None']
+OnBeforeUnloadEventHandler: TypeAlias = Union['OnBeforeUnloadEventHandlerNonNull', 'None']
 
-TimerHandler = Union['str', 'Function']
+TimerHandler: TypeAlias = Union['str', 'Function']
 
-ImageBitmapSource = Union['CanvasImageSource', 'Blob', 'ImageData']
+ImageBitmapSource: TypeAlias = Union['CanvasImageSource', 'Blob', 'ImageData']
 
 FrameRequestCallback = Callable[[DOMHighResTimeStamp], None]
 
-MessageEventSource = Union['WindowProxy', 'MessagePort', 'ServiceWorker']
+MessageEventSource: TypeAlias = Union['WindowProxy', 'MessagePort', 'ServiceWorker']
 
-MessageEventSource = Union['WindowProxy', 'MessagePort', 'ServiceWorker', 'HTMLPortalElement', 'PortalHost']
-
-ConstrainPoint2D = Union['Sequence[Point2D]', 'ConstrainPoint2DParameters']
+ConstrainPoint2D: TypeAlias = Union['Sequence[Point2D]', 'ConstrainPoint2DParameters']
 
 IntersectionObserverCallback = Callable[[Sequence[IntersectionObserverEntry],IntersectionObserver], None]
 
-ProfilerResource = str
+ProfilerResource: TypeAlias = str
 
-JsonLdRecord = Any
+JsonLdRecord: TypeAlias = Any
 
-JsonLdInput = Union['JsonLdRecord', 'Sequence[JsonLdRecord]', 'str', 'RemoteDocument']
+JsonLdInput: TypeAlias = Union['JsonLdRecord', 'Sequence[JsonLdRecord]', 'str', 'RemoteDocument']
 
-JsonLdContext = Union['JsonLdRecord', 'Sequence[Union["JsonLdRecord", "str"]]', 'str']
+JsonLdContext: TypeAlias = Union['JsonLdRecord', 'Sequence[Union["JsonLdRecord", "str"]]', 'str']
 
 LoadDocumentCallback = Callable[[str,Union['LoadDocumentOptions', 'None']], Awaitable[RemoteDocument]]
 
@@ -826,51 +828,51 @@ NavigatorUserMediaSuccessCallback = Callable[[MediaStream], None]
 
 NavigatorUserMediaErrorCallback = Callable[[DOMException], None]
 
-ConstrainULong = Union['int', 'ConstrainULongRange']
+ConstrainULong: TypeAlias = Union['int', 'ConstrainULongRange']
 
-ConstrainDouble = Union['float', 'ConstrainDoubleRange']
+ConstrainDouble: TypeAlias = Union['float', 'ConstrainDoubleRange']
 
-ConstrainBoolean = Union['bool', 'ConstrainBooleanParameters']
+ConstrainBoolean: TypeAlias = Union['bool', 'ConstrainBooleanParameters']
 
-ConstrainDOMString = Union['str', 'Sequence[str]', 'ConstrainDOMStringParameters']
+ConstrainDOMString: TypeAlias = Union['str', 'Sequence[str]', 'ConstrainDOMStringParameters']
 
 MediaSessionActionHandler = Callable[[MediaSessionActionDetails], None]
 
-Megabit = float
+Megabit: TypeAlias = float
 
-Millisecond = int
+Millisecond: TypeAlias = int
 
 NotificationPermissionCallback = Callable[[NotificationPermission], None]
 
-RotationMatrixType = Union['Float32Array', 'Float64Array', 'DOMMatrix']
+RotationMatrixType: TypeAlias = Union['Float32Array', 'Float64Array', 'DOMMatrix']
 
-PerformanceEntryList = Sequence[PerformanceEntry]
+PerformanceEntryList: TypeAlias = Sequence[PerformanceEntry]
 
 PerformanceObserverCallback = Callable[[PerformanceObserverEntryList,PerformanceObserver,PerformanceObserverCallbackOptions], None]
 
-PushMessageDataInit = Union['BufferSource', 'str']
+PushMessageDataInit: TypeAlias = Union['BufferSource', 'str']
 
 RemotePlaybackAvailabilityCallback = Callable[[bool], None]
 
 ReportingObserverCallback = Callable[[Sequence[Report],ReportingObserver], None]
 
-ReportList = Sequence[Report]
+ReportList: TypeAlias = Sequence[Report]
 
 IdleRequestCallback = Callable[[IdleDeadline], None]
 
 ResizeObserverCallback = Callable[[Sequence[ResizeObserverEntry],ResizeObserver], None]
 
-AttributeMatchList = Sequence[str]
+AttributeMatchList: TypeAlias = Sequence[str]
 
 SchedulerPostTaskCallback = Callable[[], Any]
 
 SharedStorageOperationConstructor = Callable[[SharedStorageRunOperationMethodOptions], SharedStorageOperation]
 
-SharedStorageResponse = Union['str', 'FencedFrameConfig']
+SharedStorageResponse: TypeAlias = Union['str', 'FencedFrameConfig']
 
-ReadableStreamReader = Union['ReadableStreamDefaultReader', 'ReadableStreamBYOBReader']
+ReadableStreamReader: TypeAlias = Union['ReadableStreamDefaultReader', 'ReadableStreamBYOBReader']
 
-ReadableStreamController = Union['ReadableStreamDefaultController', 'ReadableByteStreamController']
+ReadableStreamController: TypeAlias = Union['ReadableStreamDefaultController', 'ReadableByteStreamController']
 
 UnderlyingSourceStartCallback = Callable[[ReadableStreamController], Any]
 
@@ -900,17 +902,17 @@ CreateScriptCallback = Callable[[str,Any], str]
 
 CreateScriptURLCallback = Callable[[str,Any], str]
 
-HTMLString = str
+HTMLString: TypeAlias = str
 
-ScriptString = str
+ScriptString: TypeAlias = str
 
-ScriptURLString = str
+ScriptURLString: TypeAlias = str
 
-TrustedType = Union['TrustedHTML', 'TrustedScript', 'TrustedScriptURL']
+TrustedType: TypeAlias = Union['TrustedHTML', 'TrustedScript', 'TrustedScriptURL']
 
-URLPatternInput = Union['str', 'URLPatternInit']
+URLPatternInput: TypeAlias = Union['str', 'URLPatternInit']
 
-VibratePattern = Union['int', 'Sequence[int]']
+VibratePattern: TypeAlias = Union['int', 'Sequence[int]']
 
 VideoFrameRequestCallback = Callable[[DOMHighResTimeStamp,VideoFrameCallbackMetadata], None]
 
@@ -918,17 +920,17 @@ EffectCallback = Callable[[Union['float', 'None'],Union['Element', 'CSSPseudoEle
 
 LaunchConsumer = Callable[[LaunchParams], Any]
 
-UUID = str
+UUID: TypeAlias = str
 
-BluetoothServiceUUID = Union['str', 'int']
+BluetoothServiceUUID: TypeAlias = Union['str', 'int']
 
-BluetoothCharacteristicUUID = Union['str', 'int']
+BluetoothCharacteristicUUID: TypeAlias = Union['str', 'int']
 
-BluetoothDescriptorUUID = Union['str', 'int']
+BluetoothDescriptorUUID: TypeAlias = Union['str', 'int']
 
 LockGrantedCallback = Callable[[Union['Lock', 'None']], Awaitable[Any]]
 
-NDEFMessageSource = Union['str', 'BufferSource', 'NDEFMessageInit']
+NDEFMessageSource: TypeAlias = Union['str', 'BufferSource', 'NDEFMessageInit']
 
 DecodeErrorCallback = Callable[[DOMException], None]
 
@@ -938,15 +940,15 @@ AudioWorkletProcessorConstructor = Callable[[object], AudioWorkletProcessor]
 
 AudioWorkletProcessCallback = Callable[[Sequence[Sequence[Float32Array]],Sequence[Sequence[Float32Array]],object], bool]
 
-Base64URLString = str
+Base64URLString: TypeAlias = str
 
-PublicKeyCredentialJSON = Union['RegistrationResponseJSON', 'AuthenticationResponseJSON']
+PublicKeyCredentialJSON: TypeAlias = Union['RegistrationResponseJSON', 'AuthenticationResponseJSON']
 
-COSEAlgorithmIdentifier = int
+COSEAlgorithmIdentifier: TypeAlias = int
 
-UvmEntry = Sequence[int]
+UvmEntry: TypeAlias = Sequence[int]
 
-UvmEntries = Sequence[UvmEntry]
+UvmEntries: TypeAlias = Sequence[UvmEntry]
 
 AudioDataOutputCallback = Callable[[AudioData], None]
 
@@ -958,123 +960,123 @@ EncodedVideoChunkOutputCallback = Callable[[EncodedVideoChunk,EncodedVideoChunkM
 
 WebCodecsErrorCallback = Callable[[DOMException], None]
 
-ImageBufferSource = Union['BufferSource', 'ReadableStream']
+ImageBufferSource: TypeAlias = Union['BufferSource', 'ReadableStream']
 
-GLenum = int
+GLenum: TypeAlias = int
 
-GLboolean = bool
+GLboolean: TypeAlias = bool
 
-GLbitfield = int
+GLbitfield: TypeAlias = int
 
-GLbyte = int
+GLbyte: TypeAlias = int
 
-GLshort = int
+GLshort: TypeAlias = int
 
-GLint = int
+GLint: TypeAlias = int
 
-GLsizei = int
+GLsizei: TypeAlias = int
 
-GLintptr = int
+GLintptr: TypeAlias = int
 
-GLsizeiptr = int
+GLsizeiptr: TypeAlias = int
 
-GLubyte = int
+GLubyte: TypeAlias = int
 
-GLushort = int
+GLushort: TypeAlias = int
 
-GLuint = int
+GLuint: TypeAlias = int
 
-GLfloat = float
+GLfloat: TypeAlias = float
 
-GLclampf = float
+GLclampf: TypeAlias = float
 
-TexImageSource = Union['ImageBitmap', 'ImageData', 'HTMLImageElement', 'HTMLCanvasElement', 'HTMLVideoElement', 'OffscreenCanvas', 'VideoFrame']
+TexImageSource: TypeAlias = Union['ImageBitmap', 'ImageData', 'HTMLImageElement', 'HTMLCanvasElement', 'HTMLVideoElement', 'OffscreenCanvas', 'VideoFrame']
 
-Float32List = Union['Float32Array', 'Sequence[GLfloat]']
+Float32List: TypeAlias = Union['Float32Array', 'Sequence[GLfloat]']
 
-Int32List = Union['Int32Array', 'Sequence[GLint]']
+Int32List: TypeAlias = Union['Int32Array', 'Sequence[GLint]']
 
-GLint64 = int
+GLint64: TypeAlias = int
 
-GLuint64 = int
+GLuint64: TypeAlias = int
 
-Uint32List = Union['Uint32Array', 'Sequence[GLuint]']
+Uint32List: TypeAlias = Union['Uint32Array', 'Sequence[GLuint]']
 
-GPUBufferUsageFlags = int
+GPUBufferUsageFlags: TypeAlias = int
 
-GPUMapModeFlags = int
+GPUMapModeFlags: TypeAlias = int
 
-GPUTextureUsageFlags = int
+GPUTextureUsageFlags: TypeAlias = int
 
-GPUShaderStageFlags = int
+GPUShaderStageFlags: TypeAlias = int
 
-GPUBindingResource = Union['GPUSampler', 'GPUTextureView', 'GPUBufferBinding', 'GPUExternalTexture']
+GPUBindingResource: TypeAlias = Union['GPUSampler', 'GPUTextureView', 'GPUBufferBinding', 'GPUExternalTexture']
 
-GPUPipelineConstantValue = float
+GPUPipelineConstantValue: TypeAlias = float
 
-GPUColorWriteFlags = int
+GPUColorWriteFlags: TypeAlias = int
 
-GPUImageCopyExternalImageSource = Union['ImageBitmap', 'ImageData', 'HTMLImageElement', 'HTMLVideoElement', 'VideoFrame', 'HTMLCanvasElement', 'OffscreenCanvas']
+GPUImageCopyExternalImageSource: TypeAlias = Union['ImageBitmap', 'ImageData', 'HTMLImageElement', 'HTMLVideoElement', 'VideoFrame', 'HTMLCanvasElement', 'OffscreenCanvas']
 
-GPUBufferDynamicOffset = int
+GPUBufferDynamicOffset: TypeAlias = int
 
-GPUStencilValue = int
+GPUStencilValue: TypeAlias = int
 
-GPUSampleMask = int
+GPUSampleMask: TypeAlias = int
 
-GPUDepthBias = int
+GPUDepthBias: TypeAlias = int
 
-GPUSize64 = int
+GPUSize64: TypeAlias = int
 
-GPUIntegerCoordinate = int
+GPUIntegerCoordinate: TypeAlias = int
 
-GPUIndex32 = int
+GPUIndex32: TypeAlias = int
 
-GPUSize32 = int
+GPUSize32: TypeAlias = int
 
-GPUSignedOffset32 = int
+GPUSignedOffset32: TypeAlias = int
 
-GPUSize64Out = int
+GPUSize64Out: TypeAlias = int
 
-GPUIntegerCoordinateOut = int
+GPUIntegerCoordinateOut: TypeAlias = int
 
-GPUSize32Out = int
+GPUSize32Out: TypeAlias = int
 
-GPUFlagsConstant = int
+GPUFlagsConstant: TypeAlias = int
 
-GPUColor = Union['Sequence[float]', 'GPUColorDict']
+GPUColor: TypeAlias = Union['Sequence[float]', 'GPUColorDict']
 
-GPUOrigin2D = Union['Sequence[GPUIntegerCoordinate]', 'GPUOrigin2DDict']
+GPUOrigin2D: TypeAlias = Union['Sequence[GPUIntegerCoordinate]', 'GPUOrigin2DDict']
 
-GPUOrigin3D = Union['Sequence[GPUIntegerCoordinate]', 'GPUOrigin3DDict']
+GPUOrigin3D: TypeAlias = Union['Sequence[GPUIntegerCoordinate]', 'GPUOrigin3DDict']
 
-GPUExtent3D = Union['Sequence[GPUIntegerCoordinate]', 'GPUExtent3DDict']
+GPUExtent3D: TypeAlias = Union['Sequence[GPUIntegerCoordinate]', 'GPUExtent3DDict']
 
-ArrayBufferView = Union['Int8Array', 'Int16Array', 'Int32Array', 'Uint8Array', 'Uint16Array', 'Uint32Array', 'Uint8ClampedArray', 'BigInt64Array', 'BigUint64Array', 'Float32Array', 'Float64Array', 'DataView']
+ArrayBufferView: TypeAlias = Union['Int8Array', 'Int16Array', 'Int32Array', 'Uint8Array', 'Uint16Array', 'Uint32Array', 'Uint8ClampedArray', 'BigInt64Array', 'BigUint64Array', 'Float32Array', 'Float64Array', 'DataView']
 
-BufferSource = Union['ArrayBufferView', 'ArrayBuffer']
+BufferSource: TypeAlias = Union['ArrayBufferView', 'ArrayBuffer']
 
-AllowSharedBufferSource = Union['ArrayBuffer', 'SharedArrayBuffer', 'ArrayBufferView']
+AllowSharedBufferSource: TypeAlias = Union['ArrayBuffer', 'SharedArrayBuffer', 'ArrayBufferView']
 
 Function = Callable[[Any], Any]
 
 VoidFunction = Callable[[], None]
 
-MLNamedArrayBufferViews = ArrayBufferView
+MLNamedArrayBufferViews: TypeAlias = ArrayBufferView
 
-MLGPUResource = Union['GPUBuffer', 'GPUTexture']
+MLGPUResource: TypeAlias = Union['GPUBuffer', 'GPUTexture']
 
-MLNamedGPUResources = MLGPUResource
+MLNamedGPUResources: TypeAlias = MLGPUResource
 
-MLNamedOperands = MLOperand
+MLNamedOperands: TypeAlias = MLOperand
 
-MLBufferView = Union['ArrayBufferView', 'MLBufferResourceView']
+MLBufferView: TypeAlias = Union['ArrayBufferView', 'MLBufferResourceView']
 
-RTCRtpTransform = Union['SFrameTransform', 'RTCRtpScriptTransform']
+RTCRtpTransform: TypeAlias = Union['SFrameTransform', 'RTCRtpScriptTransform']
 
-SmallCryptoKeyID = int
+SmallCryptoKeyID: TypeAlias = int
 
-CryptoKeyID = Union['SmallCryptoKeyID', 'bigint']
+CryptoKeyID: TypeAlias = Union['SmallCryptoKeyID', 'bigint']
 
 GenerateAssertionCallback = Callable[[str,str,RTCIdentityProviderOptions], Awaitable[RTCIdentityAssertionResult]]
 
@@ -1084,13 +1086,13 @@ RTCPeerConnectionErrorCallback = Callable[[DOMException], None]
 
 RTCSessionDescriptionCallback = Callable[[RTCSessionDescriptionInit], None]
 
-LineAndPositionSetting = Union['float', 'AutoKeyword']
+LineAndPositionSetting: TypeAlias = Union['float', 'AutoKeyword']
 
 XRFrameRequestCallback = Callable[[DOMHighResTimeStamp,XRFrame], None]
 
-XRWebGLRenderingContext = Union['WebGLRenderingContext', 'WebGL2RenderingContext']
+XRWebGLRenderingContext: TypeAlias = Union['WebGLRenderingContext', 'WebGL2RenderingContext']
 
-FormDataEntryValue = Union['File', 'str']
+FormDataEntryValue: TypeAlias = Union['File', 'str']
 
 class ANGLE_instanced_arrays:
     VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE = 0x88FE
@@ -1132,7 +1134,7 @@ class SecurityPolicyViolationEvent(Event):
     lineNumber: int
     columnNumber: int
 
-class SecurityPolicyViolationEventInit(TypedDict, EventInit):
+class SecurityPolicyViolationEventInit(EventInit):
     documentURI: str
     referrer: NotRequired[str]
     blockedURI: NotRequired[str]
@@ -1373,6 +1375,13 @@ class LinkStyle:
 
 class DocumentStyle:
     styleSheets: StyleSheetList
+
+class CSSRuleList:
+    length: int
+    @overload
+    def item(self, index: int) -> CSSRule: ...
+    @overload
+    def item(self, index: int) -> Union['CSSRule', 'None']: ...
 
 class CSSRule:
     UNKNOWN_RULE = 0
@@ -2177,7 +2186,7 @@ class CredentialRequestOptions(TypedDict):
     publicKey: NotRequired[PublicKeyCredentialRequestOptions]
 
 class IdentityCredentialRequestOptions(TypedDict):
-    providers: NotRequired[Sequence[IdentityProviderConfig]]
+    providers: Sequence[IdentityProviderConfig]
     context: NotRequired[IdentityCredentialRequestOptionsContext]
 
 class IdentityProviderConfig(TypedDict):
@@ -2257,7 +2266,7 @@ class File(Blob):
     lastModified: int
     webkitRelativePath: str
 
-class FilePropertyBag(TypedDict, BlobPropertyBag):
+class FilePropertyBag(BlobPropertyBag):
     lastModified: NotRequired[int]
 
 class FileList:
@@ -2340,7 +2349,7 @@ class IDBVersionChangeEvent(Event):
     oldVersion: int
     newVersion: Union['int', 'None']
 
-class IDBVersionChangeEventInit(TypedDict, EventInit):
+class IDBVersionChangeEventInit(EventInit):
     oldVersion: NotRequired[int]
     newVersion: NotRequired[Union['int', 'None']]
 
@@ -2577,7 +2586,7 @@ class OVR_multiview2:
 
     def framebufferTextureMultiviewOVR(self, target: GLenum, attachment: GLenum, texture: Union['WebGLTexture', 'None'], level: GLint, baseViewIndex: GLint, numViews: GLsizei) -> None: ...
 
-class SVGElement(Element, GlobalEventHandlers, DocumentAndElementEventHandlers, SVGElementInstance, HTMLOrSVGElement, ElementCSSInlineStyle):
+class SVGElement(Element, GlobalEventHandlers, SVGElementInstance, HTMLOrSVGElement, ElementCSSInlineStyle):
     className: SVGAnimatedString
     ownerSVGElement: Union['SVGSVGElement', 'None']
     viewportElement: Union['SVGElement', 'None']
@@ -3273,7 +3282,7 @@ class SVGScriptElement(SVGElement, SVGURIReference):
     type: str
     crossOrigin: Union['str', 'None']
 
-class SVGAElement(SVGGraphicsElement, SVGURIReference, HTMLHyperlinkElementUtils):
+class SVGAElement(SVGGraphicsElement, SVGURIReference):
     target: SVGAnimatedString
     download: str
     ping: str
@@ -3283,6 +3292,16 @@ class SVGAElement(SVGGraphicsElement, SVGURIReference, HTMLHyperlinkElementUtils
     type: str
     text: str
     referrerPolicy: str
+    origin: str
+    protocol: str
+    username: str
+    password: str
+    host: str
+    hostname: str
+    port: str
+    pathname: str
+    search: str
+    hash: str
 
 class SVGViewElement(SVGElement, SVGFitToViewBox): ...
 
@@ -3544,83 +3563,83 @@ class CryptoKeyPair(TypedDict):
     publicKey: NotRequired[CryptoKey]
     privateKey: NotRequired[CryptoKey]
 
-class RsaKeyGenParams(TypedDict, Algorithm):
+class RsaKeyGenParams(Algorithm):
     modulusLength: int
     publicExponent: BigInteger
 
-class RsaHashedKeyGenParams(TypedDict, RsaKeyGenParams):
+class RsaHashedKeyGenParams(RsaKeyGenParams):
     hash: HashAlgorithmIdentifier
 
-class RsaKeyAlgorithm(TypedDict, KeyAlgorithm):
+class RsaKeyAlgorithm(KeyAlgorithm):
     modulusLength: int
     publicExponent: BigInteger
 
-class RsaHashedKeyAlgorithm(TypedDict, RsaKeyAlgorithm):
+class RsaHashedKeyAlgorithm(RsaKeyAlgorithm):
     hash: KeyAlgorithm
 
-class RsaHashedImportParams(TypedDict, Algorithm):
+class RsaHashedImportParams(Algorithm):
     hash: HashAlgorithmIdentifier
 
-class RsaPssParams(TypedDict, Algorithm):
+class RsaPssParams(Algorithm):
     saltLength: int
 
-class RsaOaepParams(TypedDict, Algorithm):
+class RsaOaepParams(Algorithm):
     label: NotRequired[BufferSource]
 
-class EcdsaParams(TypedDict, Algorithm):
+class EcdsaParams(Algorithm):
     hash: HashAlgorithmIdentifier
 
-class EcKeyGenParams(TypedDict, Algorithm):
+class EcKeyGenParams(Algorithm):
     namedCurve: NamedCurve
 
-class EcKeyAlgorithm(TypedDict, KeyAlgorithm):
+class EcKeyAlgorithm(KeyAlgorithm):
     namedCurve: NamedCurve
 
-class EcKeyImportParams(TypedDict, Algorithm):
+class EcKeyImportParams(Algorithm):
     namedCurve: NamedCurve
 
-class EcdhKeyDeriveParams(TypedDict, Algorithm):
+class EcdhKeyDeriveParams(Algorithm):
     public: CryptoKey
 
-class AesCtrParams(TypedDict, Algorithm):
+class AesCtrParams(Algorithm):
     counter: BufferSource
     length: int
 
-class AesKeyAlgorithm(TypedDict, KeyAlgorithm):
+class AesKeyAlgorithm(KeyAlgorithm):
     length: int
 
-class AesKeyGenParams(TypedDict, Algorithm):
+class AesKeyGenParams(Algorithm):
     length: int
 
-class AesDerivedKeyParams(TypedDict, Algorithm):
+class AesDerivedKeyParams(Algorithm):
     length: int
 
-class AesCbcParams(TypedDict, Algorithm):
+class AesCbcParams(Algorithm):
     iv: BufferSource
 
-class AesGcmParams(TypedDict, Algorithm):
+class AesGcmParams(Algorithm):
     iv: BufferSource
     additionalData: NotRequired[BufferSource]
     tagLength: NotRequired[int]
 
-class HmacImportParams(TypedDict, Algorithm):
+class HmacImportParams(Algorithm):
     hash: HashAlgorithmIdentifier
     length: NotRequired[int]
 
-class HmacKeyAlgorithm(TypedDict, KeyAlgorithm):
+class HmacKeyAlgorithm(KeyAlgorithm):
     hash: KeyAlgorithm
     length: int
 
-class HmacKeyGenParams(TypedDict, Algorithm):
+class HmacKeyGenParams(Algorithm):
     hash: HashAlgorithmIdentifier
     length: NotRequired[int]
 
-class HkdfParams(TypedDict, Algorithm):
+class HkdfParams(Algorithm):
     hash: HashAlgorithmIdentifier
     salt: BufferSource
     info: BufferSource
 
-class Pbkdf2Params(TypedDict, Algorithm):
+class Pbkdf2Params(Algorithm):
     salt: BufferSource
     iterations: int
     hash: HashAlgorithmIdentifier
@@ -3632,7 +3651,7 @@ class Accelerometer(Sensor):
     y: Union['float', 'None']
     z: Union['float', 'None']
 
-class AccelerometerSensorOptions(TypedDict, SensorOptions):
+class AccelerometerSensorOptions(SensorOptions):
     referenceFrame: NotRequired[AccelerometerLocalCoordinateSystem]
 
 class LinearAccelerationSensor(Accelerometer):
@@ -3648,9 +3667,9 @@ class AccelerometerReadingValues(TypedDict):
     y: Union['float', 'None']
     z: Union['float', 'None']
 
-class LinearAccelerationReadingValues(TypedDict, AccelerometerReadingValues): ...
+class LinearAccelerationReadingValues(AccelerometerReadingValues): ...
 
-class GravityReadingValues(TypedDict, AccelerometerReadingValues): ...
+class GravityReadingValues(AccelerometerReadingValues): ...
 
 class AmbientLightSensor(Sensor):
     @classmethod
@@ -3770,7 +3789,6 @@ class HTMLAnchorElement(HTMLElement, HTMLAttributionSrcElementUtils, HTMLHyperli
     rev: str
     shape: str
     attributionSourceId: int
-    attributionDestination: str
 
 class HTMLImageElement(HTMLElement, HTMLAttributionSrcElementUtils):
     @classmethod
@@ -3972,7 +3990,7 @@ class MediaDevices(EventTarget):
 
     def getUserMedia(self, constraints: Union['MediaStreamConstraints', 'None'] = {}) -> Awaitable[MediaStream]: ...
 
-    def getViewportMedia(self, constraints: Union['DisplayMediaStreamConstraints', 'None'] = {}) -> Awaitable[MediaStream]: ...
+    def getViewportMedia(self, constraints: Union['ViewportMediaStreamConstraints', 'None'] = {}) -> Awaitable[MediaStream]: ...
 
     def getDisplayMedia(self, options: Union['DisplayMediaStreamOptions', 'None'] = {}) -> Awaitable[MediaStream]: ...
 
@@ -4103,7 +4121,7 @@ class BackgroundFetchUIOptions(TypedDict):
     icons: NotRequired[Sequence[ImageResource]]
     title: NotRequired[str]
 
-class BackgroundFetchOptions(TypedDict, BackgroundFetchUIOptions):
+class BackgroundFetchOptions(BackgroundFetchUIOptions):
     downloadTotal: NotRequired[int]
 
 class BackgroundFetchRegistration(EventTarget):
@@ -4132,7 +4150,7 @@ class BackgroundFetchEvent(ExtendableEvent):
     def new(cls, type: str, init: BackgroundFetchEventInit) -> BackgroundFetchEvent: ...
     registration: BackgroundFetchRegistration
 
-class BackgroundFetchEventInit(TypedDict, ExtendableEventInit):
+class BackgroundFetchEventInit(ExtendableEventInit):
     registration: BackgroundFetchRegistration
 
 class BackgroundFetchUpdateUIEvent(BackgroundFetchEvent):
@@ -4153,7 +4171,7 @@ class SyncEvent(ExtendableEvent):
     tag: str
     lastChance: bool
 
-class SyncEventInit(TypedDict, ExtendableEventInit):
+class SyncEventInit(ExtendableEventInit):
     tag: str
     lastChance: NotRequired[bool]
 
@@ -4229,7 +4247,7 @@ class CapturedMouseEvent(Event):
     surfaceX: int
     surfaceY: int
 
-class CapturedMouseEventInit(TypedDict, EventInit):
+class CapturedMouseEventInit(EventInit):
     surfaceX: NotRequired[int]
     surfaceY: NotRequired[int]
 
@@ -4240,7 +4258,7 @@ class CaptureController(EventTarget):
 
     def setFocusBehavior(self, focusBehavior: CaptureStartFocusBehavior) -> None: ...
 
-class ClipboardEventInit(TypedDict, EventInit):
+class ClipboardEventInit(EventInit):
     clipboardData: NotRequired[Union['DataTransfer', 'None']]
 
 class ClipboardEvent(Event):
@@ -4269,7 +4287,7 @@ class Clipboard(EventTarget):
 
     def writeText(self, data: str) -> Awaitable[None]: ...
 
-class ClipboardPermissionDescriptor(TypedDict, PermissionDescriptor):
+class ClipboardPermissionDescriptor(PermissionDescriptor):
     allowWithoutGesture: NotRequired[bool]
 
 class Window(EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWorkerGlobalScope, AnimationFrameProvider, WindowSessionStorage, WindowLocalStorage):
@@ -4398,6 +4416,7 @@ class Window(EventTarget, GlobalEventHandlers, WindowEventHandlers, WindowOrWork
     def cancelIdleCallback(self, handle: int) -> None: ...
 
     def getSelection(self) -> Union['Selection', 'None']: ...
+    sharedStorage: Union['WindowSharedStorage', 'None']
     speechSynthesis: SpeechSynthesis
     launchQueue: LaunchQueue
 
@@ -4530,7 +4549,7 @@ class ContentIndex:
 
     def getAll(self) -> Awaitable[Sequence[ContentDescription]]: ...
 
-class ContentIndexEventInit(TypedDict, ExtendableEventInit):
+class ContentIndexEventInit(ExtendableEventInit):
     id: str
 
 class ContentIndexEvent(ExtendableEvent):
@@ -4600,7 +4619,7 @@ class CookieChangeEvent(Event):
     changed: Sequence[CookieListItem]
     deleted: Sequence[CookieListItem]
 
-class CookieChangeEventInit(TypedDict, EventInit):
+class CookieChangeEventInit(EventInit):
     changed: NotRequired[CookieList]
     deleted: NotRequired[CookieList]
 
@@ -4610,7 +4629,7 @@ class ExtendableCookieChangeEvent(ExtendableEvent):
     changed: Sequence[CookieListItem]
     deleted: Sequence[CookieListItem]
 
-class ExtendableCookieChangeEventInit(TypedDict, ExtendableEventInit):
+class ExtendableCookieChangeEventInit(ExtendableEventInit):
     changed: NotRequired[CookieList]
     deleted: NotRequired[CookieList]
 
@@ -4655,7 +4674,7 @@ class PasswordCredential(Credential, CredentialUserData):
     def new(cls, data: PasswordCredentialData) -> PasswordCredential: ...
     password: str
 
-class PasswordCredentialData(TypedDict, CredentialData):
+class PasswordCredentialData(CredentialData):
     name: NotRequired[str]
     iconURL: NotRequired[str]
     origin: str
@@ -4671,7 +4690,7 @@ class FederatedCredentialRequestOptions(TypedDict):
     providers: NotRequired[Sequence[str]]
     protocols: NotRequired[Sequence[str]]
 
-class FederatedCredentialInit(TypedDict, CredentialData):
+class FederatedCredentialInit(CredentialData):
     name: NotRequired[str]
     iconURL: NotRequired[str]
     origin: str
@@ -4751,7 +4770,7 @@ class AnimationEvent(Event):
     elapsedTime: float
     pseudoElement: str
 
-class AnimationEventInit(TypedDict, EventInit):
+class AnimationEventInit(EventInit):
     animationName: NotRequired[str]
     elapsedTime: NotRequired[float]
     pseudoElement: NotRequired[str]
@@ -5051,7 +5070,7 @@ class ContentVisibilityAutoStateChangeEvent(Event):
     def new(cls, type: str, eventInitDict: Union['ContentVisibilityAutoStateChangeEventInit', 'None'] = {}) -> ContentVisibilityAutoStateChangeEvent: ...
     skipped: bool
 
-class ContentVisibilityAutoStateChangeEventInit(TypedDict, EventInit):
+class ContentVisibilityAutoStateChangeEventInit(EventInit):
     skipped: NotRequired[bool]
 
 class CSSCounterStyleRule(CSSRule):
@@ -5126,7 +5145,7 @@ class FontFacePalettes:
 
     def __getter__(self, index: int) -> FontFacePalette: ...
 
-class FontFaceSetLoadEventInit(TypedDict, EventInit):
+class FontFaceSetLoadEventInit(EventInit):
     fontfaces: NotRequired[Sequence[FontFace]]
 
 class FontFaceSetLoadEvent(Event):
@@ -5308,7 +5327,7 @@ class NavigationEvent(UIEvent):
     dir: SpatialNavigationDirection
     relatedTarget: Union['EventTarget', 'None']
 
-class NavigationEventInit(TypedDict, UIEventInit):
+class NavigationEventInit(UIEventInit):
     dir: NotRequired[SpatialNavigationDirection]
     relatedTarget: NotRequired[Union['EventTarget', 'None']]
 
@@ -5413,7 +5432,7 @@ class TransitionEvent(Event):
     elapsedTime: float
     pseudoElement: str
 
-class TransitionEventInit(TypedDict, EventInit):
+class TransitionEventInit(EventInit):
     propertyName: NotRequired[str]
     elapsedTime: NotRequired[float]
     pseudoElement: NotRequired[str]
@@ -5691,7 +5710,7 @@ class ViewTransition:
 class ScrollOptions(TypedDict):
     behavior: NotRequired[ScrollBehavior]
 
-class ScrollToOptions(TypedDict, ScrollOptions):
+class ScrollToOptions(ScrollOptions):
     left: NotRequired[float]
     top: NotRequired[float]
 
@@ -5710,7 +5729,7 @@ class MediaQueryListEvent(Event):
     media: str
     matches: bool
 
-class MediaQueryListEventInit(TypedDict, EventInit):
+class MediaQueryListEventInit(EventInit):
     media: NotRequired[str]
     matches: NotRequired[bool]
 
@@ -5731,7 +5750,7 @@ class CaretPosition:
 
     def getClientRect(self) -> Union['DOMRect', 'None']: ...
 
-class ScrollIntoViewOptions(TypedDict, ScrollOptions):
+class ScrollIntoViewOptions(ScrollOptions):
     block: NotRequired[ScrollLogicalPosition]
     inline: NotRequired[ScrollLogicalPosition]
 
@@ -5776,18 +5795,18 @@ class HTMLElement(Element, ElementCSSInlineStyle, GlobalEventHandlers, ElementCo
 class MouseEvent(UIEvent):
     @classmethod
     def new(cls, type: str, eventInitDict: Union['MouseEventInit', 'None'] = {}) -> MouseEvent: ...
-    screenX: Union['float', 'int']
-    screenY: Union['float', 'int']
     pageX: float
     pageY: float
-    clientX: Union['float', 'int']
-    clientY: Union['float', 'int']
     x: float
     y: float
     offsetX: float
     offsetY: float
     movementX: float
     movementY: float
+    screenX: int
+    screenY: int
+    clientX: int
+    clientY: int
     ctrlKey: bool
     shiftKey: bool
     altKey: bool
@@ -5799,17 +5818,6 @@ class MouseEvent(UIEvent):
     def getModifierState(self, keyArg: str) -> bool: ...
 
     def initMouseEvent(self, typeArg: str, bubblesArg: Union['bool', 'None'] = False, cancelableArg: Union['bool', 'None'] = False, viewArg: Union['Window', 'None'] = None, detailArg: Union['int', 'None'] = 0, screenXArg: Union['int', 'None'] = 0, screenYArg: Union['int', 'None'] = 0, clientXArg: Union['int', 'None'] = 0, clientYArg: Union['int', 'None'] = 0, ctrlKeyArg: Union['bool', 'None'] = False, altKeyArg: Union['bool', 'None'] = False, shiftKeyArg: Union['bool', 'None'] = False, metaKeyArg: Union['bool', 'None'] = False, buttonArg: Union['int', 'None'] = 0, relatedTargetArg: Union['EventTarget', 'None'] = None) -> None: ...
-
-class MouseEventInit(TypedDict, EventModifierInit):
-    screenX: Union['NotRequired[float]', 'NotRequired[int]']
-    screenY: Union['NotRequired[float]', 'NotRequired[int]']
-    clientX: Union['NotRequired[float]', 'NotRequired[int]']
-    clientY: Union['NotRequired[float]', 'NotRequired[int]']
-    movementX: NotRequired[float]
-    movementY: NotRequired[float]
-    button: NotRequired[int]
-    buttons: NotRequired[int]
-    relatedTarget: NotRequired[Union['EventTarget', 'None']]
 
 class BoxQuadOptions(TypedDict):
     box: NotRequired[CSSBoxType]
@@ -5907,7 +5915,7 @@ class CSSNamespaceRule(CSSRule):
     namespaceURI: str
     prefix: str
 
-class MathMLElement(Element, ElementCSSInlineStyle, GlobalEventHandlers, HTMLOrForeignElement): ...
+class MathMLElement(Element, ElementCSSInlineStyle, GlobalEventHandlers, HTMLOrSVGElement): ...
 
 class ElementInternals(ARIAMixin):
     states: CustomStateSet
@@ -6068,7 +6076,7 @@ class DocumentPictureInPictureEvent(Event):
     def new(cls, type: str, eventInitDict: DocumentPictureInPictureEventInit) -> DocumentPictureInPictureEvent: ...
     window: Window
 
-class DocumentPictureInPictureEventInit(TypedDict, EventInit):
+class DocumentPictureInPictureEventInit(EventInit):
     window: Window
 
 class Event:
@@ -6114,7 +6122,7 @@ class CustomEvent(Event):
 
     def initCustomEvent(self, type: str, bubbles: Union['bool', 'None'] = False, cancelable: Union['bool', 'None'] = False, detail: Union['Any', 'None'] = None) -> None: ...
 
-class CustomEventInit(TypedDict, EventInit):
+class CustomEventInit(EventInit):
     detail: NotRequired[Any]
 
 class EventTarget:
@@ -6130,7 +6138,7 @@ class EventTarget:
 class EventListenerOptions(TypedDict):
     capture: NotRequired[bool]
 
-class AddEventListenerOptions(TypedDict, EventListenerOptions):
+class AddEventListenerOptions(EventListenerOptions):
     passive: NotRequired[bool]
     once: NotRequired[bool]
     signal: NotRequired[AbortSignal]
@@ -6533,7 +6541,7 @@ class EditContext(EventTarget):
     oncompositionstart: EventHandler
     oncompositionend: EventHandler
 
-class TextUpdateEventInit(TypedDict, EventInit):
+class TextUpdateEventInit(EventInit):
     updateRangeStart: NotRequired[int]
     updateRangeEnd: NotRequired[int]
     text: NotRequired[str]
@@ -6556,24 +6564,18 @@ class TextUpdateEvent(Event):
 class TextFormatInit(TypedDict):
     rangeStart: NotRequired[int]
     rangeEnd: NotRequired[int]
-    textColor: NotRequired[str]
-    backgroundColor: NotRequired[str]
     underlineStyle: NotRequired[str]
     underlineThickness: NotRequired[str]
-    underlineColor: NotRequired[str]
 
 class TextFormat:
     @classmethod
     def new(cls, options: Union['TextFormatInit', 'None'] = {}) -> TextFormat: ...
     rangeStart: int
     rangeEnd: int
-    textColor: str
-    backgroundColor: str
     underlineStyle: str
     underlineThickness: str
-    underlineColor: str
 
-class TextFormatUpdateEventInit(TypedDict, EventInit):
+class TextFormatUpdateEventInit(EventInit):
     textFormats: NotRequired[Sequence[TextFormat]]
 
 class TextFormatUpdateEvent(Event):
@@ -6582,7 +6584,7 @@ class TextFormatUpdateEvent(Event):
 
     def getTextFormats(self) -> Sequence[TextFormat]: ...
 
-class CharacterBoundsUpdateEventInit(TypedDict, EventInit):
+class CharacterBoundsUpdateEventInit(EventInit):
     rangeStart: NotRequired[int]
     rangeEnd: NotRequired[int]
 
@@ -6592,9 +6594,11 @@ class CharacterBoundsUpdateEvent(Event):
     rangeStart: int
     rangeEnd: int
 
+class RestrictionTarget: ...
+
 class BrowserCaptureMediaStreamTrack(MediaStreamTrack):
 
-    def restrictTo(self, cropTarget: Union['CropTarget', 'None']) -> Awaitable[None]: ...
+    def restrictTo(self, RestrictionTarget: Union['RestrictionTarget', 'None']) -> Awaitable[None]: ...
 
     def cropTo(self, cropTarget: Union['CropTarget', 'None']) -> Awaitable[None]: ...
 
@@ -6712,7 +6716,7 @@ class MediaKeyMessageEvent(Event):
     messageType: MediaKeyMessageType
     message: ArrayBuffer
 
-class MediaKeyMessageEventInit(TypedDict, EventInit):
+class MediaKeyMessageEventInit(EventInit):
     messageType: MediaKeyMessageType
     message: ArrayBuffer
 
@@ -6722,7 +6726,7 @@ class MediaEncryptedEvent(Event):
     initDataType: str
     initData: ArrayBuffer
 
-class MediaEncryptedEventInit(TypedDict, EventInit):
+class MediaEncryptedEventInit(EventInit):
     initDataType: NotRequired[str]
     initData: NotRequired[ArrayBuffer]
 
@@ -6928,6 +6932,7 @@ class FenceEvent(TypedDict):
     eventType: str
     eventData: str
     destination: Sequence[FenceReportingDestination]
+    once: NotRequired[bool]
 
 class Fence:
 
@@ -7043,7 +7048,7 @@ class HMACGetSecretOutput(TypedDict):
     output1: ArrayBuffer
     output2: NotRequired[ArrayBuffer]
 
-class FileSystemPermissionDescriptor(TypedDict, PermissionDescriptor):
+class FileSystemPermissionDescriptor(PermissionDescriptor):
     handle: FileSystemHandle
     mode: NotRequired[FileSystemPermissionMode]
 
@@ -7070,10 +7075,10 @@ class FilePickerOptions(TypedDict):
     id: NotRequired[str]
     startIn: NotRequired[StartInDirectory]
 
-class OpenFilePickerOptions(TypedDict, FilePickerOptions):
+class OpenFilePickerOptions(FilePickerOptions):
     multiple: NotRequired[bool]
 
-class SaveFilePickerOptions(TypedDict, FilePickerOptions):
+class SaveFilePickerOptions(FilePickerOptions):
     suggestedName: NotRequired[Union['str', 'None']]
 
 class DirectoryPickerOptions(TypedDict):
@@ -7453,7 +7458,7 @@ class GamepadEvent(Event):
     def new(cls, type: str, eventInitDict: GamepadEventInit) -> GamepadEvent: ...
     gamepad: Gamepad
 
-class GamepadEventInit(TypedDict, EventInit):
+class GamepadEventInit(EventInit):
     gamepad: Gamepad
 
 class WindowEventHandlers:
@@ -7497,7 +7502,7 @@ class SensorErrorEvent(Event):
     def new(cls, type: str, errorEventInitDict: SensorErrorEventInit) -> SensorErrorEvent: ...
     error: DOMException
 
-class SensorErrorEventInit(TypedDict, EventInit):
+class SensorErrorEventInit(EventInit):
     error: DOMException
 
 class MockSensorConfiguration(TypedDict):
@@ -7524,9 +7529,9 @@ class GeolocationSensor(Sensor):
     heading: Union['float', 'None']
     speed: Union['float', 'None']
 
-class GeolocationSensorOptions(TypedDict, SensorOptions): ...
+class GeolocationSensorOptions(SensorOptions): ...
 
-class ReadOptions(TypedDict, GeolocationSensorOptions):
+class ReadOptions(GeolocationSensorOptions):
     signal: NotRequired[Union['AbortSignal', 'None']]
 
 class GeolocationSensorReading(TypedDict):
@@ -7784,7 +7789,7 @@ class DOMMatrix2DInit(TypedDict):
     m41: NotRequired[float]
     m42: NotRequired[float]
 
-class DOMMatrixInit(TypedDict, DOMMatrix2DInit):
+class DOMMatrixInit(DOMMatrix2DInit):
     m13: NotRequired[float]
     m14: NotRequired[float]
     m23: NotRequired[float]
@@ -7813,7 +7818,7 @@ class Gyroscope(Sensor):
     y: Union['float', 'None']
     z: Union['float', 'None']
 
-class GyroscopeSensorOptions(TypedDict, SensorOptions):
+class GyroscopeSensorOptions(SensorOptions):
     referenceFrame: NotRequired[GyroscopeLocalCoordinateSystem]
 
 class GyroscopeReadingValues(TypedDict):
@@ -8238,7 +8243,7 @@ class TrackEvent(Event):
     def new(cls, type: str, eventInitDict: Union['TrackEventInit', 'None'] = {}) -> TrackEvent: ...
     track: Union['VideoTrack', 'AudioTrack', 'TextTrack', 'None']
 
-class TrackEventInit(TypedDict, EventInit):
+class TrackEventInit(EventInit):
     track: NotRequired[Union['VideoTrack', 'AudioTrack', 'TextTrack', 'None']]
 
 class HTMLMapElement(HTMLElement):
@@ -8610,7 +8615,7 @@ class SubmitEvent(Event):
     def new(cls, type: str, eventInitDict: Union['SubmitEventInit', 'None'] = {}) -> SubmitEvent: ...
     submitter: Union['HTMLElement', 'None']
 
-class SubmitEventInit(TypedDict, EventInit):
+class SubmitEventInit(EventInit):
     submitter: NotRequired[Union['HTMLElement', 'None']]
 
 class FormDataEvent(Event):
@@ -8618,7 +8623,7 @@ class FormDataEvent(Event):
     def new(cls, type: str, eventInitDict: FormDataEventInit) -> FormDataEvent: ...
     formData: FormData
 
-class FormDataEventInit(TypedDict, EventInit):
+class FormDataEventInit(EventInit):
     formData: FormData
 
 class HTMLDetailsElement(HTMLElement):
@@ -8967,6 +8972,16 @@ class UserActivation:
     hasBeenActive: bool
     isActive: bool
 
+class ToggleEvent(Event):
+    @classmethod
+    def new(cls, type: str, eventInitDict: Union['ToggleEventInit', 'None'] = {}) -> ToggleEvent: ...
+    oldState: str
+    newState: str
+
+class ToggleEventInit(EventInit):
+    oldState: NotRequired[str]
+    newState: NotRequired[str]
+
 class FocusOptions(TypedDict):
     preventScroll: NotRequired[bool]
     focusVisible: NotRequired[bool]
@@ -9013,24 +9028,14 @@ class DragEvent(MouseEvent):
     def new(cls, type: str, eventInitDict: Union['DragEventInit', 'None'] = {}) -> DragEvent: ...
     dataTransfer: Union['DataTransfer', 'None']
 
-class DragEventInit(TypedDict, MouseEventInit):
+class DragEventInit(MouseEventInit):
     dataTransfer: NotRequired[Union['DataTransfer', 'None']]
 
 class PopoverInvokerElement:
     popoverTargetElement: Union['Element', 'None']
     popoverTargetAction: str
 
-class ToggleEvent(Event):
-    @classmethod
-    def new(cls, type: str, eventInitDict: Union['ToggleEventInit', 'None'] = {}) -> ToggleEvent: ...
-    oldState: str
-    newState: str
-
-class ToggleEventInit(TypedDict, EventInit):
-    oldState: NotRequired[str]
-    newState: NotRequired[str]
-
-class WindowPostMessageOptions(TypedDict, StructuredSerializeOptions):
+class WindowPostMessageOptions(StructuredSerializeOptions):
     targetOrigin: NotRequired[str]
 
 class BarProp:
@@ -9099,11 +9104,11 @@ class NavigationUpdateCurrentEntryOptions(TypedDict):
 class NavigationOptions(TypedDict):
     info: NotRequired[Any]
 
-class NavigationNavigateOptions(TypedDict, NavigationOptions):
+class NavigationNavigateOptions(NavigationOptions):
     state: NotRequired[Any]
     history: NotRequired[NavigationHistoryBehavior]
 
-class NavigationReloadOptions(TypedDict, NavigationOptions):
+class NavigationReloadOptions(NavigationOptions):
     state: NotRequired[Any]
 
 class NavigationResult(TypedDict):
@@ -9137,12 +9142,13 @@ class NavigateEvent(Event):
     formData: Union['FormData', 'None']
     downloadRequest: Union['str', 'None']
     info: Any
+    hasUAVisualTransition: bool
 
     def intercept(self, options: Union['NavigationInterceptOptions', 'None'] = {}) -> None: ...
 
     def scroll(self) -> None: ...
 
-class NavigateEventInit(TypedDict, EventInit):
+class NavigateEventInit(EventInit):
     navigationType: NotRequired[NavigationType]
     destination: NavigationDestination
     canIntercept: NotRequired[bool]
@@ -9152,6 +9158,7 @@ class NavigateEventInit(TypedDict, EventInit):
     formData: NotRequired[Union['FormData', 'None']]
     downloadRequest: NotRequired[Union['str', 'None']]
     info: NotRequired[Any]
+    hasUAVisualTransition: NotRequired[bool]
 
 class NavigationInterceptOptions(TypedDict):
     handler: NotRequired[NavigationInterceptHandler]
@@ -9173,16 +9180,18 @@ class NavigationCurrentEntryChangeEvent(Event):
     navigationType: Union['NavigationType', 'None']
     from_: NavigationHistoryEntry
 
-class NavigationCurrentEntryChangeEventInit(TypedDict, EventInit):
+class NavigationCurrentEntryChangeEventInit(EventInit):
     navigationType: NotRequired[Union['NavigationType', 'None']]
 
 class PopStateEvent(Event):
     @classmethod
     def new(cls, type: str, eventInitDict: Union['PopStateEventInit', 'None'] = {}) -> PopStateEvent: ...
     state: Any
+    hasUAVisualTransition: bool
 
-class PopStateEventInit(TypedDict, EventInit):
+class PopStateEventInit(EventInit):
     state: NotRequired[Any]
+    hasUAVisualTransition: NotRequired[bool]
 
 class HashChangeEvent(Event):
     @classmethod
@@ -9190,7 +9199,7 @@ class HashChangeEvent(Event):
     oldURL: str
     newURL: str
 
-class HashChangeEventInit(TypedDict, EventInit):
+class HashChangeEventInit(EventInit):
     oldURL: NotRequired[str]
     newURL: NotRequired[str]
 
@@ -9199,7 +9208,7 @@ class PageTransitionEvent(Event):
     def new(cls, type: str, eventInitDict: Union['PageTransitionEventInit', 'None'] = {}) -> PageTransitionEvent: ...
     persisted: bool
 
-class PageTransitionEventInit(TypedDict, EventInit):
+class PageTransitionEventInit(EventInit):
     persisted: NotRequired[bool]
 
 class BeforeUnloadEvent(Event):
@@ -9214,7 +9223,7 @@ class ErrorEvent(Event):
     colno: int
     error: Any
 
-class ErrorEventInit(TypedDict, EventInit):
+class ErrorEventInit(EventInit):
     message: NotRequired[str]
     filename: NotRequired[str]
     lineno: NotRequired[int]
@@ -9227,7 +9236,7 @@ class PromiseRejectionEvent(Event):
     promise: Awaitable[Any]
     reason: Any
 
-class PromiseRejectionEventInit(TypedDict, EventInit):
+class PromiseRejectionEventInit(EventInit):
     promise: Awaitable[Any]
     reason: NotRequired[Any]
 
@@ -9349,7 +9358,7 @@ class MessageEvent(Event):
 
     def initMessageEvent(self, type: str, bubbles: Union['bool', 'None'] = False, cancelable: Union['bool', 'None'] = False, data: Union['Any', 'None'] = None, origin: Union['str', 'None'] = "", lastEventId: Union['str', 'None'] = "", source: Union['MessageEventSource', 'None'] = None, ports: Union['Sequence[MessagePort]', 'None'] = []) -> None: ...
 
-class MessageEventInit(TypedDict, EventInit):
+class MessageEventInit(EventInit):
     data: NotRequired[Any]
     origin: NotRequired[str]
     lastEventId: NotRequired[str]
@@ -9490,7 +9499,7 @@ class StorageEvent(Event):
 
     def initStorageEvent(self, type: str, bubbles: Union['bool', 'None'] = False, cancelable: Union['bool', 'None'] = False, key: Union['str', 'None'] = None, oldValue: Union['str', 'None'] = None, newValue: Union['str', 'None'] = None, url: Union['str', 'None'] = "", storageArea: Union['Storage', 'None'] = None) -> None: ...
 
-class StorageEventInit(TypedDict, EventInit):
+class StorageEventInit(EventInit):
     key: NotRequired[Union['str', 'None']]
     oldValue: NotRequired[Union['str', 'None']]
     newValue: NotRequired[Union['str', 'None']]
@@ -9774,7 +9783,7 @@ class ImageResource(TypedDict):
 
 class Ink:
 
-    def requestPresenter(self, param: Union['InkPresenterParam', 'None'] = None) -> Awaitable[InkPresenter]: ...
+    def requestPresenter(self, param: Union['InkPresenterParam', 'None'] = {}) -> Awaitable[InkPresenter]: ...
 
 class InkPresenterParam(TypedDict):
     presentationArea: NotRequired[Union['Element', 'None']]
@@ -10061,7 +10070,7 @@ class Magnetometer(Sensor):
     y: Union['float', 'None']
     z: Union['float', 'None']
 
-class MagnetometerSensorOptions(TypedDict, SensorOptions):
+class MagnetometerSensorOptions(SensorOptions):
     referenceFrame: NotRequired[MagnetometerLocalCoordinateSystem]
 
 class UncalibratedMagnetometer(Sensor):
@@ -10100,11 +10109,11 @@ class MediaConfiguration(TypedDict):
     video: NotRequired[VideoConfiguration]
     audio: NotRequired[AudioConfiguration]
 
-class MediaDecodingConfiguration(TypedDict, MediaConfiguration):
+class MediaDecodingConfiguration(MediaConfiguration):
     type: MediaDecodingType
     keySystemConfiguration: NotRequired[MediaCapabilitiesKeySystemConfiguration]
 
-class MediaEncodingConfiguration(TypedDict, MediaConfiguration):
+class MediaEncodingConfiguration(MediaConfiguration):
     type: MediaEncodingType
 
 class VideoConfiguration(TypedDict):
@@ -10145,11 +10154,11 @@ class MediaCapabilitiesInfo(TypedDict):
     smooth: bool
     powerEfficient: bool
 
-class MediaCapabilitiesDecodingInfo(TypedDict, MediaCapabilitiesInfo):
+class MediaCapabilitiesDecodingInfo(MediaCapabilitiesInfo):
     keySystemAccess: MediaKeySystemAccess
     configuration: NotRequired[MediaDecodingConfiguration]
 
-class MediaCapabilitiesEncodingInfo(TypedDict, MediaCapabilitiesInfo):
+class MediaCapabilitiesEncodingInfo(MediaCapabilitiesInfo):
     configuration: NotRequired[MediaEncodingConfiguration]
 
 class MediaCapabilities:
@@ -10228,11 +10237,11 @@ class MockCaptureDeviceConfiguration(TypedDict):
     deviceId: NotRequired[str]
     groupId: NotRequired[str]
 
-class MockCameraConfiguration(TypedDict, MockCaptureDeviceConfiguration):
+class MockCameraConfiguration(MockCaptureDeviceConfiguration):
     defaultFrameRate: NotRequired[float]
     facingMode: NotRequired[str]
 
-class MockMicrophoneConfiguration(TypedDict, MockCaptureDeviceConfiguration):
+class MockMicrophoneConfiguration(MockCaptureDeviceConfiguration):
     defaultSampleRate: NotRequired[int]
 
 class CanvasCaptureMediaStreamTrack(MediaStreamTrack):
@@ -10245,7 +10254,7 @@ class CaptureActionEvent(Event):
     def new(cls, init: Union['CaptureActionEventInit', 'None'] = {}) -> CaptureActionEvent: ...
     action: CaptureAction
 
-class CaptureActionEventInit(TypedDict, EventInit):
+class CaptureActionEventInit(EventInit):
     action: NotRequired[str]
 
 class CropTarget: ...
@@ -10279,7 +10288,7 @@ class MediaStream(EventTarget):
     onaddtrack: EventHandler
     onremovetrack: EventHandler
 
-class MediaTrackConstraints(TypedDict, MediaTrackConstraintSet):
+class MediaTrackConstraints(MediaTrackConstraintSet):
     advanced: NotRequired[Sequence[MediaTrackConstraintSet]]
 
 class MediaStreamTrackEvent(Event):
@@ -10287,7 +10296,7 @@ class MediaStreamTrackEvent(Event):
     def new(cls, type: str, eventInitDict: MediaStreamTrackEventInit) -> MediaStreamTrackEvent: ...
     track: MediaStreamTrack
 
-class MediaStreamTrackEventInit(TypedDict, EventInit):
+class MediaStreamTrackEventInit(EventInit):
     track: MediaStreamTrack
 
 class OverconstrainedError(DOMException):
@@ -10317,7 +10326,7 @@ class DoubleRange(TypedDict):
     max: NotRequired[float]
     min: NotRequired[float]
 
-class ConstrainDoubleRange(TypedDict, DoubleRange):
+class ConstrainDoubleRange(DoubleRange):
     exact: NotRequired[float]
     ideal: NotRequired[float]
 
@@ -10325,7 +10334,7 @@ class ULongRange(TypedDict):
     max: NotRequired[int]
     min: NotRequired[int]
 
-class ConstrainULongRange(TypedDict, ULongRange):
+class ConstrainULongRange(ULongRange):
     exact: NotRequired[int]
     ideal: NotRequired[int]
 
@@ -10337,10 +10346,7 @@ class ConstrainDOMStringParameters(TypedDict):
     exact: NotRequired[Union['str', 'Sequence[str]']]
     ideal: NotRequired[Union['str', 'Sequence[str]']]
 
-class DevicePermissionDescriptor(TypedDict, PermissionDescriptor):
-    deviceId: NotRequired[str]
-
-class CameraDevicePermissionDescriptor(TypedDict, DevicePermissionDescriptor):
+class CameraDevicePermissionDescriptor(PermissionDescriptor):
     panTiltZoom: NotRequired[bool]
 
 class MediaStreamTrackProcessor:
@@ -10358,6 +10364,10 @@ class VideoTrackGenerator:
     writable: WritableStream
     muted: bool
     track: MediaStreamTrack
+
+class ViewportMediaStreamConstraints(TypedDict):
+    video: NotRequired[Union['bool', 'MediaTrackConstraints']]
+    audio: NotRequired[Union['bool', 'MediaTrackConstraints']]
 
 class MediaSession:
     metadata: Union['MediaMetadata', 'None']
@@ -10570,7 +10580,7 @@ class NotificationEvent(ExtendableEvent):
     notification: Notification
     action: str
 
-class NotificationEventInit(TypedDict, ExtendableEventInit):
+class NotificationEventInit(ExtendableEventInit):
     notification: Notification
     action: NotRequired[str]
 
@@ -10582,7 +10592,7 @@ class DeviceOrientationEvent(Event):
     gamma: Union['float', 'None']
     absolute: bool
 
-class DeviceOrientationEventInit(TypedDict, EventInit):
+class DeviceOrientationEventInit(EventInit):
     alpha: NotRequired[Union['float', 'None']]
     beta: NotRequired[Union['float', 'None']]
     gamma: NotRequired[Union['float', 'None']]
@@ -10616,7 +10626,7 @@ class DeviceMotionEventRotationRateInit(TypedDict):
     beta: NotRequired[Union['float', 'None']]
     gamma: NotRequired[Union['float', 'None']]
 
-class DeviceMotionEventInit(TypedDict, EventInit):
+class DeviceMotionEventInit(EventInit):
     acceleration: NotRequired[DeviceMotionEventAccelerationInit]
     accelerationIncludingGravity: NotRequired[DeviceMotionEventAccelerationInit]
     rotationRate: NotRequired[DeviceMotionEventRotationRateInit]
@@ -10627,7 +10637,7 @@ class OrientationSensor(Sensor):
 
     def populateMatrix(self, targetMatrix: RotationMatrixType) -> None: ...
 
-class OrientationSensorOptions(TypedDict, SensorOptions):
+class OrientationSensorOptions(SensorOptions):
     referenceFrame: NotRequired[OrientationSensorLocalCoordinateSystem]
 
 class AbsoluteOrientationSensor(OrientationSensor):
@@ -10641,7 +10651,7 @@ class RelativeOrientationSensor(OrientationSensor):
 class AbsoluteOrientationReadingValues(TypedDict):
     quaternion: Sequence[float]
 
-class RelativeOrientationReadingValues(TypedDict, AbsoluteOrientationReadingValues): ...
+class RelativeOrientationReadingValues(AbsoluteOrientationReadingValues): ...
 
 class Client:
     lifecycleState: ClientLifecycleState
@@ -10697,7 +10707,7 @@ class PaymentRequestEvent(ExtendableEvent):
 
     def respondWith(self, handlerResponsePromise: Awaitable[PaymentHandlerResponse]) -> None: ...
 
-class PaymentRequestEventInit(TypedDict, ExtendableEventInit):
+class PaymentRequestEventInit(ExtendableEventInit):
     topOrigin: NotRequired[str]
     paymentRequestOrigin: NotRequired[str]
     paymentRequestId: NotRequired[str]
@@ -10715,6 +10725,44 @@ class PaymentHandlerResponse(TypedDict):
     payerPhone: NotRequired[Union['str', 'None']]
     shippingAddress: NotRequired[AddressInit]
     shippingOption: NotRequired[Union['str', 'None']]
+
+class AddressInit(TypedDict):
+    country: NotRequired[str]
+    addressLine: NotRequired[Sequence[str]]
+    region: NotRequired[str]
+    city: NotRequired[str]
+    dependentLocality: NotRequired[str]
+    postalCode: NotRequired[str]
+    sortingCode: NotRequired[str]
+    organization: NotRequired[str]
+    recipient: NotRequired[str]
+    phone: NotRequired[str]
+
+class PaymentOptions(TypedDict):
+    requestPayerName: NotRequired[bool]
+    requestBillingAddress: NotRequired[bool]
+    requestPayerEmail: NotRequired[bool]
+    requestPayerPhone: NotRequired[bool]
+    requestShipping: NotRequired[bool]
+    shippingType: NotRequired[PaymentShippingType]
+
+class PaymentShippingOption(TypedDict):
+    id: str
+    label: str
+    amount: PaymentCurrencyAmount
+    selected: NotRequired[bool]
+
+class AddressErrors(TypedDict):
+    addressLine: NotRequired[str]
+    city: NotRequired[str]
+    country: NotRequired[str]
+    dependentLocality: NotRequired[str]
+    organization: NotRequired[str]
+    phone: NotRequired[str]
+    postalCode: NotRequired[str]
+    recipient: NotRequired[str]
+    region: NotRequired[str]
+    sortingCode: NotRequired[str]
 
 class PaymentRequest(EventTarget):
     @classmethod
@@ -10740,11 +10788,11 @@ class PaymentDetailsBase(TypedDict):
     displayItems: NotRequired[Sequence[PaymentItem]]
     modifiers: NotRequired[Sequence[PaymentDetailsModifier]]
 
-class PaymentDetailsInit(TypedDict, PaymentDetailsBase):
+class PaymentDetailsInit(PaymentDetailsBase):
     id: NotRequired[str]
     total: PaymentItem
 
-class PaymentDetailsUpdate(TypedDict, PaymentDetailsBase):
+class PaymentDetailsUpdate(PaymentDetailsBase):
     total: NotRequired[PaymentItem]
     paymentMethodErrors: NotRequired[object]
 
@@ -10783,7 +10831,7 @@ class PaymentMethodChangeEvent(PaymentRequestUpdateEvent):
     methodName: str
     methodDetails: Union['object', 'None']
 
-class PaymentMethodChangeEventInit(TypedDict, PaymentRequestUpdateEventInit):
+class PaymentMethodChangeEventInit(PaymentRequestUpdateEventInit):
     methodName: NotRequired[str]
     methodDetails: NotRequired[Union['object', 'None']]
 
@@ -10793,7 +10841,7 @@ class PaymentRequestUpdateEvent(Event):
 
     def updateWith(self, detailsPromise: Awaitable[PaymentDetailsUpdate]) -> None: ...
 
-class PaymentRequestUpdateEventInit(TypedDict, EventInit): ...
+class PaymentRequestUpdateEventInit(EventInit): ...
 
 class MemoryMeasurement(TypedDict):
     bytes: NotRequired[int]
@@ -10853,7 +10901,7 @@ class PeriodicSyncManager:
 class BackgroundSyncOptions(TypedDict):
     minInterval: NotRequired[int]
 
-class PeriodicSyncEventInit(TypedDict, ExtendableEventInit):
+class PeriodicSyncEventInit(ExtendableEventInit):
     tag: str
 
 class PeriodicSyncEvent(ExtendableEvent):
@@ -10908,10 +10956,10 @@ class PictureInPictureEvent(Event):
     def new(cls, type: str, eventInitDict: PictureInPictureEventInit) -> PictureInPictureEvent: ...
     pictureInPictureWindow: PictureInPictureWindow
 
-class PictureInPictureEventInit(TypedDict, EventInit):
+class PictureInPictureEventInit(EventInit):
     pictureInPictureWindow: PictureInPictureWindow
 
-class PointerEventInit(TypedDict, MouseEventInit):
+class PointerEventInit(MouseEventInit):
     pointerId: NotRequired[int]
     width: NotRequired[float]
     height: NotRequired[float]
@@ -10947,6 +10995,17 @@ class PointerEvent(MouseEvent):
 
     def getPredictedEvents(self) -> Sequence[PointerEvent]: ...
 
+class MouseEventInit(TypedDict, EventModifierInit):
+    movementX: NotRequired[float]
+    movementY: NotRequired[float]
+    screenX: NotRequired[int]
+    screenY: NotRequired[int]
+    clientX: NotRequired[int]
+    clientY: NotRequired[int]
+    button: NotRequired[int]
+    buttons: NotRequired[int]
+    relatedTarget: NotRequired[Union['EventTarget', 'None']]
+
 class HTMLPortalElement(HTMLElement):
     @classmethod
     def new(cls) -> HTMLPortalElement: ...
@@ -10955,16 +11014,16 @@ class HTMLPortalElement(HTMLElement):
 
     def activate(self, options: Union['PortalActivateOptions', 'None'] = {}) -> Awaitable[None]: ...
 
-    def postMessage(self, message: Any, options: Union['PostMessageOptions', 'None'] = {}) -> None: ...
+    def postMessage(self, message: Any, options: Union['StructuredSerializeOptions', 'None'] = {}) -> None: ...
     onmessage: EventHandler
     onmessageerror: EventHandler
 
-class PortalActivateOptions(TypedDict, PostMessageOptions):
+class PortalActivateOptions(StructuredSerializeOptions):
     data: NotRequired[Any]
 
 class PortalHost(EventTarget):
 
-    def postMessage(self, message: Any, options: Union['PostMessageOptions', 'None'] = {}) -> None: ...
+    def postMessage(self, message: Any, options: Union['StructuredSerializeOptions', 'None'] = {}) -> None: ...
     onmessage: EventHandler
     onmessageerror: EventHandler
 
@@ -10975,7 +11034,7 @@ class PortalActivateEvent(Event):
 
     def adoptPredecessor(self) -> HTMLPortalElement: ...
 
-class PortalActivateEventInit(TypedDict, EventInit):
+class PortalActivateEventInit(EventInit):
     data: NotRequired[Any]
 
 class Presentation:
@@ -11006,7 +11065,7 @@ class PresentationConnectionAvailableEvent(Event):
     def new(cls, type: str, eventInitDict: PresentationConnectionAvailableEventInit) -> PresentationConnectionAvailableEvent: ...
     connection: PresentationConnection
 
-class PresentationConnectionAvailableEventInit(TypedDict, EventInit):
+class PresentationConnectionAvailableEventInit(EventInit):
     connection: PresentationConnection
 
 class PresentationConnection(EventTarget):
@@ -11037,7 +11096,7 @@ class PresentationConnectionCloseEvent(Event):
     reason: PresentationConnectionCloseReason
     message: str
 
-class PresentationConnectionCloseEventInit(TypedDict, EventInit):
+class PresentationConnectionCloseEventInit(EventInit):
     reason: PresentationConnectionCloseReason
     message: NotRequired[str]
 
@@ -11048,7 +11107,7 @@ class PresentationConnectionList(EventTarget):
     connections: Sequence[PresentationConnection]
     onconnectionavailable: EventHandler
 
-class PrivateNetworkAccessPermissionDescriptor(TypedDict, PermissionDescriptor):
+class PrivateNetworkAccessPermissionDescriptor(PermissionDescriptor):
     id: NotRequired[str]
 
 class ProximitySensor(Sensor):
@@ -11063,7 +11122,7 @@ class ProximityReadingValues(TypedDict):
     max: Union['float', 'None']
     near: Union['bool', 'None']
 
-class PushPermissionDescriptor(TypedDict, PermissionDescriptor):
+class PushPermissionDescriptor(PermissionDescriptor):
     userVisibleOnly: NotRequired[bool]
 
 class PushManager:
@@ -11113,7 +11172,7 @@ class PushEvent(ExtendableEvent):
     def new(cls, type: str, eventInitDict: Union['PushEventInit', 'None'] = {}) -> PushEvent: ...
     data: Union['PushMessageData', 'None']
 
-class PushEventInit(TypedDict, ExtendableEventInit):
+class PushEventInit(ExtendableEventInit):
     data: NotRequired[PushMessageDataInit]
 
 class PushSubscriptionChangeEvent(ExtendableEvent):
@@ -11122,7 +11181,7 @@ class PushSubscriptionChangeEvent(ExtendableEvent):
     newSubscription: Union['PushSubscription', 'None']
     oldSubscription: Union['PushSubscription', 'None']
 
-class PushSubscriptionChangeEventInit(TypedDict, ExtendableEventInit):
+class PushSubscriptionChangeEventInit(ExtendableEventInit):
     newSubscription: NotRequired[PushSubscription]
     oldSubscription: NotRequired[PushSubscription]
 
@@ -11216,7 +11275,7 @@ class GenerateTestReportParameters(TypedDict):
     message: str
     group: NotRequired[str]
 
-class TopLevelStorageAccessPermissionDescriptor(TypedDict, PermissionDescriptor):
+class TopLevelStorageAccessPermissionDescriptor(PermissionDescriptor):
     requestedOrigin: NotRequired[str]
 
 class IdleRequestOptions(TypedDict):
@@ -11318,7 +11377,7 @@ class TaskPriorityChangeEvent(Event):
     def new(cls, type: str, priorityChangeEventInitDict: TaskPriorityChangeEventInit) -> TaskPriorityChangeEvent: ...
     previousPriority: TaskPriority
 
-class TaskPriorityChangeEventInit(TypedDict, EventInit):
+class TaskPriorityChangeEventInit(EventInit):
     previousPriority: TaskPriority
 
 class TaskControllerInit(TypedDict):
@@ -11410,7 +11469,7 @@ class AuthenticationExtensionsPaymentInputs(TypedDict):
     total: NotRequired[PaymentCurrencyAmount]
     instrument: NotRequired[PaymentCredentialInstrument]
 
-class CollectedClientPaymentData(TypedDict, CollectedClientData):
+class CollectedClientPaymentData(CollectedClientData):
     payment: CollectedClientAdditionalPaymentData
 
 class CollectedClientAdditionalPaymentData(TypedDict):
@@ -11577,7 +11636,7 @@ class NavigationPreloadState(TypedDict):
     headerValue: NotRequired[ByteString]
 
 class WindowClient(Client):
-    visibilityState: VisibilityState
+    visibilityState: DocumentVisibilityState
     focused: bool
     ancestorOrigins: Sequence[str]
 
@@ -11605,7 +11664,7 @@ class ExtendableEvent(Event):
 
     def waitUntil(self, f: Awaitable[Any]) -> None: ...
 
-class ExtendableEventInit(TypedDict, EventInit): ...
+class ExtendableEventInit(EventInit): ...
 
 class FetchEvent(ExtendableEvent):
     @classmethod
@@ -11619,7 +11678,7 @@ class FetchEvent(ExtendableEvent):
 
     def respondWith(self, r: Awaitable[Response]) -> None: ...
 
-class FetchEventInit(TypedDict, ExtendableEventInit):
+class FetchEventInit(ExtendableEventInit):
     request: Request
     preloadResponse: NotRequired[Awaitable[Any]]
     clientId: NotRequired[str]
@@ -11636,7 +11695,7 @@ class ExtendableMessageEvent(ExtendableEvent):
     source: Union['Client', 'ServiceWorker', 'MessagePort', 'None']
     ports: Sequence[MessagePort]
 
-class ExtendableMessageEventInit(TypedDict, ExtendableEventInit):
+class ExtendableMessageEventInit(ExtendableEventInit):
     data: NotRequired[Any]
     origin: NotRequired[str]
     lastEventId: NotRequired[str]
@@ -11676,7 +11735,7 @@ class CacheStorage:
 
     def keys(self) -> Awaitable[Sequence[str]]: ...
 
-class MultiCacheQueryOptions(TypedDict, CacheQueryOptions):
+class MultiCacheQueryOptions(CacheQueryOptions):
     cacheName: NotRequired[str]
 
 class FaceDetector:
@@ -11717,6 +11776,7 @@ class SharedStorageWorklet(Worklet): ...
 class SharedStorageWorkletGlobalScope(WorkletGlobalScope):
 
     def register(self, name: str, operationCtor: SharedStorageOperationConstructor) -> None: ...
+    sharedStorage: WorkletSharedStorage
 
 class SharedStorageOperation: ...
 
@@ -11797,7 +11857,7 @@ class SpeechRecognitionErrorEvent(Event):
     error: SpeechRecognitionErrorCode
     message: str
 
-class SpeechRecognitionErrorEventInit(TypedDict, EventInit):
+class SpeechRecognitionErrorEventInit(EventInit):
     error: SpeechRecognitionErrorCode
     message: NotRequired[str]
 
@@ -11822,7 +11882,7 @@ class SpeechRecognitionEvent(Event):
     resultIndex: int
     results: SpeechRecognitionResultList
 
-class SpeechRecognitionEventInit(TypedDict, EventInit):
+class SpeechRecognitionEventInit(EventInit):
     resultIndex: NotRequired[int]
     results: SpeechRecognitionResultList
 
@@ -11883,7 +11943,7 @@ class SpeechSynthesisEvent(Event):
     elapsedTime: float
     name: str
 
-class SpeechSynthesisEventInit(TypedDict, EventInit):
+class SpeechSynthesisEventInit(EventInit):
     utterance: SpeechSynthesisUtterance
     charIndex: NotRequired[int]
     charLength: NotRequired[int]
@@ -11895,7 +11955,7 @@ class SpeechSynthesisErrorEvent(SpeechSynthesisEvent):
     def new(cls, type: str, eventInitDict: SpeechSynthesisErrorEventInit) -> SpeechSynthesisErrorEvent: ...
     error: SpeechSynthesisErrorCode
 
-class SpeechSynthesisErrorEventInit(TypedDict, SpeechSynthesisEventInit):
+class SpeechSynthesisErrorEventInit(SpeechSynthesisEventInit):
     error: SpeechSynthesisErrorCode
 
 class SpeechSynthesisVoice:
@@ -12224,7 +12284,7 @@ class TouchList:
 
     def item(self, index: int) -> Union['Touch', 'None']: ...
 
-class TouchEventInit(TypedDict, EventModifierInit):
+class TouchEventInit(EventModifierInit):
     touches: NotRequired[Sequence[Touch]]
     targetTouches: NotRequired[Sequence[Touch]]
     changedTouches: NotRequired[Sequence[Touch]]
@@ -12313,7 +12373,7 @@ class GenerateBidInterestGroup(TypedDict):
     ads: NotRequired[Sequence[AuctionAd]]
     adComponents: NotRequired[Sequence[AuctionAd]]
 
-class AuctionAdInterestGroup(TypedDict, GenerateBidInterestGroup):
+class AuctionAdInterestGroup(GenerateBidInterestGroup):
     priority: NotRequired[float]
     prioritySignalsOverrides: NotRequired[float]
 
@@ -12411,13 +12471,13 @@ class ReportingBrowserSignals(TypedDict):
     componentSeller: NotRequired[str]
     buyerAndSellerReportingId: NotRequired[str]
 
-class ReportResultBrowserSignals(TypedDict, ReportingBrowserSignals):
+class ReportResultBrowserSignals(ReportingBrowserSignals):
     desirability: float
     topLevelSellerSignals: NotRequired[str]
     modifiedBid: NotRequired[float]
     dataVersion: NotRequired[int]
 
-class ReportWinBrowserSignals(TypedDict, ReportingBrowserSignals):
+class ReportWinBrowserSignals(ReportingBrowserSignals):
     adCost: NotRequired[float]
     seller: NotRequired[str]
     madeHighestScoringOtherBid: NotRequired[bool]
@@ -12472,10 +12532,10 @@ class FocusEvent(UIEvent):
     def new(cls, type: str, eventInitDict: Union['FocusEventInit', 'None'] = {}) -> FocusEvent: ...
     relatedTarget: Union['EventTarget', 'None']
 
-class FocusEventInit(TypedDict, UIEventInit):
+class FocusEventInit(UIEventInit):
     relatedTarget: NotRequired[Union['EventTarget', 'None']]
 
-class EventModifierInit(TypedDict, UIEventInit):
+class EventModifierInit(UIEventInit):
     ctrlKey: NotRequired[bool]
     shiftKey: NotRequired[bool]
     altKey: NotRequired[bool]
@@ -12502,7 +12562,7 @@ class WheelEvent(MouseEvent):
     deltaZ: float
     deltaMode: int
 
-class WheelEventInit(TypedDict, MouseEventInit):
+class WheelEventInit(MouseEventInit):
     deltaX: NotRequired[float]
     deltaY: NotRequired[float]
     deltaZ: NotRequired[float]
@@ -12531,7 +12591,7 @@ class KeyboardEvent(UIEvent):
     charCode: int
     keyCode: int
 
-class KeyboardEventInit(TypedDict, EventModifierInit):
+class KeyboardEventInit(EventModifierInit, TypedDict):
     key: NotRequired[str]
     code: NotRequired[str]
     location: NotRequired[int]
@@ -12547,7 +12607,7 @@ class CompositionEvent(UIEvent):
 
     def initCompositionEvent(self, typeArg: str, bubblesArg: Union['bool', 'None'] = False, cancelableArg: Union['bool', 'None'] = False, viewArg: Union['WindowProxy', 'None'] = None, dataArg: Union['str', 'None'] = "") -> None: ...
 
-class CompositionEventInit(TypedDict, UIEventInit):
+class CompositionEventInit(UIEventInit):
     data: NotRequired[str]
 
 class MutationEvent(Event):
@@ -12795,7 +12855,7 @@ class Global:
     value: Any
 
 class AnimationTimeline:
-    currentTime: Union['Union["CSSNumberish", "None"]', 'Union["float", "None"]']
+    currentTime: Union['CSSNumberish', 'None']
     duration: Union['CSSNumberish', 'None']
 
     def play(self, effect: Union['AnimationEffect', 'None'] = None) -> Animation: ...
@@ -12803,8 +12863,8 @@ class AnimationTimeline:
 class Animation(EventTarget):
     @classmethod
     def new(cls, effect: Union['AnimationEffect', 'None'] = None, timeline: Union['AnimationTimeline', 'None'] = None) -> Animation: ...
-    startTime: Union['Union["CSSNumberish", "None"]', 'Union["float", "None"]']
-    currentTime: Union['Union["CSSNumberish", "None"]', 'Union["float", "None"]']
+    startTime: Union['CSSNumberish', 'None']
+    currentTime: Union['CSSNumberish', 'None']
     id: str
     effect: Union['AnimationEffect', 'None']
     timeline: Union['AnimationTimeline', 'None']
@@ -12857,7 +12917,7 @@ class EffectTiming(TypedDict):
     delay: NotRequired[float]
     endDelay: NotRequired[float]
     playbackRate: NotRequired[float]
-    duration: Union['NotRequired[Union["float", "CSSNumericValue", "str"]]', 'NotRequired[Union["float", "str"]]']
+    duration: NotRequired[Union['float', 'CSSNumericValue', 'str']]
     fill: NotRequired[FillMode]
     iterationStart: NotRequired[float]
     iterations: NotRequired[float]
@@ -12877,9 +12937,9 @@ class OptionalEffectTiming(TypedDict):
 
 class ComputedEffectTiming(TypedDict, EffectTiming):
     startTime: NotRequired[CSSNumberish]
-    endTime: Union['NotRequired[CSSNumberish]', 'NotRequired[float]']
-    activeDuration: Union['NotRequired[CSSNumberish]', 'NotRequired[float]']
-    localTime: Union['NotRequired[Union["CSSNumberish", "None"]]', 'NotRequired[Union["float", "None"]]']
+    endTime: NotRequired[CSSNumberish]
+    activeDuration: NotRequired[CSSNumberish]
+    localTime: NotRequired[Union['CSSNumberish', 'None']]
     progress: NotRequired[Union['float', 'None']]
     currentIteration: NotRequired[Union['float', 'None']]
 
@@ -12941,12 +13001,12 @@ class KeyframeAnimationOptions(TypedDict, KeyframeEffectOptions):
 class AnimationPlaybackEvent(Event):
     @classmethod
     def new(cls, type: str, eventInitDict: Union['AnimationPlaybackEventInit', 'None'] = {}) -> AnimationPlaybackEvent: ...
-    currentTime: Union['Union["CSSNumberish", "None"]', 'Union["float", "None"]']
-    timelineTime: Union['Union["CSSNumberish", "None"]', 'Union["float", "None"]']
+    currentTime: Union['CSSNumberish', 'None']
+    timelineTime: Union['CSSNumberish', 'None']
 
-class AnimationPlaybackEventInit(TypedDict, EventInit):
-    currentTime: Union['NotRequired[Union["CSSNumberish", "None"]]', 'NotRequired[Union["float", "None"]]']
-    timelineTime: Union['NotRequired[Union["CSSNumberish", "None"]]', 'NotRequired[Union["float", "None"]]']
+class AnimationPlaybackEventInit(EventInit):
+    currentTime: NotRequired[Union['CSSNumberish', 'None']]
+    timelineTime: NotRequired[Union['CSSNumberish', 'None']]
 
 class DocumentTimelineOptions(TypedDict):
     originTime: NotRequired[DOMHighResTimeStamp]
@@ -12992,10 +13052,10 @@ class BluetoothDataFilterInit(TypedDict):
     dataPrefix: NotRequired[BufferSource]
     mask: NotRequired[BufferSource]
 
-class BluetoothManufacturerDataFilterInit(TypedDict, BluetoothDataFilterInit):
+class BluetoothManufacturerDataFilterInit(BluetoothDataFilterInit):
     companyIdentifier: int
 
-class BluetoothServiceDataFilterInit(TypedDict, BluetoothDataFilterInit):
+class BluetoothServiceDataFilterInit(BluetoothDataFilterInit):
     service: BluetoothServiceUUID
 
 class BluetoothLEScanFilterInit(TypedDict):
@@ -13022,7 +13082,7 @@ class Bluetooth(EventTarget, BluetoothDeviceEventHandlers, CharacteristicEventHa
 
     def requestDevice(self, options: Union['RequestDeviceOptions', 'None'] = {}) -> Awaitable[BluetoothDevice]: ...
 
-class BluetoothPermissionDescriptor(TypedDict, PermissionDescriptor):
+class BluetoothPermissionDescriptor(PermissionDescriptor):
     deviceId: NotRequired[str]
     filters: NotRequired[Sequence[BluetoothLEScanFilterInit]]
     optionalServices: NotRequired[Sequence[BluetoothServiceUUID]]
@@ -13046,7 +13106,7 @@ class ValueEvent(Event):
     def new(cls, type: str, initDict: Union['ValueEventInit', 'None'] = {}) -> ValueEvent: ...
     value: Any
 
-class ValueEventInit(TypedDict, EventInit):
+class ValueEventInit(EventInit):
     value: NotRequired[Any]
 
 class BluetoothDevice(EventTarget, BluetoothDeviceEventHandlers, CharacteristicEventHandlers, ServiceEventHandlers):
@@ -13078,7 +13138,7 @@ class BluetoothAdvertisingEvent(Event):
     manufacturerData: BluetoothManufacturerDataMap
     serviceData: BluetoothServiceDataMap
 
-class BluetoothAdvertisingEventInit(TypedDict, EventInit):
+class BluetoothAdvertisingEventInit(EventInit):
     device: BluetoothDevice
     uuids: NotRequired[Sequence[Union['str', 'int']]]
     name: NotRequired[str]
@@ -13245,7 +13305,7 @@ class NDEFReadingEvent(Event):
     serialNumber: str
     message: NDEFMessage
 
-class NDEFReadingEventInit(TypedDict, EventInit):
+class NDEFReadingEventInit(EventInit):
     serialNumber: NotRequired[Union['str', 'None']]
     message: NDEFMessageInit
 
@@ -13378,7 +13438,7 @@ class AudioRenderCapacityEvent(Event):
     peakLoad: float
     underrunRatio: float
 
-class AudioRenderCapacityEventInit(TypedDict, EventInit):
+class AudioRenderCapacityEventInit(EventInit):
     timestamp: NotRequired[float]
     averageLoad: NotRequired[float]
     peakLoad: NotRequired[float]
@@ -13410,7 +13470,7 @@ class OfflineAudioCompletionEvent(Event):
     def new(cls, type: str, eventInitDict: OfflineAudioCompletionEventInit) -> OfflineAudioCompletionEvent: ...
     renderedBuffer: AudioBuffer
 
-class OfflineAudioCompletionEventInit(TypedDict, EventInit):
+class OfflineAudioCompletionEventInit(EventInit):
     renderedBuffer: AudioBuffer
 
 class AudioBuffer:
@@ -13508,7 +13568,7 @@ class AnalyserNode(AudioNode):
     maxDecibels: float
     smoothingTimeConstant: float
 
-class AnalyserOptions(TypedDict, AudioNodeOptions):
+class AnalyserOptions(AudioNodeOptions):
     fftSize: NotRequired[int]
     maxDecibels: NotRequired[float]
     minDecibels: NotRequired[float]
@@ -13559,7 +13619,7 @@ class AudioProcessingEvent(Event):
     inputBuffer: AudioBuffer
     outputBuffer: AudioBuffer
 
-class AudioProcessingEventInit(TypedDict, EventInit):
+class AudioProcessingEventInit(EventInit):
     playbackTime: float
     inputBuffer: AudioBuffer
     outputBuffer: AudioBuffer
@@ -13575,7 +13635,7 @@ class BiquadFilterNode(AudioNode):
 
     def getFrequencyResponse(self, frequencyHz: Float32Array, magResponse: Float32Array, phaseResponse: Float32Array) -> None: ...
 
-class BiquadFilterOptions(TypedDict, AudioNodeOptions):
+class BiquadFilterOptions(AudioNodeOptions):
     type: NotRequired[BiquadFilterType]
     Q: NotRequired[float]
     detune: NotRequired[float]
@@ -13586,14 +13646,14 @@ class ChannelMergerNode(AudioNode):
     @classmethod
     def new(cls, context: BaseAudioContext, options: Union['ChannelMergerOptions', 'None'] = {}) -> ChannelMergerNode: ...
 
-class ChannelMergerOptions(TypedDict, AudioNodeOptions):
+class ChannelMergerOptions(AudioNodeOptions):
     numberOfInputs: NotRequired[int]
 
 class ChannelSplitterNode(AudioNode):
     @classmethod
     def new(cls, context: BaseAudioContext, options: Union['ChannelSplitterOptions', 'None'] = {}) -> ChannelSplitterNode: ...
 
-class ChannelSplitterOptions(TypedDict, AudioNodeOptions):
+class ChannelSplitterOptions(AudioNodeOptions):
     numberOfOutputs: NotRequired[int]
 
 class ConstantSourceNode(AudioScheduledSourceNode):
@@ -13610,7 +13670,7 @@ class ConvolverNode(AudioNode):
     buffer: Union['AudioBuffer', 'None']
     normalize: bool
 
-class ConvolverOptions(TypedDict, AudioNodeOptions):
+class ConvolverOptions(AudioNodeOptions):
     buffer: NotRequired[Union['AudioBuffer', 'None']]
     disableNormalization: NotRequired[bool]
 
@@ -13619,7 +13679,7 @@ class DelayNode(AudioNode):
     def new(cls, context: BaseAudioContext, options: Union['DelayOptions', 'None'] = {}) -> DelayNode: ...
     delayTime: AudioParam
 
-class DelayOptions(TypedDict, AudioNodeOptions):
+class DelayOptions(AudioNodeOptions):
     maxDelayTime: NotRequired[float]
     delayTime: NotRequired[float]
 
@@ -13633,7 +13693,7 @@ class DynamicsCompressorNode(AudioNode):
     attack: AudioParam
     release: AudioParam
 
-class DynamicsCompressorOptions(TypedDict, AudioNodeOptions):
+class DynamicsCompressorOptions(AudioNodeOptions):
     attack: NotRequired[float]
     knee: NotRequired[float]
     ratio: NotRequired[float]
@@ -13645,7 +13705,7 @@ class GainNode(AudioNode):
     def new(cls, context: BaseAudioContext, options: Union['GainOptions', 'None'] = {}) -> GainNode: ...
     gain: AudioParam
 
-class GainOptions(TypedDict, AudioNodeOptions):
+class GainOptions(AudioNodeOptions):
     gain: NotRequired[float]
 
 class IIRFilterNode(AudioNode):
@@ -13654,7 +13714,7 @@ class IIRFilterNode(AudioNode):
 
     def getFrequencyResponse(self, frequencyHz: Float32Array, magResponse: Float32Array, phaseResponse: Float32Array) -> None: ...
 
-class IIRFilterOptions(TypedDict, AudioNodeOptions):
+class IIRFilterOptions(AudioNodeOptions):
     feedforward: Sequence[float]
     feedback: Sequence[float]
 
@@ -13695,7 +13755,7 @@ class OscillatorNode(AudioScheduledSourceNode):
 
     def setPeriodicWave(self, periodicWave: PeriodicWave) -> None: ...
 
-class OscillatorOptions(TypedDict, AudioNodeOptions):
+class OscillatorOptions(AudioNodeOptions):
     type: NotRequired[OscillatorType]
     frequency: NotRequired[float]
     detune: NotRequired[float]
@@ -13723,7 +13783,7 @@ class PannerNode(AudioNode):
 
     def setOrientation(self, x: float, y: float, z: float) -> None: ...
 
-class PannerOptions(TypedDict, AudioNodeOptions):
+class PannerOptions(AudioNodeOptions):
     panningModel: NotRequired[PanningModelType]
     distanceModel: NotRequired[DistanceModelType]
     positionX: NotRequired[float]
@@ -13746,7 +13806,7 @@ class PeriodicWave:
 class PeriodicWaveConstraints(TypedDict):
     disableNormalization: NotRequired[bool]
 
-class PeriodicWaveOptions(TypedDict, PeriodicWaveConstraints):
+class PeriodicWaveOptions(PeriodicWaveConstraints):
     real: NotRequired[Sequence[float]]
     imag: NotRequired[Sequence[float]]
 
@@ -13759,7 +13819,7 @@ class StereoPannerNode(AudioNode):
     def new(cls, context: BaseAudioContext, options: Union['StereoPannerOptions', 'None'] = {}) -> StereoPannerNode: ...
     pan: AudioParam
 
-class StereoPannerOptions(TypedDict, AudioNodeOptions):
+class StereoPannerOptions(AudioNodeOptions):
     pan: NotRequired[float]
 
 class WaveShaperNode(AudioNode):
@@ -13768,7 +13828,7 @@ class WaveShaperNode(AudioNode):
     curve: Float32Array
     oversample: OverSampleType
 
-class WaveShaperOptions(TypedDict, AudioNodeOptions):
+class WaveShaperOptions(AudioNodeOptions):
     curve: NotRequired[Sequence[float]]
     oversample: NotRequired[OverSampleType]
 
@@ -13792,7 +13852,7 @@ class AudioWorkletNode(AudioNode):
     port: MessagePort
     onprocessorerror: EventHandler
 
-class AudioWorkletNodeOptions(TypedDict, AudioNodeOptions):
+class AudioWorkletNodeOptions(AudioNodeOptions):
     numberOfInputs: NotRequired[int]
     numberOfOutputs: NotRequired[int]
     outputChannelCount: NotRequired[Sequence[int]]
@@ -13849,6 +13909,7 @@ class AuthenticatorAssertionResponseJSON(TypedDict):
     authenticatorData: Base64URLString
     signature: Base64URLString
     userHandle: NotRequired[Base64URLString]
+    attestationObject: NotRequired[Base64URLString]
 
 class AuthenticationExtensionsClientOutputsJSON(TypedDict): ...
 
@@ -13860,7 +13921,9 @@ class PublicKeyCredentialCreationOptionsJSON(TypedDict):
     timeout: NotRequired[int]
     excludeCredentials: NotRequired[Sequence[PublicKeyCredentialDescriptorJSON]]
     authenticatorSelection: NotRequired[AuthenticatorSelectionCriteria]
+    hints: NotRequired[Sequence[str]]
     attestation: NotRequired[str]
+    attestationFormats: NotRequired[Sequence[str]]
     extensions: NotRequired[AuthenticationExtensionsClientInputsJSON]
 
 class PublicKeyCredentialUserEntityJSON(TypedDict):
@@ -13881,6 +13944,9 @@ class PublicKeyCredentialRequestOptionsJSON(TypedDict):
     rpId: NotRequired[str]
     allowCredentials: NotRequired[Sequence[PublicKeyCredentialDescriptorJSON]]
     userVerification: NotRequired[str]
+    hints: NotRequired[Sequence[str]]
+    attestation: NotRequired[str]
+    attestationFormats: NotRequired[Sequence[str]]
     extensions: NotRequired[AuthenticationExtensionsClientInputsJSON]
 
 class AuthenticatorResponse:
@@ -13915,6 +13981,7 @@ class PublicKeyCredentialCreationOptions(TypedDict):
     timeout: NotRequired[int]
     excludeCredentials: NotRequired[Sequence[PublicKeyCredentialDescriptor]]
     authenticatorSelection: NotRequired[AuthenticatorSelectionCriteria]
+    hints: NotRequired[Sequence[str]]
     attestation: NotRequired[str]
     attestationFormats: NotRequired[Sequence[str]]
     extensions: NotRequired[AuthenticationExtensionsClientInputs]
@@ -13922,10 +13989,10 @@ class PublicKeyCredentialCreationOptions(TypedDict):
 class PublicKeyCredentialEntity(TypedDict):
     name: str
 
-class PublicKeyCredentialRpEntity(TypedDict, PublicKeyCredentialEntity):
+class PublicKeyCredentialRpEntity(PublicKeyCredentialEntity):
     id: NotRequired[str]
 
-class PublicKeyCredentialUserEntity(TypedDict, PublicKeyCredentialEntity):
+class PublicKeyCredentialUserEntity(PublicKeyCredentialEntity):
     id: BufferSource
     displayName: str
 
@@ -13941,6 +14008,7 @@ class PublicKeyCredentialRequestOptions(TypedDict):
     rpId: NotRequired[str]
     allowCredentials: NotRequired[Sequence[PublicKeyCredentialDescriptor]]
     userVerification: NotRequired[str]
+    hints: NotRequired[Sequence[str]]
     attestation: NotRequired[str]
     attestationFormats: NotRequired[Sequence[str]]
     extensions: NotRequired[AuthenticationExtensionsClientInputs]
@@ -14377,7 +14445,7 @@ class ImageTrack:
     repetitionCount: float
     selected: bool
 
-class Ed448Params(TypedDict, Algorithm):
+class Ed448Params(Algorithm):
     context: NotRequired[BufferSource]
 
 class NavigatorAutomationInformation:
@@ -15013,7 +15081,7 @@ class WebGLContextEvent(Event):
     def new(cls, type: str, eventInit: Union['WebGLContextEventInit', 'None'] = {}) -> WebGLContextEvent: ...
     statusMessage: str
 
-class WebGLContextEventInit(TypedDict, EventInit):
+class WebGLContextEventInit(EventInit):
     statusMessage: NotRequired[str]
 
 class WebGLQuery(WebGLObject): ...
@@ -15624,7 +15692,7 @@ class GPUAdapter:
 
     def requestAdapterInfo(self, unmaskHints: Union['Sequence[str]', 'None'] = []) -> Awaitable[GPUAdapterInfo]: ...
 
-class GPUDeviceDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUDeviceDescriptor(GPUObjectDescriptorBase):
     requiredFeatures: NotRequired[Sequence[GPUFeatureName]]
     requiredLimits: NotRequired[GPUSize64]
     defaultQueue: NotRequired[GPUQueueDescriptor]
@@ -15685,7 +15753,7 @@ class GPUBuffer(GPUObjectBase):
 
     def destroy(self) -> None: ...
 
-class GPUBufferDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUBufferDescriptor(GPUObjectDescriptorBase):
     size: GPUSize64
     usage: GPUBufferUsageFlags
     mappedAtCreation: NotRequired[bool]
@@ -15704,7 +15772,7 @@ class GPUTexture(GPUObjectBase):
     format: GPUTextureFormat
     usage: GPUFlagsConstant
 
-class GPUTextureDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUTextureDescriptor(GPUObjectDescriptorBase):
     size: GPUExtent3D
     mipLevelCount: NotRequired[GPUIntegerCoordinate]
     sampleCount: NotRequired[GPUSize32]
@@ -15715,7 +15783,7 @@ class GPUTextureDescriptor(TypedDict, GPUObjectDescriptorBase):
 
 class GPUTextureView(GPUObjectBase): ...
 
-class GPUTextureViewDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUTextureViewDescriptor(GPUObjectDescriptorBase):
     format: NotRequired[GPUTextureFormat]
     dimension: NotRequired[GPUTextureViewDimension]
     aspect: NotRequired[GPUTextureAspect]
@@ -15726,13 +15794,13 @@ class GPUTextureViewDescriptor(TypedDict, GPUObjectDescriptorBase):
 
 class GPUExternalTexture(GPUObjectBase): ...
 
-class GPUExternalTextureDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUExternalTextureDescriptor(GPUObjectDescriptorBase):
     source: Union['HTMLVideoElement', 'VideoFrame']
     colorSpace: NotRequired[PredefinedColorSpace]
 
 class GPUSampler(GPUObjectBase): ...
 
-class GPUSamplerDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUSamplerDescriptor(GPUObjectDescriptorBase):
     addressModeU: NotRequired[GPUAddressMode]
     addressModeV: NotRequired[GPUAddressMode]
     addressModeW: NotRequired[GPUAddressMode]
@@ -15746,7 +15814,7 @@ class GPUSamplerDescriptor(TypedDict, GPUObjectDescriptorBase):
 
 class GPUBindGroupLayout(GPUObjectBase): ...
 
-class GPUBindGroupLayoutDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUBindGroupLayoutDescriptor(GPUObjectDescriptorBase):
     entries: Sequence[GPUBindGroupLayoutEntry]
 
 class GPUBindGroupLayoutEntry(TypedDict):
@@ -15780,7 +15848,7 @@ class GPUExternalTextureBindingLayout(TypedDict): ...
 
 class GPUBindGroup(GPUObjectBase): ...
 
-class GPUBindGroupDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUBindGroupDescriptor(GPUObjectDescriptorBase):
     layout: GPUBindGroupLayout
     entries: Sequence[GPUBindGroupEntry]
 
@@ -15795,14 +15863,14 @@ class GPUBufferBinding(TypedDict):
 
 class GPUPipelineLayout(GPUObjectBase): ...
 
-class GPUPipelineLayoutDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUPipelineLayoutDescriptor(GPUObjectDescriptorBase):
     bindGroupLayouts: Sequence[GPUBindGroupLayout]
 
 class GPUShaderModule(GPUObjectBase):
 
     def getCompilationInfo(self) -> Awaitable[GPUCompilationInfo]: ...
 
-class GPUShaderModuleDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUShaderModuleDescriptor(GPUObjectDescriptorBase):
     code: str
     sourceMap: NotRequired[object]
     hints: NotRequired[GPUShaderModuleCompilationHint]
@@ -15829,7 +15897,7 @@ class GPUPipelineError(DOMException):
 class GPUPipelineErrorInit(TypedDict):
     reason: GPUPipelineErrorReason
 
-class GPUPipelineDescriptorBase(TypedDict, GPUObjectDescriptorBase):
+class GPUPipelineDescriptorBase(GPUObjectDescriptorBase):
     layout: Union['GPUPipelineLayout', 'GPUAutoLayoutMode']
 
 class GPUPipelineBase:
@@ -15843,12 +15911,12 @@ class GPUProgrammableStage(TypedDict):
 
 class GPUComputePipeline(GPUObjectBase, GPUPipelineBase): ...
 
-class GPUComputePipelineDescriptor(TypedDict, GPUPipelineDescriptorBase):
+class GPUComputePipelineDescriptor(GPUPipelineDescriptorBase):
     compute: GPUProgrammableStage
 
 class GPURenderPipeline(GPUObjectBase, GPUPipelineBase): ...
 
-class GPURenderPipelineDescriptor(TypedDict, GPUPipelineDescriptorBase):
+class GPURenderPipelineDescriptor(GPUPipelineDescriptorBase):
     vertex: GPUVertexState
     primitive: NotRequired[GPUPrimitiveState]
     depthStencil: NotRequired[GPUDepthStencilState]
@@ -15867,7 +15935,7 @@ class GPUMultisampleState(TypedDict):
     mask: NotRequired[GPUSampleMask]
     alphaToCoverageEnabled: NotRequired[bool]
 
-class GPUFragmentState(TypedDict, GPUProgrammableStage):
+class GPUFragmentState(GPUProgrammableStage):
     targets: Sequence[Union['GPUColorTargetState', 'None']]
 
 class GPUColorTargetState(TypedDict):
@@ -15902,7 +15970,7 @@ class GPUStencilFaceState(TypedDict):
     depthFailOp: NotRequired[GPUStencilOperation]
     passOp: NotRequired[GPUStencilOperation]
 
-class GPUVertexState(TypedDict, GPUProgrammableStage):
+class GPUVertexState(GPUProgrammableStage):
     buffers: NotRequired[Sequence[Union['GPUVertexBufferLayout', 'None']]]
 
 class GPUVertexBufferLayout(TypedDict):
@@ -15920,7 +15988,7 @@ class GPUImageDataLayout(TypedDict):
     bytesPerRow: NotRequired[GPUSize32]
     rowsPerImage: NotRequired[GPUSize32]
 
-class GPUImageCopyBuffer(TypedDict, GPUImageDataLayout):
+class GPUImageCopyBuffer(GPUImageDataLayout):
     buffer: GPUBuffer
 
 class GPUImageCopyTexture(TypedDict):
@@ -15929,7 +15997,7 @@ class GPUImageCopyTexture(TypedDict):
     origin: NotRequired[GPUOrigin3D]
     aspect: NotRequired[GPUTextureAspect]
 
-class GPUImageCopyTextureTagged(TypedDict, GPUImageCopyTexture):
+class GPUImageCopyTextureTagged(GPUImageCopyTexture):
     colorSpace: NotRequired[PredefinedColorSpace]
     premultipliedAlpha: NotRequired[bool]
 
@@ -15940,7 +16008,7 @@ class GPUImageCopyExternalImage(TypedDict):
 
 class GPUCommandBuffer(GPUObjectBase): ...
 
-class GPUCommandBufferDescriptor(TypedDict, GPUObjectDescriptorBase): ...
+class GPUCommandBufferDescriptor(GPUObjectDescriptorBase): ...
 
 class GPUCommandsMixin: ...
 
@@ -15966,7 +16034,7 @@ class GPUCommandEncoder(GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin):
 
     def finish(self, descriptor: Union['GPUCommandBufferDescriptor', 'None'] = {}) -> GPUCommandBuffer: ...
 
-class GPUCommandEncoderDescriptor(TypedDict, GPUObjectDescriptorBase): ...
+class GPUCommandEncoderDescriptor(GPUObjectDescriptorBase): ...
 
 class GPUBindingCommandsMixin:
     @overload
@@ -15997,7 +16065,7 @@ class GPUComputePassTimestampWrites(TypedDict):
     beginningOfPassWriteIndex: NotRequired[GPUSize32]
     endOfPassWriteIndex: NotRequired[GPUSize32]
 
-class GPUComputePassDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUComputePassDescriptor(GPUObjectDescriptorBase):
     timestampWrites: NotRequired[GPUComputePassTimestampWrites]
 
 class GPURenderPassEncoder(GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUBindingCommandsMixin, GPURenderCommandsMixin):
@@ -16023,7 +16091,7 @@ class GPURenderPassTimestampWrites(TypedDict):
     beginningOfPassWriteIndex: NotRequired[GPUSize32]
     endOfPassWriteIndex: NotRequired[GPUSize32]
 
-class GPURenderPassDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPURenderPassDescriptor(GPUObjectDescriptorBase):
     colorAttachments: Sequence[Union['GPURenderPassColorAttachment', 'None']]
     depthStencilAttachment: NotRequired[GPURenderPassDepthStencilAttachment]
     occlusionQuerySet: NotRequired[GPUQuerySet]
@@ -16048,7 +16116,7 @@ class GPURenderPassDepthStencilAttachment(TypedDict):
     stencilStoreOp: NotRequired[GPUStoreOp]
     stencilReadOnly: NotRequired[bool]
 
-class GPURenderPassLayout(TypedDict, GPUObjectDescriptorBase):
+class GPURenderPassLayout(GPUObjectDescriptorBase):
     colorFormats: Sequence[Union['GPUTextureFormat', 'None']]
     depthStencilFormat: NotRequired[GPUTextureFormat]
     sampleCount: NotRequired[GPUSize32]
@@ -16071,17 +16139,17 @@ class GPURenderCommandsMixin:
 
 class GPURenderBundle(GPUObjectBase): ...
 
-class GPURenderBundleDescriptor(TypedDict, GPUObjectDescriptorBase): ...
+class GPURenderBundleDescriptor(GPUObjectDescriptorBase): ...
 
 class GPURenderBundleEncoder(GPUObjectBase, GPUCommandsMixin, GPUDebugCommandsMixin, GPUBindingCommandsMixin, GPURenderCommandsMixin):
 
     def finish(self, descriptor: Union['GPURenderBundleDescriptor', 'None'] = {}) -> GPURenderBundle: ...
 
-class GPURenderBundleEncoderDescriptor(TypedDict, GPURenderPassLayout):
+class GPURenderBundleEncoderDescriptor(GPURenderPassLayout):
     depthReadOnly: NotRequired[bool]
     stencilReadOnly: NotRequired[bool]
 
-class GPUQueueDescriptor(TypedDict, GPUObjectDescriptorBase): ...
+class GPUQueueDescriptor(GPUObjectDescriptorBase): ...
 
 class GPUQueue(GPUObjectBase):
 
@@ -16101,7 +16169,7 @@ class GPUQuerySet(GPUObjectBase):
     type: GPUQueryType
     count: GPUSize32Out
 
-class GPUQuerySetDescriptor(TypedDict, GPUObjectDescriptorBase):
+class GPUQuerySetDescriptor(GPUObjectDescriptorBase):
     type: GPUQueryType
     count: GPUSize32
 
@@ -16146,7 +16214,7 @@ class GPUUncapturedErrorEvent(Event):
     def new(cls, type: str, gpuUncapturedErrorEventInitDict: GPUUncapturedErrorEventInit) -> GPUUncapturedErrorEvent: ...
     error: GPUError
 
-class GPUUncapturedErrorEventInit(TypedDict, EventInit):
+class GPUUncapturedErrorEventInit(EventInit):
     error: GPUError
 
 class GPUColorDict(TypedDict):
@@ -16212,7 +16280,7 @@ class HIDConnectionEvent(Event):
     def new(cls, type: str, eventInitDict: HIDConnectionEventInit) -> HIDConnectionEvent: ...
     device: HIDDevice
 
-class HIDConnectionEventInit(TypedDict, EventInit):
+class HIDConnectionEventInit(EventInit):
     device: HIDDevice
 
 class HIDInputReportEvent(Event):
@@ -16222,7 +16290,7 @@ class HIDInputReportEvent(Event):
     reportId: int
     data: DataView
 
-class HIDInputReportEventInit(TypedDict, EventInit):
+class HIDInputReportEventInit(EventInit):
     device: HIDDevice
     reportId: int
     data: DataView
@@ -16302,7 +16370,7 @@ class DOMException:
     INVALID_NODE_TYPE_ERR = 24
     DATA_CLONE_ERR = 25
 
-class MidiPermissionDescriptor(TypedDict, PermissionDescriptor):
+class MidiPermissionDescriptor(PermissionDescriptor):
     sysex: NotRequired[bool]
 
 class MIDIOptions(TypedDict):
@@ -16347,7 +16415,7 @@ class MIDIMessageEvent(Event):
     def new(cls, type: str, eventInitDict: Union['MIDIMessageEventInit', 'None'] = {}) -> MIDIMessageEvent: ...
     data: Uint8Array
 
-class MIDIMessageEventInit(TypedDict, EventInit):
+class MIDIMessageEventInit(EventInit):
     data: NotRequired[Uint8Array]
 
 class MIDIConnectionEvent(Event):
@@ -16355,7 +16423,7 @@ class MIDIConnectionEvent(Event):
     def new(cls, type: str, eventInitDict: Union['MIDIConnectionEventInit', 'None'] = {}) -> MIDIConnectionEvent: ...
     port: MIDIPort
 
-class MIDIConnectionEventInit(TypedDict, EventInit):
+class MIDIConnectionEventInit(EventInit):
     port: NotRequired[MIDIPort]
 
 class NavigatorML:
@@ -16749,7 +16817,7 @@ class SFrameTransformErrorEvent(Event):
     keyID: Union['CryptoKeyID', 'None']
     frame: Any
 
-class SFrameTransformErrorEventInit(TypedDict, EventInit):
+class SFrameTransformErrorEventInit(EventInit):
     errorType: SFrameTransformErrorEventType
     frame: Any
     keyID: NotRequired[Union['CryptoKeyID', 'None']]
@@ -17026,13 +17094,13 @@ class RTCDataChannelInit(TypedDict):
     negotiated: NotRequired[bool]
     id: NotRequired[int]
 
-class RTCRtpStreamStats(TypedDict, RTCStats):
+class RTCRtpStreamStats(RTCStats):
     ssrc: int
     kind: str
     transportId: NotRequired[str]
     codecId: NotRequired[str]
 
-class RTCCodecStats(TypedDict, RTCStats):
+class RTCCodecStats(RTCStats):
     payloadType: int
     transportId: str
     mimeType: str
@@ -17040,12 +17108,12 @@ class RTCCodecStats(TypedDict, RTCStats):
     channels: NotRequired[int]
     sdpFmtpLine: NotRequired[str]
 
-class RTCReceivedRtpStreamStats(TypedDict, RTCRtpStreamStats):
+class RTCReceivedRtpStreamStats(RTCRtpStreamStats):
     packetsReceived: NotRequired[int]
     packetsLost: NotRequired[int]
     jitter: NotRequired[float]
 
-class RTCInboundRtpStreamStats(TypedDict, RTCReceivedRtpStreamStats):
+class RTCInboundRtpStreamStats(RTCReceivedRtpStreamStats):
     trackIdentifier: str
     mid: NotRequired[str]
     remoteId: NotRequired[str]
@@ -17100,18 +17168,18 @@ class RTCInboundRtpStreamStats(TypedDict, RTCReceivedRtpStreamStats):
     rtxSsrc: NotRequired[int]
     fecSsrc: NotRequired[int]
 
-class RTCRemoteInboundRtpStreamStats(TypedDict, RTCReceivedRtpStreamStats):
+class RTCRemoteInboundRtpStreamStats(RTCReceivedRtpStreamStats):
     localId: NotRequired[str]
     roundTripTime: NotRequired[float]
     totalRoundTripTime: NotRequired[float]
     fractionLost: NotRequired[float]
     roundTripTimeMeasurements: NotRequired[int]
 
-class RTCSentRtpStreamStats(TypedDict, RTCRtpStreamStats):
+class RTCSentRtpStreamStats(RTCRtpStreamStats):
     packetsSent: NotRequired[int]
     bytesSent: NotRequired[int]
 
-class RTCOutboundRtpStreamStats(TypedDict, RTCSentRtpStreamStats):
+class RTCOutboundRtpStreamStats(RTCSentRtpStreamStats):
     mid: NotRequired[str]
     mediaSourceId: NotRequired[str]
     remoteId: NotRequired[str]
@@ -17143,7 +17211,7 @@ class RTCOutboundRtpStreamStats(TypedDict, RTCSentRtpStreamStats):
     active: NotRequired[bool]
     scalabilityMode: NotRequired[str]
 
-class RTCRemoteOutboundRtpStreamStats(TypedDict, RTCSentRtpStreamStats):
+class RTCRemoteOutboundRtpStreamStats(RTCSentRtpStreamStats):
     localId: NotRequired[str]
     remoteTimestamp: NotRequired[DOMHighResTimeStamp]
     reportsSent: NotRequired[int]
@@ -17151,11 +17219,11 @@ class RTCRemoteOutboundRtpStreamStats(TypedDict, RTCSentRtpStreamStats):
     totalRoundTripTime: NotRequired[float]
     roundTripTimeMeasurements: NotRequired[int]
 
-class RTCMediaSourceStats(TypedDict, RTCStats):
+class RTCMediaSourceStats(RTCStats):
     trackIdentifier: str
     kind: str
 
-class RTCAudioSourceStats(TypedDict, RTCMediaSourceStats):
+class RTCAudioSourceStats(RTCMediaSourceStats):
     audioLevel: NotRequired[float]
     totalAudioEnergy: NotRequired[float]
     totalSamplesDuration: NotRequired[float]
@@ -17166,13 +17234,13 @@ class RTCAudioSourceStats(TypedDict, RTCMediaSourceStats):
     totalCaptureDelay: NotRequired[float]
     totalSamplesCaptured: NotRequired[int]
 
-class RTCVideoSourceStats(TypedDict, RTCMediaSourceStats):
+class RTCVideoSourceStats(RTCMediaSourceStats):
     width: NotRequired[int]
     height: NotRequired[int]
     frames: NotRequired[int]
     framesPerSecond: NotRequired[float]
 
-class RTCAudioPlayoutStats(TypedDict, RTCStats):
+class RTCAudioPlayoutStats(RTCStats):
     kind: str
     synthesizedSamplesDuration: NotRequired[float]
     synthesizedSamplesEvents: NotRequired[int]
@@ -17180,11 +17248,11 @@ class RTCAudioPlayoutStats(TypedDict, RTCStats):
     totalPlayoutDelay: NotRequired[float]
     totalSamplesCount: NotRequired[int]
 
-class RTCPeerConnectionStats(TypedDict, RTCStats):
+class RTCPeerConnectionStats(RTCStats):
     dataChannelsOpened: NotRequired[int]
     dataChannelsClosed: NotRequired[int]
 
-class RTCDataChannelStats(TypedDict, RTCStats):
+class RTCDataChannelStats(RTCStats):
     label: NotRequired[str]
     protocol: NotRequired[str]
     dataChannelIdentifier: NotRequired[int]
@@ -17194,7 +17262,7 @@ class RTCDataChannelStats(TypedDict, RTCStats):
     messagesReceived: NotRequired[int]
     bytesReceived: NotRequired[int]
 
-class RTCTransportStats(TypedDict, RTCStats):
+class RTCTransportStats(RTCStats):
     packetsSent: NotRequired[int]
     packetsReceived: NotRequired[int]
     bytesSent: NotRequired[int]
@@ -17212,7 +17280,7 @@ class RTCTransportStats(TypedDict, RTCStats):
     srtpCipher: NotRequired[str]
     selectedCandidatePairChanges: NotRequired[int]
 
-class RTCIceCandidateStats(TypedDict, RTCStats):
+class RTCIceCandidateStats(RTCStats):
     transportId: str
     address: NotRequired[Union['str', 'None']]
     port: NotRequired[int]
@@ -17227,7 +17295,7 @@ class RTCIceCandidateStats(TypedDict, RTCStats):
     usernameFragment: NotRequired[str]
     tcpType: NotRequired[RTCIceTcpCandidateType]
 
-class RTCIceCandidatePairStats(TypedDict, RTCStats):
+class RTCIceCandidatePairStats(RTCStats):
     transportId: str
     localCandidateId: str
     remoteCandidateId: str
@@ -17251,7 +17319,7 @@ class RTCIceCandidatePairStats(TypedDict, RTCStats):
     packetsDiscardedOnSend: NotRequired[int]
     bytesDiscardedOnSend: NotRequired[int]
 
-class RTCCertificateStats(TypedDict, RTCStats):
+class RTCCertificateStats(RTCStats):
     fingerprint: str
     fingerprintAlgorithm: str
     base64Certificate: str
@@ -17264,12 +17332,12 @@ class RTCIceServer(TypedDict):
 
 class RTCOfferAnswerOptions(TypedDict): ...
 
-class RTCOfferOptions(TypedDict, RTCOfferAnswerOptions):
+class RTCOfferOptions(RTCOfferAnswerOptions, TypedDict):
     iceRestart: NotRequired[bool]
     offerToReceiveAudio: NotRequired[bool]
     offerToReceiveVideo: NotRequired[bool]
 
-class RTCAnswerOptions(TypedDict, RTCOfferAnswerOptions): ...
+class RTCAnswerOptions(RTCOfferAnswerOptions): ...
 
 class RTCSessionDescription:
     @classmethod
@@ -17321,7 +17389,7 @@ class RTCPeerConnectionIceEvent(Event):
     candidate: Union['RTCIceCandidate', 'None']
     url: Union['str', 'None']
 
-class RTCPeerConnectionIceEventInit(TypedDict, EventInit):
+class RTCPeerConnectionIceEventInit(EventInit):
     candidate: NotRequired[Union['RTCIceCandidate', 'None']]
     url: NotRequired[Union['str', 'None']]
 
@@ -17334,7 +17402,7 @@ class RTCPeerConnectionIceErrorEvent(Event):
     errorCode: int
     errorText: str
 
-class RTCPeerConnectionIceErrorEventInit(TypedDict, EventInit):
+class RTCPeerConnectionIceErrorEventInit(EventInit):
     address: NotRequired[Union['str', 'None']]
     port: NotRequired[Union['int', 'None']]
     url: NotRequired[str]
@@ -17359,7 +17427,7 @@ class RTCRtpParameters(TypedDict):
     rtcp: RTCRtcpParameters
     codecs: Sequence[RTCRtpCodecParameters]
 
-class RTCRtpReceiveParameters(TypedDict, RTCRtpParameters): ...
+class RTCRtpReceiveParameters(RTCRtpParameters): ...
 
 class RTCRtpCodingParameters(TypedDict):
     rid: NotRequired[str]
@@ -17379,14 +17447,14 @@ class RTCRtpCodec(TypedDict):
     channels: NotRequired[int]
     sdpFmtpLine: NotRequired[str]
 
-class RTCRtpCodecParameters(TypedDict, RTCRtpCodec):
+class RTCRtpCodecParameters(RTCRtpCodec):
     payloadType: int
 
 class RTCRtpCapabilities(TypedDict):
     codecs: Sequence[RTCRtpCodecCapability]
     headerExtensions: Sequence[RTCRtpHeaderExtensionCapability]
 
-class RTCRtpCodecCapability(TypedDict, RTCRtpCodec): ...
+class RTCRtpCodecCapability(RTCRtpCodec): ...
 
 class RTCRtpHeaderExtensionCapability(TypedDict):
     uri: str
@@ -17399,7 +17467,7 @@ class RTCRtpContributingSource(TypedDict):
     audioLevel: NotRequired[float]
     rtpTimestamp: int
 
-class RTCRtpSynchronizationSource(TypedDict, RTCRtpContributingSource): ...
+class RTCRtpSynchronizationSource(RTCRtpContributingSource): ...
 
 class RTCRtpTransceiver:
     mid: Union['str', 'None']
@@ -17436,7 +17504,7 @@ class RTCTrackEvent(Event):
     streams: Sequence[MediaStream]
     transceiver: RTCRtpTransceiver
 
-class RTCTrackEventInit(TypedDict, EventInit):
+class RTCTrackEventInit(EventInit):
     receiver: RTCRtpReceiver
     track: MediaStreamTrack
     streams: NotRequired[Sequence[MediaStream]]
@@ -17454,7 +17522,7 @@ class RTCDataChannelEvent(Event):
     def new(cls, type: str, eventInitDict: RTCDataChannelEventInit) -> RTCDataChannelEvent: ...
     channel: RTCDataChannel
 
-class RTCDataChannelEventInit(TypedDict, EventInit):
+class RTCDataChannelEventInit(EventInit):
     channel: RTCDataChannel
 
 class RTCDTMFSender(EventTarget):
@@ -17469,7 +17537,7 @@ class RTCDTMFToneChangeEvent(Event):
     def new(cls, type: str, eventInitDict: Union['RTCDTMFToneChangeEventInit', 'None'] = {}) -> RTCDTMFToneChangeEvent: ...
     tone: str
 
-class RTCDTMFToneChangeEventInit(TypedDict, EventInit):
+class RTCDTMFToneChangeEventInit(EventInit):
     tone: NotRequired[str]
 
 class RTCStatsReport: ...
@@ -17484,7 +17552,7 @@ class RTCErrorEvent(Event):
     def new(cls, type: str, eventInitDict: RTCErrorEventInit) -> RTCErrorEvent: ...
     error: RTCError
 
-class RTCErrorEventInit(TypedDict, EventInit):
+class RTCErrorEventInit(EventInit):
     error: RTCError
 
 class WebSocket(EventTarget):
@@ -17516,7 +17584,7 @@ class CloseEvent(Event):
     code: int
     reason: str
 
-class CloseEventInit(TypedDict, EventInit):
+class CloseEventInit(EventInit):
     wasClean: NotRequired[bool]
     code: NotRequired[int]
     reason: NotRequired[str]
@@ -17642,7 +17710,7 @@ class USB(EventTarget):
 
     def requestDevice(self, options: USBDeviceRequestOptions) -> Awaitable[USBDevice]: ...
 
-class USBConnectionEventInit(TypedDict, EventInit):
+class USBConnectionEventInit(EventInit):
     device: USBDevice
 
 class USBConnectionEvent(Event):
@@ -17774,7 +17842,7 @@ class USBEndpoint:
     type: USBEndpointType
     packetSize: int
 
-class USBPermissionDescriptor(TypedDict, PermissionDescriptor):
+class USBPermissionDescriptor(PermissionDescriptor):
     filters: NotRequired[Sequence[USBDeviceFilter]]
     exclusionFilters: NotRequired[Sequence[USBDeviceFilter]]
 
@@ -18004,7 +18072,7 @@ class XRSessionEvent(Event):
     def new(cls, type: str, eventInitDict: XRSessionEventInit) -> XRSessionEvent: ...
     session: XRSession
 
-class XRSessionEventInit(TypedDict, EventInit):
+class XRSessionEventInit(EventInit):
     session: XRSession
 
 class XRInputSourceEvent(Event):
@@ -18013,7 +18081,7 @@ class XRInputSourceEvent(Event):
     frame: XRFrame
     inputSource: XRInputSource
 
-class XRInputSourceEventInit(TypedDict, EventInit):
+class XRInputSourceEventInit(EventInit):
     frame: XRFrame
     inputSource: XRInputSource
 
@@ -18024,7 +18092,7 @@ class XRInputSourcesChangeEvent(Event):
     added: Sequence[XRInputSource]
     removed: Sequence[XRInputSource]
 
-class XRInputSourcesChangeEventInit(TypedDict, EventInit):
+class XRInputSourcesChangeEventInit(EventInit):
     session: XRSession
     added: Sequence[XRInputSource]
     removed: Sequence[XRInputSource]
@@ -18035,14 +18103,14 @@ class XRReferenceSpaceEvent(Event):
     referenceSpace: XRReferenceSpace
     transform: Union['XRRigidTransform', 'None']
 
-class XRReferenceSpaceEventInit(TypedDict, EventInit):
+class XRReferenceSpaceEventInit(EventInit):
     referenceSpace: XRReferenceSpace
     transform: NotRequired[Union['XRRigidTransform', 'None']]
 
-class XRSessionSupportedPermissionDescriptor(TypedDict, PermissionDescriptor):
+class XRSessionSupportedPermissionDescriptor(PermissionDescriptor):
     mode: NotRequired[XRSessionMode]
 
-class XRPermissionDescriptor(TypedDict, PermissionDescriptor):
+class XRPermissionDescriptor(PermissionDescriptor):
     mode: NotRequired[XRSessionMode]
     requiredFeatures: NotRequired[Sequence[str]]
     optionalFeatures: NotRequired[Sequence[str]]
@@ -18131,20 +18199,20 @@ class XRLayerInit(TypedDict):
     isStatic: NotRequired[bool]
     clearOnAccess: NotRequired[bool]
 
-class XRQuadLayerInit(TypedDict, XRLayerInit):
+class XRQuadLayerInit(XRLayerInit):
     textureType: NotRequired[XRTextureType]
     transform: NotRequired[Union['XRRigidTransform', 'None']]
     width: NotRequired[float]
     height: NotRequired[float]
 
-class XRCylinderLayerInit(TypedDict, XRLayerInit):
+class XRCylinderLayerInit(XRLayerInit):
     textureType: NotRequired[XRTextureType]
     transform: NotRequired[Union['XRRigidTransform', 'None']]
     radius: NotRequired[float]
     centralAngle: NotRequired[float]
     aspectRatio: NotRequired[float]
 
-class XREquirectLayerInit(TypedDict, XRLayerInit):
+class XREquirectLayerInit(XRLayerInit):
     textureType: NotRequired[XRTextureType]
     transform: NotRequired[Union['XRRigidTransform', 'None']]
     radius: NotRequired[float]
@@ -18152,7 +18220,7 @@ class XREquirectLayerInit(TypedDict, XRLayerInit):
     upperVerticalAngle: NotRequired[float]
     lowerVerticalAngle: NotRequired[float]
 
-class XRCubeLayerInit(TypedDict, XRLayerInit):
+class XRCubeLayerInit(XRLayerInit):
     orientation: NotRequired[Union['DOMPointReadOnly', 'None']]
 
 class XRMediaLayerInit(TypedDict):
@@ -18160,18 +18228,18 @@ class XRMediaLayerInit(TypedDict):
     layout: NotRequired[XRLayerLayout]
     invertStereo: NotRequired[bool]
 
-class XRMediaQuadLayerInit(TypedDict, XRMediaLayerInit):
+class XRMediaQuadLayerInit(XRMediaLayerInit):
     transform: NotRequired[Union['XRRigidTransform', 'None']]
     width: NotRequired[Union['float', 'None']]
     height: NotRequired[Union['float', 'None']]
 
-class XRMediaCylinderLayerInit(TypedDict, XRMediaLayerInit):
+class XRMediaCylinderLayerInit(XRMediaLayerInit):
     transform: NotRequired[Union['XRRigidTransform', 'None']]
     radius: NotRequired[float]
     centralAngle: NotRequired[float]
     aspectRatio: NotRequired[Union['float', 'None']]
 
-class XRMediaEquirectLayerInit(TypedDict, XRMediaLayerInit):
+class XRMediaEquirectLayerInit(XRMediaLayerInit):
     transform: NotRequired[Union['XRRigidTransform', 'None']]
     radius: NotRequired[float]
     centralHorizontalAngle: NotRequired[float]
@@ -18193,7 +18261,7 @@ class XRLayerEvent(Event):
     def new(cls, type: str, eventInitDict: XRLayerEventInit) -> XRLayerEvent: ...
     layer: XRLayer
 
-class XRLayerEventInit(TypedDict, EventInit):
+class XRLayerEventInit(EventInit):
     layer: XRLayer
 
 class WindowControlsOverlay(EventTarget):
@@ -18208,7 +18276,7 @@ class WindowControlsOverlayGeometryChangeEvent(Event):
     titlebarAreaRect: DOMRect
     visible: bool
 
-class WindowControlsOverlayGeometryChangeEventInit(TypedDict, EventInit):
+class WindowControlsOverlayGeometryChangeEventInit(EventInit):
     titlebarAreaRect: DOMRect
     visible: NotRequired[bool]
 
@@ -18266,7 +18334,7 @@ class ProgressEvent(Event):
     loaded: int
     total: int
 
-class ProgressEventInit(TypedDict, EventInit):
+class ProgressEventInit(EventInit):
     lengthComputable: NotRequired[bool]
     loaded: NotRequired[int]
     total: NotRequired[int]
@@ -18277,4 +18345,4 @@ document: Document
 window: Window
 navigator: Navigator
 console: ConsoleNamespace
-
+WindowProxy: TypeAlias = Window
