@@ -59,10 +59,10 @@ class Websocket:
     def __init__(self, url: str):
         self.inner = js.WebSocket.new(url)
 
-        self.inner.addEventListener("close", create_proxy(self.on_close))
-        self.inner.addEventListener("error", create_proxy(self.on_error))
-        self.inner.addEventListener("open", create_proxy(self.on_open))
-        self.inner.addEventListener("message", create_proxy(self.on_message))
+        self.inner.addEventListener("close", create_proxy(self.on_close))  # type: ignore
+        self.inner.addEventListener("error", create_proxy(self.on_error))  # type: ignore
+        self.inner.addEventListener("open", create_proxy(self.on_open))  # type: ignore
+        self.inner.addEventListener("message", create_proxy(self.on_message))  # type: ignore
 
         self.state = WebsocketState(self.inner.readyState)
         self.messages = asyncio.Queue[Any]()
@@ -88,7 +88,7 @@ class Websocket:
         self.state = self.inner.readyState
 
     def send(self, data: Any):
-        self.inner.send(data)
+        self.inner.send(data)  # type: ignore
 
     async def recv(self) -> Any:
         return await self.messages.get()

@@ -241,7 +241,6 @@ class ElementArgs(TypedDict, total=False):
     inert: str
     inputmode: str
     is_: str
-    inputmode: str
     itemid: str
     itemprop: str
     itemref: str
@@ -334,443 +333,451 @@ class ElementArgs(TypedDict, total=False):
 mapped_attributes = {"prevent_default": "kine-prevent-default", "class_": "class", "for_": "for", "is_": "is"}
 
 
-class Element(BaseElement):
+class InnnerElement(BaseElement):
     def __init__(self, **attributes: Unpack[ElementArgs]):
         unrolled_attributes = cast(dict[str, Any], attributes) | attributes.pop("extras", cast(dict[str, Any], {}))
         remapped_attributes = {mapped_attributes.get(k, k): v for k, v in unrolled_attributes.items()}
 
         super().__init__(**remapped_attributes)
 
+class Element(CGI, InnnerElement):
+    pass
 
-class base(CGI, Element):
+class base(Element):
     pass
 
 
-class head(CGI, Element):
+class head(Element):
     pass
 
 
-class link(CGI, Element):
+class link(Element):
     pass
 
 
-class title(CGI, Element):
+class title(Element):
     pass
 
 
-class body(CGI, Element):
+class body(Element):
     pass
 
 
-class address(CGI, Element):
+class address(Element):
     pass
 
 
-class article(CGI, Element):
+class article(Element):
     pass
 
 
-class input(CGI, Element):
+class input(Element):
     pass
 
 
-class button(CGI, Element):
+class button(Element):
     pass
 
 
-class h1(CGI, Element):
+class h1(Element):
     pass
 
 
-class h2(CGI, Element):
+class h2(Element):
     pass
 
 
-class h3(CGI, Element):
+class h3(Element):
     pass
 
 
-class h4(CGI, Element):
+class h4(Element):
     pass
 
 
-class h5(CGI, Element):
+class h5(Element):
     pass
 
 
-class a(CGI, Element):
+class a(Element):
     pass
 
 
-class abbr(CGI, Element):
+class abbr(Element):
     pass
 
 
-class area(CGI, Element):
+class area(Element):
     pass
 
 
-class aside(CGI, Element):
+class aside(Element):
     pass
 
 
-class audio(CGI, Element):
+class audio(Element):
     pass
 
 
-class b(CGI, Element):
+class b(Element):
     pass
 
 
-class bdi(CGI, Element):
+class bdi(Element):
     pass
 
 
-class bdo(CGI, Element):
+class bdo(Element):
     pass
 
 
-class blockquote(CGI, Element):
+class blockquote(Element):
     pass
 
 
-class br(CGI, Element):
+class br(Element):
     pass
 
 
-class canvas(CGI, Element):
+class canvas(Element):
     pass
 
 
-class caption(CGI, Element):
+class caption(Element):
     pass
 
 
-class cite(CGI, Element):
+class cite(Element):
     pass
 
 
-class code(CGI, Element):
+class code(Element):
     pass
 
 
-class col(CGI, Element):
+class col(Element):
     pass
 
 
-class colgroup(CGI, Element):
+class colgroup(Element):
     pass
 
 
-class data(CGI, Element):
+class data(Element):
     pass
 
 
-class datalist(CGI, Element):
+class datalist(Element):
     pass
 
 
-class dd(CGI, Element):
+class dd(Element):
     pass
 
 
-del_ = type("del", (CGI, Element), {})
+del_ = type("del", (Element,), {})
 
 
-class details(CGI, Element):
+class details(Element):
     pass
 
 
-class dfn(CGI, Element):
+class dfn(Element):
     pass
 
 
-class dialog(CGI, Element):
+class dialog(Element):
     pass
 
 
-class dl(CGI, Element):
+class dl(Element):
     pass
 
 
-class dt(CGI, Element):
+class dt(Element):
     pass
 
 
-class em(CGI, Element):
+class em(Element):
     pass
 
 
-class embed(CGI, Element):
+class embed(Element):
     pass
 
 
-class fieldset(CGI, Element):
+class fieldset(Element):
     pass
 
 
-class figcaption(CGI, Element):
+class figcaption(Element):
     pass
 
 
-class figure(CGI, Element):
+class figure(Element):
     pass
 
 
-class footer(CGI, Element):
+class footer(Element):
     pass
 
 
-class form(CGI, Element):
+class form(Element):
     pass
 
 
-class header(CGI, Element):
+class header(Element):
     pass
 
 
-class hgroup(CGI, Element):
+class hgroup(Element):
     pass
 
 
-class hr(CGI, Element):
+class hr(Element):
     pass
 
 
-class html(CGI, Element):
+class html(Element):
     pass
 
 
-class i(CGI, Element):
+class i(Element):
     pass
 
 
-class iframe(CGI, Element):
+class iframe(Element):
     pass
 
 
-class img(CGI, Element):
+class img(Element):
     pass
 
 
-class ins(CGI, Element):
+class ins(Element):
     pass
 
 
-class kbd(CGI, Element):
+class kbd(Element):
     pass
 
 
-class label(CGI, Element):
+class label(Element):
     pass
 
 
-class legend(CGI, Element):
+class legend(Element):
     pass
 
 
-class li(CGI, Element):
+class li(Element):
     pass
 
 
-class main(CGI, Element):
+class main(Element):
     pass
 
 
-map_ = type("map", (CGI, Element), {})
+map_ = type("map", (Element,), {})
 
 
-class mark(CGI, Element):
+class mark(Element):
     pass
 
 
-class menu(CGI, Element):
+class menu(Element):
     pass
 
 
-class meta(CGI, Element):
+class meta(Element):
     pass
 
 
-class meter(CGI, Element):
+class meter(Element):
     pass
 
 
-class nav(CGI, Element):
+class nav(Element):
     pass
 
 
-class noscript(CGI, Element):
+class noscript(Element):
     pass
 
 
-class object(CGI, Element):
+class object(Element):
     pass
 
 
-class ol(CGI, Element):
+class ol(Element):
     pass
 
 
-class optgroup(CGI, Element):
+class optgroup(Element):
     pass
 
 
-class option(CGI, Element):
+class option(Element):
     pass
 
 
-class output(CGI, Element):
+class output(Element):
     pass
 
 
-class p(CGI, Element):
+class p(Element):
     pass
 
 
-class picture(CGI, Element):
+class picture(Element):
     pass
 
 
-class pre(CGI, Element):
+class pre(Element):
     pass
 
 
-class progress(CGI, Element):
+class progress(Element):
     pass
 
 
-class q(CGI, Element):
+class q(Element):
     pass
 
 
-class rp(CGI, Element):
+class rp(Element):
     pass
 
 
-class rt(CGI, Element):
+class rt(Element):
     pass
 
 
-class ruby(CGI, Element):
+class ruby(Element):
     pass
 
 
-class s(CGI, Element):
+class s(Element):
     pass
 
 
-class samp(CGI, Element):
+class samp(Element):
     pass
 
 
-class script(CGI, Element):
+class script(Element):
     pass
 
 
-class section(CGI, Element):
+class section(Element):
     pass
 
 
-class select(CGI, Element):
+class select(Element):
     pass
 
 
-class slot(CGI, Element):
+class slot(Element):
     pass
 
 
-class small(CGI, Element):
+class small(Element):
     pass
 
 
-class source(CGI, Element):
+class source(Element):
     pass
 
 
-class span(CGI, Element):
+class span(Element):
     pass
 
 
-class strong(CGI, Element):
+class strong(Element):
     pass
 
 
-class style(CGI, Element):
+class style(Element):
     pass
 
 
-class sub(CGI, Element):
+class sub(Element):
     pass
 
 
-class summary(CGI, Element):
+class summary(Element):
     pass
 
 
-class sup(CGI, Element):
+class sup(Element):
     pass
 
 
-class table(CGI, Element):
+class table(Element):
     pass
 
 
-class tbody(CGI, Element):
+class tbody(Element):
     pass
 
 
-class td(CGI, Element):
+class td(Element):
     pass
 
 
-class template(CGI, Element):
+class template(Element):
     pass
 
 
-class textarea(CGI, Element):
+class textarea(Element):
     pass
 
 
-class tfoot(CGI, Element):
+class tfoot(Element):
     pass
 
 
-class thead(CGI, Element):
+class thead(Element):
     pass
 
 
-class time(CGI, Element):
+class time(Element):
     pass
 
 
-class tr(CGI, Element):
+class tr(Element):
     pass
 
 
-class track(CGI, Element):
+class track(Element):
     pass
 
 
-class u(CGI, Element):
+class u(Element):
     pass
 
 
-class ul(CGI, Element):
+class ul(Element):
     pass
 
 
-class var(CGI, Element):
+class var(Element):
     pass
 
 
-class video(CGI, Element):
+class video(Element):
     pass
 
 
-class wbr(CGI, Element):
+class wbr(Element):
     pass
 
 
-class div(CGI, Element):
+class div(Element):
     pass
+
+def el(name: str, /, **kwargs: Unpack[ElementArgs]) -> Element:
+    el = Element(**kwargs)
+    el.name = name
+
+    return el

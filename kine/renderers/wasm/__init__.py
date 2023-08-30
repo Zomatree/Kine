@@ -161,7 +161,7 @@ class App(Generic[P]):
 
                         if not g:
                             self.globals[mod.event_name] = GlobalEvent(active=1, callback=proxy_func)
-                            self.nodes[ElementId(0)].addEventListener(mod.event_name, proxy_func)
+                            self.nodes[ElementId(0)].addEventListener(mod.event_name, proxy_func)  # type: ignore
                         else:
                             g["active"] += 1
 
@@ -173,7 +173,7 @@ class App(Generic[P]):
 
                         local[mod.event_name] = proxy_func
 
-                        node.addEventListener(mod.event_name, proxy_func)
+                        node.addEventListener(mod.event_name, proxy_func)  # type: ignore
 
                 case diff.SetText():
                     node = self.nodes[mod.root]

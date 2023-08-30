@@ -15,6 +15,11 @@ class ElementArgs(TypedDict, total=False):
 
 
 class Element:
+    name: str
+
+    def __init_subclass__(cls) -> None:
+        cls.name = cls.__name__
+
     def __init__(self, **attributes: Unpack[ElementArgs]):
         self.children: tuple[Node, ...] = ()
         self.listeners: dict[str, Callable[[Any], None]] = {}

@@ -18,7 +18,7 @@ class VirtualDom:
         self.scopes = Scopes(app)
         self.scopes.dom = self
 
-        self.dirty_scopes = {ScopeId(0)}
+        self.dirty_scopes: set[ScopeId] = {ScopeId(0)}
         self.messages: asyncio.Queue[ScheduleMessage] = asyncio.Queue()
         self.pending_messages = deque[ScheduleMessage]()
 
@@ -111,7 +111,7 @@ class VirtualDom:
             diff = Diff(self.scopes)
             ran_scopes: set[ScopeId] = set()
 
-            self.dirty_scopes: set[ScopeId] = {
+            self.dirty_scopes = {
                 scope_id for scope_id in self.dirty_scopes if scope_id in self.scopes.scopes
             }
 

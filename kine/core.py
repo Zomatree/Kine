@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 P = ParamSpec("P")
 T = TypeVar("T")
 
-__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes", "no_memo")
+__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes", "memo")
 
 
 class Listener:
@@ -84,7 +84,7 @@ class ComponentFunction(Generic[P]):
         self._key: str | None = None
         self.args = args
         self.kwargs = kwargs
-        self.dont_memorize: bool = False
+        self.memorize: bool = False
 
     def key(self, key: str):
         self._key = key
@@ -112,11 +112,11 @@ def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[P, Compo
 
     return wrapper
 
-def no_memo(func: Callable[P, ComponentFunction[P]]) -> Callable[P, ComponentFunction[P]]:
+def memo(func: Callable[P, ComponentFunction[P]]) -> Callable[P, ComponentFunction[P]]:
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
         component = func(*args, **kwargs)
-        component.dont_memorize = True
+        component.memorize = True
         return component
 
     return wrapper

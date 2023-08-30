@@ -224,7 +224,7 @@ class Diff:
             for key in old.attributes:
                 self.mutations.append(RemoveAttribute(element_id, key))
 
-            for key, value in new.attributes:
+            for key, value in new.attributes.items():
                 self.mutations.append(SetAttribute(element_id, key, value))
 
         match old.children, new.children:
@@ -232,7 +232,7 @@ class Diff:
                 pass
 
             case [], new_children:
-                created = []
+                created: list[ElementId] = []
                 self.create_children(element_id, new_children, created)
                 self.mutations.append(AppendChildren(element_id, created))
 

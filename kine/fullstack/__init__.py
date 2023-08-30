@@ -37,7 +37,7 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
     else:
         async def api_runner():
             from aiohttp import web
-            import aiohttp_cors
+            import aiohttp_cors  # type: ignore
 
             server = web.Application()
             cors = aiohttp_cors.setup(server)
@@ -57,9 +57,9 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
                     return web.Response(body=pickle.dumps(response))
 
                 route = server.router.add_post(f"/{func.__name__}", wrapper)
-                cors.add(route, {f"*": aiohttp_cors.ResourceOptions(allow_credentials=True, expose_headers="*", allow_headers="*", allow_methods="*")})
+                cors.add(route, {f"*": aiohttp_cors.ResourceOptions(allow_credentials=True, expose_headers="*", allow_headers="*", allow_methods="*")})  # type: ignore
 
-            await web._run_app(server, port=api_port, host=host, print=lambda _: print(f"Running api on http://{host}:{api_port}"))
+            await web._run_app(server, port=api_port, host=host, print=lambda _: print(f"Running api on http://{host}:{api_port}"))  # type: ignore
 
         web_p = subprocess.Popen([sys.executable, "-m", "kine", "run", "--host", host, "--port", str(web_port)])
         api_p = multiprocessing.Process(target=lambda: asyncio.run(api_runner()))

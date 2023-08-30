@@ -3,6 +3,10 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar
 
+from kine.messages import Immediate
+
+from .utils import ScopeId
+
 if TYPE_CHECKING:
     from .scope import Scope
 
@@ -17,6 +21,10 @@ __all__ = (
     "use_global_state",
     "use_set",
     "use_read",
+    "signal",
+    "Signal",
+    "use_read_signal",
+    "use_write_signal",
 )
 
 T = TypeVar("T")
@@ -120,3 +128,33 @@ def use_set(cx: Scope, state: GlobalStateCallback[T]) -> Callable[[T], None]:
         cx.schedule_update()
 
     return callback
+
+class Signal(Generic[T]):
+    def __init__(self, value: T):
+        self._value = value
+        self.readers: list[ScopeId] = []
+
+    def peek(self) -> T:
+        return self._value
+
+    def requires_update(self, cx: Scope):
+        for scope_id in self.readers:
+            cx.scopes.dom.messages.put_nowait(Immediate(scope_id))
+
+def signal(initial: T) -> Signal[T]:
+    return Signal(initial)
+
+def use_read_signal(cx: Scope, signal: Signal[T]) -> T:
+    def inner():
+        signal.readers.append(cx.scope_id)
+
+    cx.use_hook(inner)
+
+    return signal._value
+
+def use_write_signal(cx: Scope, signal: Signal[T]) -> Callable[[T], None]:
+    def writer(value: T):
+        signal._value = value
+        signal.requires_update(cx)
+
+    return writer

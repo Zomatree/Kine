@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Iterable, Mapping, ParamSpec
 
 from dataclasses import dataclass
-from kine import Node, no_memo
+from kine import Node
 
 from ...fullstack import IS_WEB_PLATFORM
 from ...renderers.web_elements import a, div
@@ -31,7 +31,8 @@ class UseRouter:
         import pyodide.ffi
 
         self.current_route = route
-        js.window.history.pushState(pyodide.ffi.to_js({}), "", route)
+        empty: dict[Any, Any] = {}
+        js.window.history.pushState(pyodide.ffi.to_js(empty), "", route)
 
         self.scope.root_scope().schedule_update()
 
@@ -63,7 +64,6 @@ class Route:
     route: str
     child: Node
 
-@no_memo
 @component
 def router(cx: Scope, *elements: Route | Node, not_found: Node | None = "404: Not Found"):
     routes: list[Route] = []

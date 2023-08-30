@@ -10,10 +10,10 @@ T = TypeVar("T")
 STYLES: dict[str, str] = {}
 
 
-def styled_component(element: type, styling: str) -> Callable[..., ComponentFunction[...]]:
+def styled_component(element: type[Element], styling: str) -> Callable[..., ComponentFunction[...]]:
     random_chars = "".join(random.choices(string.ascii_lowercase, k=10))
 
-    class_name = f"{element.__name__}_{random_chars}"
+    class_name = f"{element.name}_{random_chars}"
 
     STYLES[class_name] = styling
 

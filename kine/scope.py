@@ -117,7 +117,7 @@ class Scope:
             nodes: list[VNode] = []
 
             vnode = VElement(
-                node.__class__.__name__,
+                node.name,
                 nodes,
                 node.attributes,  # type: ignore
                 [Listener(name, func) for name, func in node.listeners.items()],
@@ -227,7 +227,7 @@ class Scopes:
 
         scope.children = component.children
 
-        if scope.generation != 0 and not component.dont_memorize:
+        if scope.generation != 0 and component.memorize:
             finished_node, args, kwargs = scope.fin_frame()
 
             if args == component.args and kwargs == component.kwargs and not scope.hooks:
