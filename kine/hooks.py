@@ -92,9 +92,6 @@ class Signal(Generic[T]):
         self.initial = initial
         self.instances: dict[int, InnerSignal[T]] = {}
 
-    def peek(self, scope: Scope) -> T:
-        return self.instances[scope.root_id].value
-
     def requires_update(self, cx: Scope):
         for scope_id in self.instances[cx.root_id].readers:
             cx.scopes.dom.messages.put_nowait(Immediate(scope_id))
@@ -132,3 +129,8 @@ def use_write_signal(cx: Scope, signal: Signal[T]) -> Callable[[T], None]:
         signal.requires_update(cx)
 
     return writer
+
+def use_peek_signal(cx: Scope, signal: Signal[T]) -> T:
+    inner = cx.use_hook(write_hook, cx, signal)
+
+    return inner.value
