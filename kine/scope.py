@@ -20,9 +20,10 @@ T = TypeVar("T")
 
 class Scope:
     def __init__(
-        self, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, container: ElementId, scopes: Scopes
+        self, root_id: int, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, container: ElementId, scopes: Scopes
     ):
-        self.scope_id = scope_id
+        self.root_id = root_id
+        self.scope_id: ScopeId = scope_id
         self.parent_scope = parent_scope
         self.component: ComponentFunction[...] | None = None
         self.height = height
@@ -120,7 +121,7 @@ class Scope:
             vnode = VElement(
                 node.name,
                 nodes,
-                node.attributes,  # type: ignore
+                node.attributes,  # type: ignore - cant downcast to dict
                 [Listener(name, func) for name, func in node.listeners.items()],
                 node._key,
             )
@@ -173,7 +174,7 @@ class Scopes:
         parent_scope = self.scopes[parent] if parent is not None else None
         height = parent_scope.height + 1 if parent_scope else 0
 
-        scope = Scope(scope_id, parent_scope, height, container, self)
+        scope = Scope(id(self), scope_id, parent_scope, height, container, self)
 
         self.scopes[scope_id] = scope
 
