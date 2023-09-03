@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, Union, get_args
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, get_args
 
 if TYPE_CHECKING:
     from .utils import ElementId, ScopeId
@@ -14,14 +14,12 @@ class BaseEvent(Generic[T]):
     table: dict[str, Any] = {}
     __orig_bases__: tuple[type, ...]
 
-    subclasses = Union["EventMessage", "Immediate", "DirtyAll", "NewTask"]
-
     def __init_subclass__(cls) -> None:
         cls.type = get_args(get_args(cls.__orig_bases__[0])[0])[0]
         cls.table[cls.type] = cls
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> BaseEvent.subclasses:
+    def from_dict(cls, data: dict[str, Any]) -> ScheduleMessage:
         message_type: str = data.pop("type")
 
         return cls.table[message_type](**data)
@@ -53,4 +51,4 @@ class NewTask(BaseEvent[Literal["NewTask"]]):
 
 
 from_dict = BaseEvent.from_dict
-ScheduleMessage = BaseEvent.subclasses
+ScheduleMessage = EventMessage | Immediate | DirtyAll | NewTask
