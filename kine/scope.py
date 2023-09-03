@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Optional, ParamSpec, TypeVar
 
 from .core import ComponentFunction, Element, Listener, VComponent, VElement, VNode, VPlaceholder, VString
 from .messages import EventMessage, Immediate
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 __all__ = ("Scope", "Scopes", "TaskQueue")
 
+P = ParamSpec("P")
 T = TypeVar("T")
 
 
@@ -35,11 +36,11 @@ class Scope:
         self.hook_idx = 0
         self.children: tuple[Node, ...] = ()
 
-    def use_hook(self: Scope, f: Callable[[], T]) -> T:
+    def use_hook(self, f: Callable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
         hook_len = len(self.hooks)
 
         if self.hook_idx >= hook_len:
-            self.hooks.append(f())
+            self.hooks.append(f(*args, **kwargs))
 
         value = self.hooks[self.hook_idx]
         self.hook_idx += 1
