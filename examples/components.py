@@ -3,7 +3,6 @@ from kine.renderers.web import *
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, Callable
 
 
 @dataclass
@@ -13,29 +12,25 @@ class Item:
     description: str
 
 
-ItemState: Callable[[], dict[int, Item]] = lambda: {}
-
+items: Signal[dict[int, Item]] = signal(lambda: {})
 
 @component
-def item(cx: Scope, item_id: int):
-    item_state = use_read(cx, ItemState)
-    item = item_state[item_id]
-
-    return cx.render(div[h3[item.title], p[item.description]])
+def item(cx: Scope, item: Item):
+    return cx.render(div[
+        h3[item.title],
+        p[item.description]
+    ])
 
 
 @component
 def add_item(cx: Scope):
-    item_state = use_read(cx, ItemState)
-    set_item_state = use_set(cx, ItemState)
-
     title = use_state(cx, lambda: "")
     description = use_state(cx, lambda: "")
 
-    def update_items(_: Any):
-        id = len(item_state)
-        item_state[id] = Item(id, title.get(), description.get())
-        set_item_state(item_state)
+    def update_items(items: dict[int, Item]):
+        id = len(items)
+
+        items[id] = Item(id, title.get(), description.get())
 
     return cx.render(
         div[
@@ -43,16 +38,21 @@ def add_item(cx: Scope):
             input(type="text", oninput=lambda evt: title.set(evt["value"])),
             h3["Description"],
             input(type="text", oninput=lambda evt: description.set(evt["value"])),
-            button(onclick=update_items)["Create"],
+            button(onclick=lambda _: items.mutate(cx, update_items))["Create"],
         ]
     )
 
 
 @component
 def app(cx: Scope):
-    item_state = use_read(cx, ItemState)
+    item_state = use_read_signal(cx, items)
 
-    return cx.render(div[add_item(), div[(item(item_id).key(str(item_id)) for item_id in item_state.keys())]])
+    return cx.render(div[
+        add_item(),
+        div[(
+            item(it).key(str(it.id)) for it in item_state.values())
+        ]
+    ])
 
 
 asyncio.run(start_web(app()))
