@@ -21,6 +21,7 @@ __all__ = (
     "Signal",
     "use_read_signal",
     "use_write_signal",
+    "use_peek_signal",
 )
 
 T = TypeVar("T")
@@ -95,6 +96,20 @@ class Signal(Generic[T]):
     def requires_update(self, cx: Scope):
         for scope_id in self.instances[cx.root_id].readers:
             cx.scopes.dom.messages.put_nowait(Immediate(scope_id))
+
+    def mutate(self, cx: Scope, f: Callable[[T], Any]):
+        inner = write_hook(cx, self)
+
+        f(inner.value)
+
+        self.requires_update(cx)
+
+    def modify(self, cx: Scope, f: Callable[[T], T]):
+        inner = write_hook(cx, self)
+
+        inner.value = f(inner.value)
+
+        self.requires_update(cx)
 
     def __repr__(self) -> str:
         return f"<Signal initial_value={self.initial()!r}>"
