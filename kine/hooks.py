@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar
 
 from kine.messages import Immediate
@@ -16,11 +17,6 @@ __all__ = (
     "use_future",
     "UseState",
     "UseFuture",
-    "GlobalState",
-    "GlobalStateCallback",
-    "use_global_state",
-    "use_set",
-    "use_read",
     "signal",
     "Signal",
     "use_read_signal",
@@ -86,75 +82,53 @@ class UseFuture(Generic[T]):
 
         return task
 
-GlobalStateCallback = Callable[[], T]
-
-
-class GlobalState:
-    def __init__(self, scope: Scope):
-        self.scope = scope
-        self.states: dict[GlobalStateCallback[Any], Any] = {}
-
-    def get(self, state: GlobalStateCallback[T]) -> T:
-        if state in self.states:
-            return self.states[state]
-        else:
-            value = self.states[state] = state()
-            return value
-
-
-def use_global_state(cx: Scope) -> GlobalState:
-    def hook():
-        try:
-            return cx.consume_context(GlobalState)
-        except:
-            return cx.provide_root_context(GlobalState(cx))
-
-    return cx.use_hook(hook)
-
-
-def use_read(cx: Scope, state: GlobalStateCallback[T]) -> T:
-    root = use_global_state(cx)
-    value = root.get(state)
-
-    return value
-
-
-def use_set(cx: Scope, state: GlobalStateCallback[T]) -> Callable[[T], None]:
-    root = use_global_state(cx)
-
-    def callback(value: T):
-        root.states[state] = value
-
-        cx.schedule_update()
-
-    return callback
+@dataclass
+class InnerSignal(Generic[T]):
+    value: T
+    readers: list[ScopeId] = field(default_factory=list)
 
 class Signal(Generic[T]):
-    def __init__(self, value: T):
-        self._value = value
-        self.readers: list[ScopeId] = []
+    def __init__(self, initial: Callable[[], T]):
+        self.initial = initial
+        self.instances: dict[int, InnerSignal[T]] = {}
 
-    def peek(self) -> T:
-        return self._value
+    def peek(self, scope: Scope) -> T:
+        return self.instances[scope.root_id].value
 
     def requires_update(self, cx: Scope):
-        for scope_id in self.readers:
+        for scope_id in self.instances[cx.root_id].readers:
             cx.scopes.dom.messages.put_nowait(Immediate(scope_id))
 
-def signal(initial: T) -> Signal[T]:
+    def __repr__(self) -> str:
+        return f"<Signal initial_value={self.initial()!r}>"
+
+def signal(initial: Callable[[], T]) -> Signal[T]:
     return Signal(initial)
 
+
+def read_hook(cx: Scope, signal: Signal[Any]):
+    if not (inner := signal.instances.get(cx.root_id)):
+        inner = signal.instances[cx.root_id] = InnerSignal(signal.initial())
+
+    inner.readers.append(cx.scope_id)
+    return inner
+
 def use_read_signal(cx: Scope, signal: Signal[T]) -> T:
-    def inner():
-        signal.readers.append(cx.scope_id)
+    inner = cx.use_hook(read_hook, cx, signal)
+    return inner.value
 
-    cx.use_hook(inner)
 
-    return signal._value
+def write_hook(cx: Scope, signal: Signal[T]) -> InnerSignal[T]:
+    if not (inner := signal.instances.get(cx.root_id)):
+        inner = signal.instances[cx.root_id] = InnerSignal(signal.initial())
+
+    return inner
 
 def use_write_signal(cx: Scope, signal: Signal[T]) -> Callable[[T], None]:
+    inner = cx.use_hook(write_hook, cx, signal)
+
     def writer(value: T):
-        signal._value = value
+        inner.value = value
         signal.requires_update(cx)
 
     return writer
