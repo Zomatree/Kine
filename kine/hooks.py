@@ -11,7 +11,6 @@ from .utils import ScopeId
 if TYPE_CHECKING:
     from .scope import Scope
 
-
 __all__ = (
     "use_state",
     "use_future",
@@ -22,10 +21,11 @@ __all__ = (
     "use_read_signal",
     "use_write_signal",
     "use_peek_signal",
+    "UseRef",
+    "use_ref"
 )
 
 T = TypeVar("T")
-
 
 def use_state(cx: Scope, func: Callable[[], T]) -> UseState[T]:
     return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, func()))
@@ -149,3 +149,20 @@ def use_peek_signal(cx: Scope, signal: Signal[T]) -> T:
     inner = cx.use_hook(write_hook, cx, signal)
 
     return inner.value
+
+class UseRef(Generic[T]):
+    def __init__(self, cx: Scope):
+        self.cx = cx
+        self._value: T | None = None
+
+    @property
+    def value(self) -> T | None:
+        return self._value
+
+    @value.setter
+    def value(self, new_value: T):
+        self._value = new_value
+        self.cx.schedule_update()
+
+def use_ref(cx: Scope) -> UseRef[T]:
+    return cx.use_hook(lambda: UseRef(cx))

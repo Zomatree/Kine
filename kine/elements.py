@@ -6,6 +6,7 @@ from typing_extensions import Self, Unpack
 
 if TYPE_CHECKING:
     from .core import Node
+    from .hooks import UseRef
 
 __all__ = ("Element",)
 
@@ -18,12 +19,14 @@ class Element:
     name: str
 
     def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
         cls.name = cls.__name__
 
     def __init__(self, **attributes: Unpack[ElementArgs]):
         self.children: tuple[Node, ...] = ()
         self.listeners: dict[str, Callable[[Any], None]] = {}
         self._key = None
+        self.ref: UseRef[Any] | None = None
 
         for name, value in list(attributes.items()):
             if name.startswith("on"):

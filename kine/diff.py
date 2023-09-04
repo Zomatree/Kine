@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from .core import VComponent, VElement, VNode, VPlaceholder, VString
 from .utils import ElementId, ScopeId, find_lis
+from .hooks import UseRef
 
 if TYPE_CHECKING:
     from .scope import Scopes
@@ -61,6 +62,7 @@ class CreateElement:
     type = "CreateElement"
     root: ElementId
     tag: str
+    ref: UseRef[Any] | None
 
 
 @dataclass
@@ -578,7 +580,7 @@ class Diff:
         element_id = self.scopes.reserve_node(node)
         node.id = element_id
 
-        self.mutations.append(CreateElement(element_id, node.tag))
+        self.mutations.append(CreateElement(element_id, node.tag, node.ref))
 
         scope_id = self.current_scope()
 

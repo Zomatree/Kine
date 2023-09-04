@@ -13,7 +13,7 @@ from ...utils import ScopeId
 from ... import ComponentFunction, messages
 from ...dom import VirtualDom
 
-from ..web_elements import *
+from .elements import *
 
 P = ParamSpec("P")
 

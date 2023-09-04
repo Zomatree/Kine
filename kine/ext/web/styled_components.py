@@ -3,7 +3,7 @@ import random
 import string
 
 from kine import *
-from kine.renderers import web_elements
+from kine.renderers.web import elements
 
 T = TypeVar("T")
 
@@ -18,7 +18,7 @@ def styled_component(element: type[Element], styling: str) -> Callable[..., Comp
     STYLES[class_name] = styling
 
     @component
-    def inner_compponent(cx: Scope, **kwargs: Unpack[web_elements.ElementArgs]):
+    def inner_compponent(cx: Scope, **kwargs: Unpack[elements.ElementArgs]):
         existing_classes = kwargs.get("class_", "")
         kwargs["class_"] = f"{class_name} {existing_classes}"
 
@@ -40,4 +40,4 @@ def generate_styling() -> str:
 def styled_component_provider(cx: Scope):
     styling = generate_styling()
 
-    return cx.render(web_elements.div[web_elements.style[styling], *cx.children])
+    return cx.render(elements.div[elements.style[styling], *cx.children])

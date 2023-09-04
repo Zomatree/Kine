@@ -6,7 +6,7 @@ import asyncio
 from ... import ComponentFunction, messages, diff
 from ...dom import VirtualDom, ElementId
 
-from ..web_elements import *
+from .elements import *
 
 P = ParamSpec("P")
 
@@ -93,6 +93,9 @@ class App(Generic[P]):
                 case diff.CreateElement():
                     element = js.document.createElement(mod.tag)
                     self.nodes[mod.root] = element
+
+                    if ref := mod.ref:
+                        ref.value = element
 
                 case diff.CreateTextNode():
                     element = js.document.createTextNode(mod.text)

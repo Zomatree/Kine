@@ -1,7 +1,7 @@
 from typing import TypeVar, TypedDict, Callable, Any, cast
 from typing_extensions import Unpack
 
-from ..elements import Element as BaseElement, CGI
+from ...elements import Element as BaseElement, CGI
 
 __all__: tuple[str, ...] = (
     "InputEvent",

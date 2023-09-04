@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from kine import Node
 
 from ...fullstack import IS_WEB_PLATFORM
-from ...renderers.web_elements import a, div
+from ...renderers.wasm import a, div
 from ... import Scope, component
 
 from .router_impl import Map, Rule

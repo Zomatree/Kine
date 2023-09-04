@@ -9,6 +9,7 @@ from .elements import Element
 if TYPE_CHECKING:
     from .scope import Scope
     from .utils import ElementId, ScopeId
+    from .hooks import UseRef
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -37,7 +38,7 @@ class VString(UserString):
 
 class VElement:
     def __init__(
-        self, tag: str, children: list[VNode], attributes: dict[str, Any], listeners: list[Listener], key: str | None
+        self, tag: str, children: list[VNode], attributes: dict[str, Any], listeners: list[Listener], key: str | None, ref: UseRef[Any] | None
     ):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
@@ -46,6 +47,7 @@ class VElement:
         self.attributes = attributes
         self.listeners = listeners
         self.key = key
+        self.ref = ref
 
     def __repr__(self) -> str:
         return f"<VElement id={self.id!r} tag={self.tag!r} children={self.children!r}>"
