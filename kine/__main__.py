@@ -167,7 +167,7 @@ def build(ctx: click.Context):
 
     cwd = pathlib.Path.cwd()
 
-    (_, config) = get_and_verify_project(cwd)
+    config = get_config(cwd)
 
     ctx.invoke(clean)
 
@@ -253,16 +253,19 @@ def run(ctx: click.Context, port: int, host: str, api: bool):
 def fullstack():
     """Builds and runs the project"""
 
-    (module, _) = get_and_verify_project(pathlib.Path.cwd())
+    module = verify_project(pathlib.Path.cwd())
 
     asyncio.run(module.main())
 
-def get_and_verify_project(path: pathlib.Path) -> tuple[types.ModuleType, dict[str, Any]]:
+def get_config(path: pathlib.Path) -> dict[str, Any]:
     config_file = path / "kine.toml"
 
     if not config_file.exists():
         exit("No kine.toml file found")
 
+    return toml.loads(config_file.read_text())
+
+def verify_project(path: pathlib.Path) -> types.ModuleType:
     try:
         module = importlib.import_module("src")
     except ImportError as e:
@@ -277,6 +280,6 @@ def get_and_verify_project(path: pathlib.Path) -> tuple[types.ModuleType, dict[s
     if not iscoroutinefunction(main):
         exit("Main function is not an async function")
 
-    return (module, toml.loads(config_file.read_text()))
+    return module
 
 cli()
