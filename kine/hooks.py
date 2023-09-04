@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Generic, ParamSpec, TypeVar
 
 from kine.messages import Immediate
 
@@ -22,10 +22,12 @@ __all__ = (
     "use_write_signal",
     "use_peek_signal",
     "UseRef",
-    "use_ref"
+    "use_ref",
+    "use_on_change"
 )
 
 T = TypeVar("T")
+P = ParamSpec("P")
 
 def use_state(cx: Scope, func: Callable[[], T]) -> UseState[T]:
     return cx.use_hook(lambda: UseState[T](cx, cx.hook_idx, func()))
@@ -166,3 +168,10 @@ class UseRef(Generic[T]):
 
 def use_ref(cx: Scope) -> UseRef[T]:
     return cx.use_hook(lambda: UseRef(cx))
+
+def use_on_change(cx: Scope, value: Any, f: Callable[P, None], *args: P.args, **kwargs: P.kwargs):
+    state = use_state(cx, lambda : value)
+
+    if state.value != value:
+        f(*args, **kwargs)
+        state.set(value)
