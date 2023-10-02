@@ -5,6 +5,7 @@ import asyncio
 
 from ... import ComponentFunction, messages, diff
 from ...dom import VirtualDom, ElementId
+from ...utils import ROOT_ELEMENT
 
 from .elements import *
 
@@ -30,7 +31,7 @@ class App(Generic[P]):
         if not main:
             raise Exception("No element with id of main")
 
-        self.nodes: dict[ElementId, js.Element | js.Text] = {ElementId(0): main}
+        self.nodes: dict[ElementId, js.Element | js.Text] = {ROOT_ELEMENT: main}
 
     async def start(self):
         edits = self.dom.rebuild()
@@ -65,7 +66,7 @@ class App(Generic[P]):
                             )
                         )
 
-                mutations = self.dom.work_with_deadline(lambda: False)
+                mutations = self.dom.work_with_deadline()
 
                 for mutation in mutations:
                     self.calculate_diffs(mutation)
@@ -164,7 +165,7 @@ class App(Generic[P]):
 
                         if not g:
                             self.globals[mod.event_name] = GlobalEvent(active=1, callback=proxy_func)
-                            self.nodes[ElementId(0)].addEventListener(mod.event_name, proxy_func)  # type: ignore
+                            self.nodes[ROOT_ELEMENT].addEventListener(mod.event_name, proxy_func)  # type: ignore
                         else:
                             g["active"] += 1
 
@@ -254,7 +255,7 @@ class App(Generic[P]):
                         self.globals[mod.event_name]["active"] -= 1
 
                         if self.globals[mod.event_name]["active"] == 0:
-                            root = self.nodes[ElementId(0)]
+                            root = self.nodes[ROOT_ELEMENT]
 
                             if TYPE_CHECKING:
                                 assert isinstance(root, js.Element)

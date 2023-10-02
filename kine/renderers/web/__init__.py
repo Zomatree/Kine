@@ -9,7 +9,7 @@ from kine import Scope
 import msgpack
 from ...ext.web.cookies import _Cookies, EvalMessage
 
-from ...utils import ScopeId
+from ...utils import ROOT_SCOPE
 from ... import ComponentFunction, messages
 from ...dom import VirtualDom
 
@@ -52,7 +52,7 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
         custom_messages = asyncio.Queue[EvalMessage]()
         dom = WebVDom(app, custom_messages)
 
-        root_scope = dom.scopes.get_scope(ScopeId(0))
+        root_scope = dom.scopes.get_scope(ROOT_SCOPE)
         root_scope.provide_context(_Cookies(cookies))
 
         edits = dom.rebuild()
@@ -107,7 +107,7 @@ async def start_web(app: ComponentFunction[P], headers: str = "", addr: str = "1
                             )
                         )
 
-                mutations = dom.work_with_deadline(lambda: False)
+                mutations = dom.work_with_deadline()
 
                 for mutation in mutations:
                     await ws.send_bytes(msgpack.dumps(mutation.serialize()))

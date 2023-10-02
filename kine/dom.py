@@ -2,23 +2,22 @@ from __future__ import annotations
 
 import asyncio
 from collections import deque
-from typing import Callable, TypeVar, cast
+from typing import TypeVar, cast
 
 from .core import ComponentFunction
 from .diff import AppendChildren, Diff, Mutations
 from .messages import DirtyAll, EventMessage, Immediate, NewTask, ScheduleMessage
 from .scope import Scopes
-from .utils import ElementId, ScopeId, select
+from .utils import ElementId, ScopeId, select, ROOT_SCOPE, ROOT_ELEMENT
 
 T = TypeVar("T")
 
 
 class VirtualDom:
     def __init__(self, app: ComponentFunction[...]):
-        self.scopes = Scopes(app)
-        self.scopes.dom = self
+        self.scopes = Scopes(app, self)
 
-        self.dirty_scopes: set[ScopeId] = {ScopeId(0)}
+        self.dirty_scopes: set[ScopeId] = {ROOT_SCOPE}
         self.messages: asyncio.Queue[ScheduleMessage] = asyncio.Queue()
         self.pending_messages = deque[ScheduleMessage]()
 
@@ -85,7 +84,7 @@ class VirtualDom:
         self.process_all_messages()
 
     def rebuild(self):
-        scope_id = ScopeId(0)
+        scope_id = ROOT_SCOPE
 
         diff_state = Diff(self.scopes)
         self.scopes.run_scope(scope_id)
@@ -104,7 +103,7 @@ class VirtualDom:
 
         return diff_state.mutations
 
-    def work_with_deadline(self, deadline: Callable[[], bool]) -> list[Mutations]:
+    def work_with_deadline(self) -> list[Mutations]:
         mutations: list[Mutations] = []
 
         while self.dirty_scopes:
@@ -124,7 +123,7 @@ class VirtualDom:
                     ran_scopes.add(scope_id)
 
                     self.scopes.run_scope(scope_id)
-                    diff.diff_scope(ElementId(0), scope_id)
+                    diff.diff_scope(ROOT_ELEMENT, scope_id)
 
                     for dirty_scope_id in diff.mutations.dirty_scopes:
                         try:

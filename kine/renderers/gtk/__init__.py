@@ -33,7 +33,7 @@ class App(Adw.Application):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.win.set_child(box)
 
-        self.nodes[ElementId(0)] = box
+        self.nodes[ROOT_ELEMENT] = box
 
         mods = self.dom.rebuild()
         self.calculate_diffs(mods)
@@ -44,7 +44,7 @@ class App(Adw.Application):
     async def bg_loop(self):
         while True:
             await self.dom.wait_for_work()
-            mutations = self.dom.work_with_deadline(lambda: False)
+            mutations = self.dom.work_with_deadline()
 
             for mutation in mutations:
                 self.calculate_diffs(mutation)

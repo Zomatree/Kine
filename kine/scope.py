@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Callable, Coroutine, Optional, ParamSpec,
 from .core import ComponentFunction, Element, Listener, VComponent, VElement, VNode, VPlaceholder, VString
 from .messages import EventMessage, Immediate
 from .elements import Element
-from .utils import ElementId, ScopeId, TaskId
+from .utils import ElementId, ScopeId, TaskId, ROOT_ELEMENT, ROOT_SCOPE
 
 if TYPE_CHECKING:
     from .core import Node
@@ -152,19 +152,18 @@ class Scope:
 
 
 class Scopes:
-    dom: VirtualDom
-
-    def __init__(self, app: ComponentFunction[...]):
+    def __init__(self, app: ComponentFunction[...], dom: VirtualDom):
+        self.dom = dom
         self.scopes: dict[ScopeId, Scope] = {}
-        self.scope_id = ScopeId(0)
-        self.element_id = ElementId(0)
+        self.scope_id = ROOT_SCOPE
+        self.element_id = ROOT_ELEMENT
         self.tasks = TaskQueue()
         self.element_idx = 0
         self.root = VElement("div", [], {}, [], None, None)
         self.nodes: dict[ElementId, VNode] = {}
         self.root.id = self.reserve_node(self.root)
 
-        scope_id = self.new_scope(None, ElementId(0))
+        scope_id = self.new_scope(None, ROOT_ELEMENT)
         scope = self.get_scope(scope_id)
         scope.component = app
 

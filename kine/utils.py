@@ -10,6 +10,8 @@ ScopeId = NewType("ScopeId", int)
 TaskId = NewType("TaskId", tuple[int, ScopeId])
 ElementId = NewType("ElementId", int)
 
+ROOT_ELEMENT = ElementId(0)
+ROOT_SCOPE = ScopeId(0)
 
 async def select(*futures: tuple[T, Awaitable[U]]) -> tuple[T, U]:
     new_futures: list[Task[tuple[T, U]]] = []

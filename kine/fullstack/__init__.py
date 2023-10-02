@@ -25,6 +25,11 @@ IS_WEB_PLATFORM = sys.platform == "emscripten"
 IS_SERVER_PLATFORM = not IS_WEB_PLATFORM
 SERVER_FUNCS: list[Callable[..., Coroutine[Any, Any, Any]]] = []
 
+if IS_SERVER_PLATFORM or TYPE_CHECKING:
+    from aiohttp import web
+    import aiohttp_cors
+
+
 async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.0.1", api_port: int = 8000, web_port: int = 8080):
     global api_url
 
@@ -36,15 +41,12 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
 
     else:
         async def api_runner():
-            from aiohttp import web
-            import aiohttp_cors  # type: ignore
-
             server = web.Application()
             cors = aiohttp_cors.setup(server)
 
             for func in SERVER_FUNCS:
                 async def wrapper(request: web.Request, func: Callable[..., Coroutine[Any, Any, Any]] = func) -> web.Response:
-                    REQUEST.set(request)
+                    token = REQUEST.set(request)
 
                     body = await request.read()
                     args, kwargs = pickle.loads(body)
@@ -53,6 +55,8 @@ async def start_fullstack(app_func: ComponentFunction[P], *, host: str = "127.0.
                         response = {"response": await func(*args, **kwargs), "failed": False}
                     except BaseException as e:
                         response = {"response": e, "failed": True}
+
+                    REQUEST.reset(token)
 
                     return web.Response(body=pickle.dumps(response))
 

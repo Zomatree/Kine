@@ -14,7 +14,6 @@ __all__ = ("Element",)
 class ElementArgs(TypedDict, total=False):
     pass
 
-
 class Element:
     name: str
 
