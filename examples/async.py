@@ -15,7 +15,10 @@ def app(cx: Scope):
 
     future = use_future(cx, http_request)
 
-    return cx.render(div[p["Http request result:"], p[str(future.value) if future.value is not None else "Loading..."]])
+    return div[
+        p["Http request result:"],
+        p[str(future.value) if future.value is not None else "Loading..."]
+    ]
 
 
 asyncio.run(start_web(app()))

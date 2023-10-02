@@ -77,7 +77,7 @@ VNode: TypeAlias = Union[VString, VElement, VPlaceholder, VComponent]
 
 
 class ComponentFunction(Generic[P]):
-    def __init__(self, func: Callable[Concatenate[Scope, P], VNode], *args: P.args, **kwargs: P.kwargs):
+    def __init__(self, func: Callable[Concatenate[Scope, P], Node], *args: P.args, **kwargs: P.kwargs):
         self.func = func
         self.children: tuple[Node, ...] = ()
         self.id: ElementId | None = None
@@ -92,7 +92,7 @@ class ComponentFunction(Generic[P]):
         self._key = key
         return self
 
-    def call(self, scope: Scope) -> VNode:
+    def call(self, scope: Scope) -> Node:
         return self.func(scope, *self.args, **self.kwargs)
 
     def __getitem__(self, children: Node | tuple[Node, ...] | Generator[Node, Any, Any]):
@@ -107,7 +107,7 @@ class ComponentFunction(Generic[P]):
         return self
 
 
-def component(func: Callable[Concatenate[Scope, P], VNode]) -> Callable[P, ComponentFunction[P]]:
+def component(func: Callable[Concatenate[Scope, P], Node]) -> Callable[P, ComponentFunction[P]]:
     @functools.wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs):
         return ComponentFunction(func, *args, **kwargs)

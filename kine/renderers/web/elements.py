@@ -65,7 +65,6 @@ __all__: tuple[str, ...] = (
     "label",
     "legend",
     "li",
-    "main",
     "map_",
     "mark",
     "menu",
@@ -538,10 +537,6 @@ class hr(Element):
     pass
 
 
-class html(Element):
-    pass
-
-
 class i(Element):
     pass
 
@@ -571,10 +566,6 @@ class legend(Element):
 
 
 class li(Element):
-    pass
-
-
-class main(Element):
     pass
 
 
@@ -781,3 +772,10 @@ def el(name: str, /, **kwargs: Unpack[ElementArgs]) -> Element:
     el.name = name
 
     return el
+
+class html:
+    x_p = p
+
+    @staticmethod
+    def rawhtml(text: str) -> str:
+        return text

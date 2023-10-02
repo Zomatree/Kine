@@ -65,7 +65,6 @@ __all__: tuple[str, ...] = (
     "header",
     "hgroup",
     "hr",
-    "html",
     "i",
     "iframe",
     "img",
@@ -74,7 +73,6 @@ __all__: tuple[str, ...] = (
     "label",
     "legend",
     "li",
-    "main",
     "map_",
     "mark",
     "menu",
@@ -549,10 +547,6 @@ class hr(CGI, Element[js.HTMLHRElement]):
     pass
 
 
-class html(CGI, Element[js.HTMLHtmlElement]):
-    pass
-
-
 class i(CGI, Element[js.HTMLElement]):
     pass
 
@@ -582,10 +576,6 @@ class legend(CGI, Element[js.HTMLLegendElement]):
 
 
 class li(CGI, Element[js.HTMLLIElement]):
-    pass
-
-
-class main(CGI, Element[js.HTMLElement]):
     pass
 
 

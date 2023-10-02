@@ -235,9 +235,9 @@ class Scopes:
             if args == component.args and kwargs == component.kwargs and not scope.hooks:
                 node = finished_node
             else:
-                node = component.call(scope)
+                node = scope.render(component.call(scope))
         else:
-            node = component.call(scope)
+            node = scope.render(component.call(scope))
 
         scope.set_wip_frame(node, component.args, component.kwargs)
         scope.next_frame()
