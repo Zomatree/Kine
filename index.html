@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <style>
+        :root {
+            font-family: 'Inter', sans-serif;
+            --font: "Inter"
+        }
+
+        body {
+            margin: 0px;
+        }
+
+        @supports (font-variation-settings: normal) {
+            :root {
+                font-family: 'Inter var', sans-serif;
+                --font: "Inter var", sans-serif
+            }
+        }
+
+        button {
+            background-color: #11ffff;
+            border-width: thin;
+            border-radius: 5px;
+            font-size: 30px;
+            padding: 5px 10px;
+            font-family: var(--font);
+        }
+
+        button:hover {
+            cursor: pointer;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            height: 100vh;
+        }
+
+        #text {
+            text-align: center;
+            margin: 5px;
+            font-size: 25px;
+        }
+    </style>
+    <title>incr_example</title>
+</head>
+<body>
+    <div id="main"></div>
+    <script>
+async function loadModule(pyodide, name) {
+    let res = await fetch(`${document.location.origin}/${name}`);
+    let buff = await res.arrayBuffer();
+
+    pyodide.unpackArchive(buff, "gztar");
+}
+let pyodide;
+
+async function main() {
+    pyodide = await loadPyodide({args:["-OO"]});
+
+    for (mod of ["src.tar.gz", "kine.tar.gz", "typing_extensions.tar.gz"]) {
+        await loadModule(pyodide, mod);
+    };
+
+    pyodide.runPythonAsync("from src import main; await main()")
+}
+main();
+</script>
+</body>
+</html>
