@@ -58,7 +58,7 @@
     <div id="main"></div>
     <script>
 async function loadModule(pyodide, name) {
-    let res = await fetch(`${document.location.origin}/${name}`);
+    let res = await fetch(`${document.location.origin}/Kine/${name}`);
     let buff = await res.arrayBuffer();
 
     pyodide.unpackArchive(buff, "gztar");
