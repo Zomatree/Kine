@@ -9,7 +9,7 @@ Supports both liveview-style server-side rendering and running client side via W
 
 ### Example
 
-See a version of this example running live [here](https://zomatree.github.io/kine)
+See a version of this example running live [here](https://zomatree.github.io/Kine/)
 
 ```py
 import asyncio
