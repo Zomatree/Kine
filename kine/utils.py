@@ -17,9 +17,8 @@ async def select(*futures: tuple[T, Awaitable[U]]) -> tuple[T, U]:
     new_futures: list[Task[tuple[T, U]]] = []
 
     for v, fut in futures:
-
         async def wrapper(i: T, fut: Awaitable[U]):
-            return v, await fut
+            return i, await fut
 
         new_futures.append(asyncio.create_task(wrapper(v, fut)))
 
