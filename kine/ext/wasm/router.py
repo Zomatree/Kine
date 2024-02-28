@@ -51,13 +51,13 @@ def use_router(cx: Scope) -> UseRouter:
 def link(cx: Scope, route: str):
     router = use_router(cx)
 
-    return cx.render(a(
+    return a(
         href=route,
         prevent_default="onclick",
         onclick=lambda _: router.push_route(route)
     )[
         cx.children
-    ])
+    ]
 
 @dataclass
 class Route:
@@ -92,9 +92,9 @@ def router(cx: Scope, *elements: Route | Node, not_found: Node | None = "404: No
         rule, dynamic_parts = match
         router.route_parameters = dynamic_parts
 
-        return cx.render(div[*before, rule.data, *after])
+        return div[*before, rule.data, *after]
 
     else:
         router.route_parameters = {}
 
-        return cx.render(div[*before, not_found, *after])
+        return div[*before, not_found, *after]

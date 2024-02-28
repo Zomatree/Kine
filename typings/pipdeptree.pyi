@@ -93,7 +93,7 @@ class PackageDAG(Mapping[K, list[V]]):
     def filter(self, include: list[str], exclude: list[str]) -> Self:
         ...
 
-    def reverse(self) -> ReversedPackageDAG[V, K]:
+    def reverse(self) -> PackageDAG[V, K]:
         ...
 
     def sort(self) -> Self:

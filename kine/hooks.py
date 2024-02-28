@@ -170,7 +170,7 @@ def use_ref(cx: Scope) -> UseRef[T]:
     return cx.use_hook(lambda: UseRef(cx))
 
 def use_on_change(cx: Scope, value: Any, f: Callable[P, None], *args: P.args, **kwargs: P.kwargs):
-    state = use_state(cx, lambda : value)
+    state = use_state(cx, lambda: value)
 
     if state.value != value:
         f(*args, **kwargs)

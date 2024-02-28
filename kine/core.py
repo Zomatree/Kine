@@ -84,8 +84,8 @@ class ComponentFunction(Generic[P]):
         self.scope_id: ScopeId | None = None
         self.parent_id: ElementId | None = None
         self._key: str | None = None
-        self.args = args
-        self.kwargs = kwargs
+        self.args: tuple[Any, ...] = args
+        self.kwargs: dict[str, Any] = kwargs
         self.memorize: bool = False
 
     def key(self, key: str):
