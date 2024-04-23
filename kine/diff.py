@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 from .core import VComponent, VElement, VNode, VPlaceholder, VString
-from .utils import ElementId, ScopeId, find_lis
 from .hooks import UseRef
+from .utils import ElementId, ScopeId, find_lis
 
 if TYPE_CHECKING:
     from .scope import Scopes
@@ -190,7 +190,7 @@ class Diff:
 
     def diff_element_nodes(self, old: VElement, new: VElement):
         if old is new:
-            return
+            return None
 
         element_id = old.id if old.id is not None else self.scopes.reserve_node(new)
 
@@ -451,11 +451,11 @@ class Diff:
 
         if left_offset == len(old):
             self.create_and_insert_after(parent_id, new[left_offset:], old[-1])
-            return
+            return None
 
         elif left_offset == len(new):
             self.remove_nodes(old[left_offset:], True)
-            return
+            return None
 
         right_offset = 0
 
@@ -474,7 +474,7 @@ class Diff:
 
         if old_len > new_len:
             self.remove_nodes(old[new_len:], True)
-        elif old_len < old_len:
+        elif old_len < new_len:
             self.create_and_insert_after(parent_id, new[old_len:], old[-1])
 
         for new_node, old_node in zip(new, old):
