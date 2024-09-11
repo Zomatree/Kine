@@ -80,7 +80,7 @@ __all__: tuple[str, ...] = (
     "meter",
     "nav",
     "noscript",
-    "object",
+    "_object",
     "ol",
     "optgroup",
     "option",
@@ -606,7 +606,7 @@ class noscript(CGI, Element[js.HTMLElement]):
     pass
 
 
-class object(CGI, Element[js.HTMLObjectElement]):
+class _object(CGI, Element[js.HTMLObjectElement]):
     pass
 
 
