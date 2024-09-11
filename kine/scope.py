@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, Optional, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, ParamSpec, TypeVar
 
-from .core import ComponentFunction, Element, Listener, VComponent, VElement, VNode, VPlaceholder, VString
-from .messages import EventMessage, Immediate
+from .core import ComponentFunction, Listener, VComponent, VElement, VNode, VPlaceholder, VString
 from .elements import Element
-from .utils import ElementId, ScopeId, TaskId, ROOT_ELEMENT, ROOT_SCOPE
+from .messages import EventMessage, Immediate
+from .utils import ROOT_ELEMENT, ROOT_SCOPE, ElementId, ScopeId, TaskId
+from .extras import _ErrorBoundary
 
 if TYPE_CHECKING:
     from .core import Node
@@ -20,7 +21,7 @@ T = TypeVar("T")
 
 class Scope:
     def __init__(
-        self, root_id: int, scope_id: ScopeId, parent_scope: Optional[Scope], height: int, container: ElementId, scopes: Scopes
+        self, root_id: int, scope_id: ScopeId, parent_scope: Scope | None, height: int, container: ElementId, scopes: Scopes
     ):
         self.root_id = root_id
         self.scope_id: ScopeId = scope_id
@@ -36,6 +37,7 @@ class Scope:
         self.hooks: list[Any] = []
         self.hook_idx = 0
         self.children: tuple[Node, ...] = ()
+        self.has_errored: bool = False
 
     def use_hook(self, f: Callable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
         hook_len = len(self.hooks)
@@ -86,14 +88,14 @@ class Scope:
     def wip_frame(self) -> tuple[VNode, tuple[Any, ...], dict[str, Any]]:
         if self.generation & 1 == 0:
             return self.frame_0
-        else:
-            return self.frame_1
+
+        return self.frame_1
 
     def fin_frame(self) -> tuple[VNode, tuple[Any, ...], dict[str, Any]]:
         if self.generation & 1 == 1:
             return self.frame_0
-        else:
-            return self.frame_1
+
+        return self.frame_1
 
     def set_wip_frame(self, node: VNode, args: tuple[Any, ...], kwargs: dict[str, Any]):
         if self.generation & 1 == 0:
@@ -112,8 +114,7 @@ class Scope:
 
     def render(self, node: Node) -> VNode:
         if isinstance(node, str):
-            vnode = VString(node)
-            return vnode
+            return VString(node)
 
         elif isinstance(node, Element):
             nodes: list[VNode] = []
@@ -127,8 +128,7 @@ class Scope:
                 node.ref
             )
 
-            for child in node.children:
-                nodes.append(self.render(child))
+            nodes.extend([self.render(child) for child in node.children])
 
             return vnode
 
@@ -167,7 +167,7 @@ class Scopes:
         scope = self.get_scope(scope_id)
         scope.component = app
 
-    def new_scope(self, parent: Optional[ScopeId], container: ElementId) -> ScopeId:
+    def new_scope(self, parent: ScopeId | None, container: ElementId) -> ScopeId:
         scope_id = self.scope_id
         self.scope_id += 1
 
@@ -213,8 +213,25 @@ class Scopes:
             if isinstance(node, VElement):
                 for listener in node.listeners:
                     if listener.name == event.name:
-                        listener.func(event.data)
-
+                        try:
+                            listener.func(event.data)
+                        except Exception as e:
+                            if current_scope := node.scope_id:
+                                scope = self.get_scope(current_scope)
+                                
+                                try:
+                                    boundary = scope.consume_context(_ErrorBoundary)
+                                except LookupError:
+                                    raise e
+                                
+                                scope.has_errored = True
+                                node = scope.render(boundary.fallback(e).call(scope))
+                                scope.set_wip_frame(node, (e,), {})
+                                
+                                scope.schedule_update()
+                                
+                                break
+                        
                         if not event.bubbles:
                             break
 
@@ -228,18 +245,30 @@ class Scopes:
         assert component is not None
 
         scope.children = component.children
+        
+        if not scope.has_errored:
+            try:
+                if scope.generation != 0 and component.memorize:
+                    finished_node, args, kwargs = scope.fin_frame()
 
-        if scope.generation != 0 and component.memorize:
-            finished_node, args, kwargs = scope.fin_frame()
+                    if args == component.args and kwargs == component.kwargs and not scope.hooks:
+                        node = finished_node
+                    else:
+                        node = scope.render(component.call(scope))
+                else:
+                    node = scope.render(component.call(scope))
+            except Exception as e:
+                try:
+                    boundary = scope.consume_context(_ErrorBoundary)
+                except LookupError:
+                    raise e
 
-            if args == component.args and kwargs == component.kwargs and not scope.hooks:
-                node = finished_node
-            else:
-                node = scope.render(component.call(scope))
-        else:
-            node = scope.render(component.call(scope))
+                scope.has_errored = True
+                node = scope.render(boundary.fallback(e).call(scope))
 
-        scope.set_wip_frame(node, component.args, component.kwargs)
+            scope.set_wip_frame(node, component.args, component.kwargs)
+
+        scope.has_errored = False
         scope.next_frame()
 
 class TaskQueue:

@@ -572,6 +572,8 @@ class Diff:
     def create_string_node(self, node: VString, nodes: list[ElementId]):
         element_id = self.scopes.reserve_node(node)
         node.id = element_id
+        node.scope_id = self.current_scope()
+        
         self.mutations.append(CreateTextNode(element_id, node.data))
         nodes.append(element_id)
 
@@ -583,6 +585,8 @@ class Diff:
         self.mutations.append(CreateElement(element_id, node.tag, node.ref))
 
         scope_id = self.current_scope()
+        
+        node.scope_id = scope_id
 
         for listener in node.listeners:
             self.mutations.append(NewEventListener(listener.name, scope_id, element_id))
@@ -598,6 +602,8 @@ class Diff:
     def create_placeholder_node(self, node: VPlaceholder, nodes: list[ElementId]):
         element_id = self.scopes.reserve_node(node)
         node.id = element_id
+        node.scope_id = self.current_scope()
+        
         self.mutations.append(CreatePlaceholder(element_id))
         nodes.append(element_id)
 
