@@ -1,23 +1,25 @@
 import asyncio
-from inspect import iscoroutinefunction
+import importlib
+import importlib.metadata as import_meta
+import os
+import os.path
+import pathlib
+import shutil
 import subprocess
 import sys
-from typing import Any
-import click
-import pathlib
-import toml
-import shutil
 import tarfile
-import os.path
-import kine
 import types
-import importlib
-import os
-import pipdeptree
-import typing_extensions
-import importlib.metadata as import_meta
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from inspect import iscoroutinefunction
+from typing import Any
 from urllib.parse import urlparse
+
+import click
+import pipdeptree
+import toml
+import typing_extensions
+
+import kine
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -71,8 +73,7 @@ def cli():
 
 @cli.command()
 @click.argument("name")
-@click.pass_context
-def new(ctx: click.Context, name: str):
+def new(name: str):
     """Creates a new project with the foldername of NAME"""
 
     try:
@@ -244,7 +245,7 @@ def run(ctx: click.Context, port: int, host: str, api: bool):
     """Builds and runs the project"""
 
     if api:
-        subprocess.run([sys.executable, "-m", "kine", "fullstack"], env={**os.environ, "KINE_RUN_API": "1"})
+        subprocess.run([sys.executable, "-m", "kine", "fullstack"], env={**os.environ, "KINE_RUN_API": "1"}, check=False)
     else:
         ctx.invoke(build)
         ctx.invoke(serve, port=port, host=host)

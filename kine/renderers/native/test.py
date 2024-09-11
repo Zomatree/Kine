@@ -10,32 +10,32 @@ class MyWindow(Window):
     def decr(self, event: MouseEvent):
         self.i -= 1
 
-    def incr(self, event: MouseEvent):
+    def incr(self, event: MouseEvent) -> None:
         self.i += 1
 
     def nodes(self):
         return Node(
-            layout=Layout(size=(self.width, self.height), align_items=AlignItems.CENTER, justify_content=JustifyContent.CENTER, gap=16),
+            layout=Layout(size=(self.width, self.height), align_items=AlignItems.CENTER, justify_content=JustifyContent.CENTER),
             style=Style(font_size=16, foreground=BLACK)
         ).add(
-            Node(
-                layout=Layout(padding=8),
-                style=Style(background=BLACK, foreground=WHITE),
-                events={
-                    "click": [self.decr]
-                }
-            ).add(
-                TextNode("-1")
-            ),
-            TextNode(str(self.i)),
-            Node(
-                layout=Layout(padding=8),
-                style=Style(background=BLACK, foreground=WHITE),
-                events={
-                    "click": [self.incr]
-                }
-            ).add(
-                TextNode("+1")
+            Node(style=Style(background=RED, border_radius=4), layout=Layout(align_items=AlignItems.CENTER, justify_content=JustifyContent.CENTER, gap=16)).add(
+                Node(
+                    layout=Layout(padding=8),
+                    events={
+                        "click": [self.decr]
+                    }
+                ).add(
+                    TextNode("-1")
+                ),
+                TextNode(str(self.i)),
+                Node(
+                    layout=Layout(padding=8),
+                    events={
+                        "click": [self.incr]
+                    }
+                ).add(
+                    TextNode("+1")
+                )
             )
         )
 

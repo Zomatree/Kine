@@ -2,11 +2,17 @@ from typing import overload
 
 
 class Rect:
-    def __init__(self, left: float, top: float, bottom: float, right: float) -> None:
+    def __init__(self, left: float, top: float, right: float, bottom: float) -> None:
         ...
 
+class RRect:
+    def __init__(self) -> None:
+        ...
+
+    def setRectRadii(self, rect: Rect, radiis: list[tuple[float, float]]) -> None: ...
+
 class Paint:
-    def __init__(self, *, Color: Color) -> None:
+    def __init__(self, *, Color: Color | None = None, AntiAlias: bool | None = None) -> None:
         ...
 
 class Color:

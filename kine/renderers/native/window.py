@@ -1,17 +1,20 @@
 from __future__ import annotations
 
+from typing import Any
+
 import glfw
+import skia
+import stretchable
 from OpenGL import GL
 from stretchable import Style as Layout
-import stretchable
 from stretchable.style import PT
-from typing import Any
-import skia
+import stretchable.node
 
-from .window_utils import glfw_window, skia_surface
-from .node import RootNode, Node
-from .utils import CursorType, WHITE
 from .events import MouseEvent
+from .node import Node, RootNode
+from .utils import WHITE, CursorType
+from .window_utils import glfw_window, skia_surface
+
 
 def draw_node(canvas: Any, node: RootNode):
     node.draw(canvas)
@@ -39,8 +42,6 @@ class Window:
         self.redraw(window)
 
     def on_click(self, window: glfw.Window, button: int, action: int, mods: int):
-        print(button, action, mods)
-
         if button == 0 and action == 1:  # left click, button down
             event = MouseEvent(button, self.cursor_position)
             self.current_nodes.execute_events("click", lambda n: box_contains_pos(n.get_box(relative=False), *self.cursor_position), event)
@@ -52,8 +53,12 @@ class Window:
     def update_node_to_current_state(self, node: RootNode):
         box = node.get_box(relative=False)
 
-        if box_contains_pos(box, *self.cursor_position):
+        in_box = box_contains_pos(box, *self.cursor_position)
+
+        if in_box and node.state.hover is False:
             node.state.hover = True
+        elif not in_box:
+            node.state.hover = False
 
         for child in node:
             assert isinstance(child, RootNode)
@@ -79,7 +84,9 @@ class Window:
 
         node = self.nodes()
         self.current_nodes = node
-        node.compute_layout()
+
+        node.mark_dirty()
+        node.compute_layout((self.width, self.height), use_rounding=True)
 
         self.update_state_from_external(window)
         self.update_node_to_current_state(node)
