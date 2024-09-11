@@ -2,19 +2,19 @@ from __future__ import annotations
 
 import functools
 from collections import UserString
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, ParamSpec, TypeAlias, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, ParamSpec, TypeAlias, TypeVar
 
 from .elements import Element
 
 if TYPE_CHECKING:
+    from .hooks import UseRef
     from .scope import Scope
     from .utils import ElementId, ScopeId
-    from .hooks import UseRef
 
 P = ParamSpec("P")
 T = TypeVar("T")
 
-__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes", "memo")
+__all__ = ("Listener", "VString", "VElement", "VNode", "ComponentFunction", "component", "Component", "Node", "Nodes", "memo", "CallableComponent")
 
 
 class Listener:
@@ -31,6 +31,8 @@ class VString(UserString):
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
         self.key = None
+        self.scope_id: ScopeId | None = None
+        
         super().__init__(value)
 
     def __repr__(self) -> str:
@@ -48,7 +50,8 @@ class VElement:
         self.listeners = listeners
         self.key = key
         self.ref = ref
-
+        self.scope_id: ScopeId | None = None
+        
     def __repr__(self) -> str:
         return f"<VElement id={self.id!r} tag={self.tag!r} children={self.children!r}>"
 
@@ -57,6 +60,7 @@ class VPlaceholder:
         self.id: ElementId | None = None
         self.parent_id: ElementId | None = None
         self.key = None
+        self.scope_id: ScopeId | None = None
 
     def __repr__(self) -> str:
         return f"<VPlaceholder id={self.id!r}>"
@@ -73,7 +77,7 @@ class VComponent:
     def __repr__(self) -> str:
         return f"<VComponent scope_id={self.scope_id!r} func={self.func!r}>"
 
-VNode: TypeAlias = Union[VString, VElement, VPlaceholder, VComponent]
+VNode: TypeAlias = VString | VElement | VPlaceholder | VComponent
 
 
 class ComponentFunction(Generic[P]):
@@ -123,6 +127,7 @@ def memo(func: Callable[P, ComponentFunction[P]]) -> Callable[P, ComponentFuncti
 
     return wrapper
 
+CallableComponent: TypeAlias = Callable[P, ComponentFunction[P]]
 Component: TypeAlias = Callable[Concatenate["Scope", P], "VNode"]
-Node: TypeAlias = Union[str, Element, ComponentFunction[...], None]
+Node: TypeAlias = str | Element | ComponentFunction[...] | None
 Nodes: TypeAlias = list[Node]

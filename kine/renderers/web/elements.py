@@ -1,10 +1,27 @@
-from typing import TypeVar, TypedDict, Callable, Any, cast
+from typing import Any, Callable, TypedDict, TypeVar, cast
+
 from typing_extensions import Unpack
 
-from ...elements import Element as BaseElement, CGI
+from ...elements import CGI
+from ...elements import Element as BaseElement
 
 __all__: tuple[str, ...] = (
     "InputEvent",
+    "CopyEvent",
+    "CompositionEvent",
+    "KeyEvent",
+    "FocusEvent",
+    "ChangeEvent",
+    "MouseEvent",
+    "PointerEvent",
+    "SelectEvent",
+    "TouchEvent",
+    "ScrollEvent",
+    "WheelEvent",
+    "AnimationEvent",
+    "TransitionEvent",
+    "VideoEvent",
+    "ToggleEvent",
     "ElementArgs",
     "Element",
     "base",
@@ -72,7 +89,7 @@ __all__: tuple[str, ...] = (
     "meter",
     "nav",
     "noscript",
-    "object",
+    "_object",
     "ol",
     "optgroup",
     "option",
@@ -207,6 +224,7 @@ class WheelEvent(TypedDict):
     delta_y: int
     delta_z: int
     delta_move: int
+
 class AnimationEvent(TypedDict):
     animation_name: str
     elapsed_time: int
@@ -596,7 +614,7 @@ class noscript(Element):
     pass
 
 
-class object(Element):
+class _object(Element):
     pass
 
 
